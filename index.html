@@ -7,290 +7,173 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        :root {
-            --primary-red: #E63946;
-            --dark-red: #D13440;
-            --light-red: #fef2f2;
-        }
-        
         body { 
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            background: linear-gradient(135deg, #E63946 0%, #f87171 100%);
             min-height: 100vh;
-            overflow-x: hidden;
         }
-        
-        .login-container {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        
-        .background-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(230, 57, 70, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
-        }
-        
         .login-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: 28rem;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
-
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-            .login-card {
-                margin: 0.5rem;
-                padding: 1.5rem !important;
-                border-radius: 1rem;
-            }
-            
-            .login-container {
-                padding: 0.5rem;
-                align-items: flex-start;
-                padding-top: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 1.25rem !important;
-            }
-            
-            .logo-glow {
-                width: 5rem !important;
-                height: 5rem !important;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .login-card {
-                padding: 1rem !important;
-            }
-            
-            .feature-card {
-                padding: 0.75rem !important;
-            }
-        }
-        
-        .logo-glow {
-            filter: drop-shadow(0 0 20px rgba(230, 57, 70, 0.4));
-        }
-        
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-red) 0%, #f97316 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #E63946 0%, #f97316 100%);
+            transition: all 0.3s ease;
         }
-        
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(230, 57, 70, 0.4);
-        }
-        
-        .input-field {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid #e5e7eb;
-        }
-        
-        .input-field:focus {
-            border-color: var(--primary-red);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
-        }
-        
-        .feature-card {
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            backdrop-filter: blur(10px);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .security-badge {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-        
-        @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Touch improvements for mobile */
-        @media (max-width: 768px) {
-            .btn-primary, .input-field, .feature-card {
-                -webkit-tap-highlight-color: transparent;
-            }
-            
-            .input-field {
-                font-size: 16px; /* Prevent zoom on iOS */
-            }
-        }
-
-        /* Landscape mode improvements */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .login-container {
-                padding: 1rem;
-                align-items: flex-start;
-            }
-            
-            .login-card {
-                margin: 1rem 0;
-            }
+            box-shadow: 0 10px 25px rgba(230, 57, 70, 0.4);
         }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <!-- Background Animation -->
-        <div class="background-animation"></div>
-        
-        <!-- Floating Elements - Hidden on mobile -->
-        <div class="hidden sm:block fixed top-10 left-10 w-6 h-6 bg-red-500 rounded-full opacity-20 floating" style="animation-delay: 0s;"></div>
-        <div class="hidden sm:block fixed top-20 right-20 w-8 h-8 bg-orange-500 rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
-        <div class="hidden sm:block fixed bottom-20 left-20 w-10 h-10 bg-red-400 rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
-        
-        <div class="login-card p-8 relative z-10">
-            <!-- Security Badge -->
-            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <div class="security-badge text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1 shadow-lg">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="hidden xs:inline">Aman & Terenkripsi</span>
-                    <span class="xs:hidden">Aman</span>
-                </div>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="login-card w-full max-w-md p-8">
+        <!-- Logo & Header -->
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <i class="fas fa-tasks text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900">TugasMerah</h1>
+            <p class="text-gray-600 mt-2">Manage tugas dengan semangat merah!</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-user mr-2 text-red-500"></i>Username
+                </label>
+                <input type="text" id="username" required 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                       placeholder="Masukkan username" value="KhoirulWangi">
             </div>
 
-            <!-- Logo & Header -->
-            <div class="text-center mb-6 sm:mb-8 pt-4">
-                <div class="logo-glow w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-2xl">
-                    <i class="fas fa-tasks text-white text-2xl sm:text-3xl"></i>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-2">TugasMerah</h1>
-                <p class="text-gray-600 text-sm sm:text-base">Manage tugas dengan semangat merah!</p>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-lock mr-2 text-red-500"></i>Password
+                </label>
+                <input type="password" id="password" required 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                       placeholder="Masukkan password" value="2509">
             </div>
 
-            <!-- Login Form -->
-            <form id="loginForm" class="space-y-4 sm:space-y-6">
+            <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl font-semibold text-lg">
+                <i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard
+            </button>
+        </form>
+
+        <!-- Demo Info -->
+        <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-200">
+            <div class="flex items-start space-x-3">
+                <i class="fas fa-info-circle text-red-500 mt-1"></i>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
-                        <i class="fas fa-user mr-2 text-red-500"></i>Username
-                    </label>
-                    <div class="relative">
-                        <input type="text" id="username" required 
-                               class="input-field w-full px-4 py-3 sm:py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 pl-12 text-sm sm:text-base"
-                               placeholder="Masukkan username"
-                               autocomplete="username">
-                        <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
-                        <i class="fas fa-lock mr-2 text-red-500"></i>Password
-                    </label>
-                    <div class="relative">
-                        <input type="password" id="password" required 
-                               class="input-field w-full px-4 py-3 sm:py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 pl-12 pr-12 text-sm sm:text-base"
-                               placeholder="Masukkan password"
-                               autocomplete="current-password">
-                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <button type="button" class="password-toggle absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500" onclick="togglePassword()">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Remember Me & Forgot Password -->
-                <div class="flex items-center justify-between text-sm">
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="rememberMe" class="w-4 h-4 text-red-500 rounded focus:ring-red-500">
-                        <span class="text-gray-600">Ingat saya</span>
-                    </label>
-                    <a href="#" class="text-red-500 hover:text-red-600 font-medium transition duration-200 text-sm">
-                        Lupa password?
-                    </a>
-                </div>
-
-                <button type="submit" id="loginBtn" class="btn-primary w-full text-white py-3 sm:py-4 rounded-2xl font-semibold text-base sm:text-lg relative overflow-hidden">
-                    <span class="relative z-10">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard
-                    </span>
-                </button>
-            </form>
-
-            <!-- Demo Info -->
-            <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl border border-red-200">
-                <div class="flex items-start space-x-2 sm:space-x-3">
-                    <i class="fas fa-info-circle text-red-500 mt-0.5 sm:mt-1 text-sm sm:text-base"></i>
-                    <div class="flex-1">
-                        <p class="text-xs sm:text-sm font-semibold text-red-800">Login untuk KhoirulWangi</p>
-                        <p class="text-xs text-red-600 mt-1 sm:mt-2 space-y-1">
-                            <span class="block">Username: <strong>KhoirulWangi</strong></span>
-                            <span class="block">Password: <strong>2509</strong></span>
-                        </p>
-                    </div>
+                    <p class="text-sm font-medium text-red-800">Login untuk KhoirulWangi</p>
+                    <p class="text-xs text-red-600 mt-1">
+                        Username: <strong>KhoirulWangi</strong><br>
+                        Password: <strong>2509</strong>
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- Features Preview -->
-            <div class="mt-6 sm:mt-8 grid grid-cols-2 gap-2 sm:gap-4">
-                <div class="feature-card p-2 sm:p-4 rounded-xl border border-gray-200 text-center group cursor-pointer">
-                    <i class="fas fa-bell text-red-500 text-lg sm:text-xl mb-1 sm:mb-2 group-hover:scale-110 transition duration-200"></i>
-                    <p class="text-xs font-semibold text-gray-700">Smart Reminder</p>
-                </div>
-                <div class="feature-card p-2 sm:p-4 rounded-xl border border-gray-200 text-center group cursor-pointer">
-                    <i class="fas fa-mobile-alt text-red-500 text-lg sm:text-xl mb-1 sm:mb-2 group-hover:scale-110 transition duration-200"></i>
-                    <p class="text-xs font-semibold text-gray-700">Fully Responsive</p>
-                </div>
-                <div class="feature-card p-2 sm:p-4 rounded-xl border border-gray-200 text-center group cursor-pointer">
-                    <i class="fas fa-chart-line text-red-500 text-lg sm:text-xl mb-1 sm:mb-2 group-hover:scale-110 transition duration-200"></i>
-                    <p class="text-xs font-semibold text-gray-700">Progress Tracking</p>
-                </div>
-                <div class="feature-card p-2 sm:p-4 rounded-xl border border-gray-200 text-center group cursor-pointer">
-                    <i class="fas fa-paper-plane text-red-500 text-lg sm:text-xl mb-1 sm:mb-2 group-hover:scale-110 transition duration-200"></i>
-                    <p class="text-xs font-semibold text-gray-700">Telegram Sync</p>
-                </div>
+        <!-- Features Preview -->
+        <div class="mt-8 grid grid-cols-2 gap-4 text-center">
+            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                <i class="fas fa-bell text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Reminder</p>
             </div>
-
-            <!-- Footer -->
-            <div class="mt-6 sm:mt-8 text-center">
-                <p class="text-xs text-gray-500">
-                    &copy; 2024 TugasMerah. All rights reserved.
-                </p>
+            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                <i class="fas fa-mobile-alt text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Responsive</p>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                <i class="fas fa-chart-line text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Progress</p>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                <i class="fas fa-paper-plane text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Telegram</p>
             </div>
         </div>
     </div>
 
     <script>
-        // JavaScript code remains the same as previous version
-        // ... (sama seperti sebelumnya)
+        // Supabase Configuration - GANTI DENGAN URL DAN KEY ANDA
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Auth System dengan Supabase
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Show loading
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Check user in database
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+                
+                if (error || !users) {
+                    throw new Error('Login gagal');
+                }
+                
+                // Login berhasil
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('user_id', users.id);
+                
+                showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+                
+            } catch (error) {
+                showNotification('Username atau password salah!', 'error');
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Redirect if already logged in
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>
