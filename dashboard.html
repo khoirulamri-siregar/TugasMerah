@@ -78,19 +78,6 @@
             }
         }
         
-        /* Animation for motivation text */
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        
-        .typewriter {
-            overflow: hidden;
-            border-right: 2px solid var(--red-primary);
-            white-space: nowrap;
-            animation: typewriter 3s steps(40) 1s 1 normal both;
-        }
-        
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
@@ -107,6 +94,10 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: #d32f2f;
+        }
+
+        .page-hidden {
+            display: none;
         }
     </style>
 </head>
@@ -127,19 +118,19 @@
             
             <!-- Navigation -->
             <nav class="space-y-2 flex-1">
-                <a href="#" class="nav-active flex items-center space-x-3 p-3 rounded-xl transition-all duration-200">
+                <a href="#" class="nav-active flex items-center space-x-3 p-3 rounded-xl transition-all duration-200" onclick="showPage('dashboard')">
                     <i class="fas fa-home w-5"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200">
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('calendar')">
                     <i class="fas fa-calendar-alt w-5"></i>
                     <span>Kalender</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200">
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('notes')">
                     <i class="fas fa-sticky-note w-5"></i>
                     <span>Catatan</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200">
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('settings')">
                     <i class="fas fa-cog w-5"></i>
                     <span>Pengaturan</span>
                 </a>
@@ -160,10 +151,10 @@
             <!-- User Info -->
             <div class="mt-4 p-3 bg-gray-50 rounded-lg flex items-center space-x-3">
                 <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                    <span class="text-white text-sm font-bold">S</span>
+                    <span class="text-white text-sm font-bold">K</span>
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900" id="sidebarUsername">Student</p>
+                    <p class="text-sm font-medium text-gray-900" id="sidebarUsername">KhoirulWangi</p>
                     <p class="text-xs text-gray-500">Pelajar</p>
                 </div>
                 <button onclick="logout()" class="text-gray-400 hover:text-red-500 transition duration-200">
@@ -181,7 +172,7 @@
                 <div class="flex justify-between items-center py-4">
                     <!-- Welcome & Date -->
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Hai, <span id="welcomeName">Student</span>! 👋</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">Hai, <span id="welcomeName">KhoirulWangi</span>! 👋</h1>
                         <p class="text-gray-600" id="currentDate">Mengambil tanggal...</p>
                     </div>
                     
@@ -204,122 +195,238 @@
             </div>
         </header>
 
-        <!-- Motivation Section -->
-        <div class="px-4 sm:px-6 lg:px-8 py-6">
-            <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <h2 class="text-xl font-bold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
-                        <p class="text-red-100 opacity-90" id="motivationSubtext">Kamu bisa, satu per satu tugas akan selesai!</p>
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard-page">
+            <!-- Motivation Section -->
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h2 class="text-xl font-bold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
+                            <p class="text-red-100 opacity-90" id="motivationSubtext">Kamu bisa, satu per satu tugas akan selesai!</p>
+                        </div>
+                        <div class="text-4xl ml-4">💪</div>
                     </div>
-                    <div class="text-4xl ml-4">💪</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Quick Actions & Reminder -->
-        <div class="px-4 sm:px-6 lg:px-8 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Reminder Harian -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-bold text-gray-900 flex items-center">
-                            <i class="fas fa-bell text-red-500 mr-2"></i>Reminder Hari Ini
+            <!-- Quick Actions & Reminder -->
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Reminder Harian -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center">
+                                <i class="fas fa-bell text-red-500 mr-2"></i>Reminder Hari Ini
+                            </h3>
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full" id="reminderCount">0 tugas</span>
+                        </div>
+                        <div id="dailyReminder" class="space-y-3 max-h-40 overflow-y-auto">
+                            <!-- Reminder items will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Progress Ringan -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
                         </h3>
-                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full" id="reminderCount">0 tugas</span>
+                        <div class="flex items-center justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#e5e7eb"
+                                        stroke-width="3"/>
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#E63946"
+                                        stroke-width="3"
+                                        stroke-dasharray="0, 100"
+                                        id="weeklyProgress"/>
+                                    <text x="18" y="20.5" text-anchor="middle" font-size="8" fill="#E63946" font-weight="bold" id="weeklyProgressText">0%</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                     </div>
-                    <div id="dailyReminder" class="space-y-3 max-h-40 overflow-y-auto">
-                        <div class="text-center py-4">
-                            <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
-                            <p class="text-sm text-gray-600">Tidak ada tugas untuk hari ini!</p>
+
+                    <!-- Kalender Mini -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-calendar text-red-500 mr-2"></i>Kalender Mini
+                        </h3>
+                        <div class="text-center mb-4">
+                            <div class="text-3xl font-bold text-red-500 mb-2" id="currentDay">...</div>
+                            <div class="text-lg font-medium text-gray-900 mb-1" id="currentMonth">...</div>
+                            <div class="text-sm text-gray-600" id="currentYear">...</div>
+                        </div>
+                        <div class="mt-4 space-y-2" id="upcomingDeadlines">
+                            <!-- Upcoming deadlines -->
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Progress Ringan -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
-                    </h3>
-                    <div class="flex items-center justify-center">
-                        <div class="relative w-32 h-32">
-                            <svg class="w-full h-full" viewBox="0 0 36 36">
-                                <path d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#e5e7eb"
-                                    stroke-width="3"/>
-                                <path d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#E63946"
-                                    stroke-width="3"
-                                    stroke-dasharray="0, 100"
-                                    id="weeklyProgress"/>
-                                <text x="18" y="20.5" text-anchor="middle" font-size="8" fill="#E63946" font-weight="bold" id="weeklyProgressText">0%</text>
-                            </svg>
-                        </div>
+            <!-- Task List Section -->
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-tasks text-red-500 mr-3"></i>Daftar Tugas Aktif
+                    </h2>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <select id="filterPriority" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
+                            <option value="all">Semua Prioritas</option>
+                            <option value="high">Tinggi</option>
+                            <option value="medium">Sedang</option>
+                            <option value="low">Rendah</option>
+                        </select>
+                        <select id="filterStatus" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
+                            <option value="all">Semua Status</option>
+                            <option value="active">Aktif</option>
+                            <option value="completed">Selesai</option>
+                        </select>
                     </div>
-                    <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                 </div>
 
-                <!-- Kalender Mini -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-calendar text-red-500 mr-2"></i>Kalender Mini
-                    </h3>
-                    <div class="text-center mb-4">
-                        <div class="text-3xl font-bold text-red-500 mb-2" id="currentDay">...</div>
-                        <div class="text-lg font-medium text-gray-900 mb-1" id="currentMonth">...</div>
-                        <div class="text-sm text-gray-600" id="currentYear">...</div>
+                <div id="taskList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Tasks will be loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-12">
+                    <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tasks text-red-500 text-3xl"></i>
                     </div>
-                    <div class="mt-4 space-y-2" id="upcomingDeadlines">
-                        <div class="text-center py-2">
-                            <p class="text-sm text-gray-600">Tidak ada deadline mendatang</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Belum ada tugas nih!</h3>
+                    <p class="text-gray-600 mb-6">Yuk tambah tugas pertama kamu dan mulai kerjakan dengan semangat! 🔥</p>
+                    <button onclick="openAddTaskModal()" class="floating-btn text-white px-6 py-3 rounded-xl font-medium inline-flex items-center space-x-2">
+                        <i class="fas fa-plus"></i>
+                        <span>Tambah Tugas Pertama</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KALENDER PAGE -->
+        <div id="calendar-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender Akademik
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Calendar View -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Kalender Bulan Ini</h3>
+                            <div class="text-center py-8">
+                                <i class="fas fa-calendar-day text-4xl text-red-500 mb-4"></i>
+                                <p class="text-gray-600">Fitur kalender lengkap akan segera hadir!</p>
+                                <p class="text-sm text-gray-500 mt-2">Sementara, gunakan reminder di dashboard</p>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Events -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Deadline Mendatang</h3>
+                            <div id="calendar-deadlines" class="space-y-3">
+                                <!-- Upcoming deadlines will be loaded here -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Task List Section -->
-        <div class="px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h2 class="text-2xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-tasks text-red-500 mr-3"></i>Daftar Tugas Aktif
-                </h2>
-                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <select id="filterPriority" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                        <option value="all">Semua Prioritas</option>
-                        <option value="high">Tinggi</option>
-                        <option value="medium">Sedang</option>
-                        <option value="low">Rendah</option>
-                    </select>
-                    <select id="filterStatus" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                        <option value="all">Semua Status</option>
-                        <option value="active">Aktif</option>
-                        <option value="completed">Selesai</option>
-                    </select>
+        <!-- CATATAN PAGE -->
+        <div id="notes-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan Cepat
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Add Note -->
+                        <div class="space-y-4">
+                            <textarea id="quickNote" rows="8" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                placeholder="Tulis catatan penting di sini..."></textarea>
+                            <button onclick="saveQuickNote()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 w-full">
+                                <i class="fas fa-save mr-2"></i>Simpan Catatan
+                            </button>
+                        </div>
+
+                        <!-- Saved Notes -->
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Catatan Tersimpan</h3>
+                            <div id="savedNotes" class="space-y-3 max-h-96 overflow-y-auto">
+                                <!-- Saved notes will appear here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div id="taskList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                <!-- Tasks will be loaded here -->
-            </div>
+        <!-- PENGATURAN PAGE -->
+        <div id="settings-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-cog text-red-500 mr-3"></i>Pengaturan
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Account Settings -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Akun</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Username</span>
+                                    <span class="font-medium">KhoirulWangi</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Status</span>
+                                    <span class="font-medium text-green-600">Aktif</span>
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Empty State -->
-            <div id="emptyState" class="text-center py-12">
-                <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-tasks text-red-500 text-3xl"></i>
+                        <!-- App Settings -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Aplikasi</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Notifikasi</span>
+                                    <button class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm">Aktif</button>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Tema</span>
+                                    <span class="font-medium">Merah</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo Info -->
+                    <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                            <div>
+                                <p class="text-sm font-medium text-blue-800">Info Demo</p>
+                                <p class="text-xs text-blue-600 mt-1">
+                                    Untuk versi production, fitur ini akan terintegrasi dengan backend database dan Telegram API.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Belum ada tugas nih!</h3>
-                <p class="text-gray-600 mb-6">Yuk tambah tugas pertama kamu dan mulai kerjakan dengan semangat! 🔥</p>
-                <button onclick="openAddTaskModal()" class="floating-btn text-white px-6 py-3 rounded-xl font-medium inline-flex items-center space-x-2">
-                    <i class="fas fa-plus"></i>
-                    <span>Tambah Tugas Pertama</span>
-                </button>
             </div>
         </div>
     </div>
@@ -327,22 +434,22 @@
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-nav md:hidden">
         <div class="flex justify-around items-center py-3">
-            <a href="#" class="nav-active flex flex-col items-center p-2 rounded-xl transition duration-200">
+            <a href="#" class="nav-active flex flex-col items-center p-2 rounded-xl transition duration-200" onclick="showPage('dashboard')">
                 <i class="fas fa-home mb-1"></i>
                 <span class="text-xs">Home</span>
             </a>
-            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200">
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('calendar')">
                 <i class="fas fa-calendar-alt mb-1"></i>
                 <span class="text-xs">Kalender</span>
             </a>
             <button onclick="openAddTaskModal()" class="floating-btn w-12 h-12 rounded-full flex items-center justify-center text-white -mt-6">
                 <i class="fas fa-plus text-lg"></i>
             </button>
-            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200">
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('notes')">
                 <i class="fas fa-sticky-note mb-1"></i>
                 <span class="text-xs">Catatan</span>
             </a>
-            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200">
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('settings')">
                 <i class="fas fa-cog mb-1"></i>
                 <span class="text-xs">Settings</span>
             </a>
@@ -421,7 +528,7 @@
                 return null;
             }
             return {
-                username: localStorage.getItem('username') || 'Student',
+                username: localStorage.getItem('username') || 'KhoirulWangi',
                 id: 1
             };
         }
@@ -430,8 +537,62 @@
             if (confirm('Yakin ingin logout?')) {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
+                localStorage.removeItem('tasks');
+                localStorage.removeItem('quickNotes');
                 window.location.href = 'index.html';
             }
+        }
+
+        // ==================== PAGE NAVIGATION ====================
+        function showPage(pageName) {
+            // Hide all pages
+            document.getElementById('dashboard-page').classList.add('page-hidden');
+            document.getElementById('calendar-page').classList.add('page-hidden');
+            document.getElementById('notes-page').classList.add('page-hidden');
+            document.getElementById('settings-page').classList.add('page-hidden');
+            
+            // Show selected page
+            document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
+            
+            // Update navigation active states
+            updateNavigationActiveState(pageName);
+            
+            // Load page-specific content
+            if (pageName === 'calendar') {
+                loadCalendarDeadlines();
+            } else if (pageName === 'notes') {
+                loadSavedNotes();
+            }
+        }
+
+        function updateNavigationActiveState(activePage) {
+            // Desktop navigation
+            const desktopItems = document.querySelectorAll('nav a');
+            desktopItems.forEach(item => {
+                const linkText = item.querySelector('span').textContent.toLowerCase();
+                if ((activePage === 'dashboard' && linkText === 'dashboard') ||
+                    (activePage === 'calendar' && linkText === 'kalender') ||
+                    (activePage === 'notes' && linkText === 'catatan') ||
+                    (activePage === 'settings' && linkText === 'pengaturan')) {
+                    item.classList.add('nav-active');
+                } else {
+                    item.classList.remove('nav-active');
+                }
+            });
+
+            // Mobile navigation
+            const mobileItems = document.querySelectorAll('.mobile-nav a');
+            mobileItems.forEach(item => {
+                const linkText = item.querySelector('.text-xs').textContent.toLowerCase();
+                if ((activePage === 'dashboard' && linkText === 'home') ||
+                    (activePage === 'calendar' && linkText === 'kalender') ||
+                    (activePage === 'notes' && linkText === 'catatan') ||
+                    (activePage === 'settings' && linkText === 'settings')) {
+                    item.classList.add('nav-active');
+                } else {
+                    item.classList.remove('nav-active');
+                }
+            });
         }
 
         // ==================== TASK MANAGEMENT ====================
@@ -683,12 +844,12 @@
                     
                     <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
                         <div class="flex items-center space-x-2">
-                            <i class="fas fa-calendar ${isOverdue(task.deadline) && !task.completed ? 'text-red-500' : ''}"></i>
-                            <span class="${isOverdue(task.deadline) && !task.completed ? 'text-red-500 font-medium' : ''}">
+                            <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500' : ''}"></i>
+                            <span class="${isOverdue(task) ? 'text-red-500 font-medium' : ''}">
                                 ${formatDate(task.deadline)}
                             </span>
                         </div>
-                        ${isOverdue(task.deadline) && !task.completed ? 
+                        ${isOverdue(task) ? 
                             '<span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Terlambat</span>' : 
                             ''
                         }
@@ -716,8 +877,8 @@
             `).join('');
         }
 
-        function isOverdue(deadline) {
-            return new Date(deadline) < new Date() && !task.completed;
+        function isOverdue(task) {
+            return new Date(task.deadline) < new Date() && !task.completed;
         }
 
         function formatDate(dateString) {
@@ -774,6 +935,93 @@
             }
         }
 
+        // ==================== NOTES SYSTEM ====================
+        function saveQuickNote() {
+            const noteText = document.getElementById('quickNote').value;
+            if (noteText.trim()) {
+                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+                const newNote = {
+                    id: Date.now(),
+                    text: noteText,
+                    created: new Date().toISOString()
+                };
+                notes.push(newNote);
+                localStorage.setItem('quickNotes', JSON.stringify(notes));
+                
+                document.getElementById('quickNote').value = '';
+                loadSavedNotes();
+                showNotification('📝 Catatan disimpan!', 'success');
+            }
+        }
+
+        function loadSavedNotes() {
+            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            const notesContainer = document.getElementById('savedNotes');
+            
+            if (notes.length === 0) {
+                notesContainer.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <i class="fas fa-sticky-note text-2xl mb-2"></i>
+                        <p>Belum ada catatan</p>
+                    </div>
+                `;
+            } else {
+                notesContainer.innerHTML = notes.map(note => `
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-gray-700 flex-1">${note.text}</p>
+                            <button onclick="deleteNote(${note.id})" class="text-red-500 hover:text-red-700 ml-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500">${new Date(note.created).toLocaleDateString('id-ID')}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function deleteNote(noteId) {
+            let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            notes = notes.filter(note => note.id !== noteId);
+            localStorage.setItem('quickNotes', JSON.stringify(notes));
+            loadSavedNotes();
+            showNotification('Catatan dihapus', 'warning');
+        }
+
+        // ==================== CALENDAR SYSTEM ====================
+        function loadCalendarDeadlines() {
+            const upcomingTasks = tasks.filter(task => 
+                new Date(task.deadline) > new Date() && !task.completed
+            ).slice(0, 5);
+            
+            const calendarContainer = document.getElementById('calendar-deadlines');
+            
+            if (upcomingTasks.length === 0) {
+                calendarContainer.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <i class="fas fa-calendar-check text-2xl mb-2"></i>
+                        <p>Tidak ada deadline mendatang</p>
+                    </div>
+                `;
+            } else {
+                calendarContainer.innerHTML = upcomingTasks.map(task => `
+                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">${task.title}</p>
+                            <p class="text-sm text-gray-600">${formatDate(task.deadline)}</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            task.priority === 'high' ? 'bg-red-100 text-red-800' : 
+                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-green-100 text-green-800'
+                        }">
+                            ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
         // ==================== MODAL FUNCTIONS ====================
         function openAddTaskModal() {
             document.getElementById('addTaskModal').classList.remove('hidden');
@@ -824,9 +1072,16 @@
             }, 3000);
         }
 
-        // ==================== FILTER EVENT LISTENERS ====================
+        // ==================== EVENT LISTENERS ====================
         document.getElementById('filterPriority').addEventListener('change', renderTasks);
         document.getElementById('filterStatus').addEventListener('change', renderTasks);
+
+        // Close modal when clicking outside
+        document.getElementById('addTaskModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddTaskModal();
+            }
+        });
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -843,13 +1098,6 @@
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('addTaskModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAddTaskModal();
-            }
         });
     </script>
 </body>
