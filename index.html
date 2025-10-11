@@ -7,10 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
         body { 
             font-family: 'Poppins', sans-serif;
@@ -22,6 +18,7 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.8s ease-out;
         }
         .btn-primary {
             background: linear-gradient(135deg, #E63946 0%, #f97316 100%);
@@ -31,13 +28,86 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(230, 57, 70, 0.4);
         }
+        .feature-card {
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .login-card {
+                margin: 1rem;
+                padding: 1.5rem !important;
+                border-radius: 16px;
+            }
+            .logo-container {
+                width: 80px !important;
+                height: 80px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.25rem !important;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-card {
+                padding: 1rem !important;
+                margin: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
+    <!-- Animated Background Elements -->
+    <div class="fixed top-10 left-10 w-6 h-6 bg-white rounded-full opacity-20 floating" style="animation-delay: 0s;"></div>
+    <div class="fixed top-20 right-20 w-8 h-8 bg-white rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
+    <div class="fixed bottom-20 left-20 w-10 h-10 bg-white rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
+    
     <div class="login-card w-full max-w-md p-8">
         <!-- Logo & Header -->
         <div class="text-center mb-8">
-            <div class="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div class="logo-container w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg floating">
                 <i class="fas fa-tasks text-white text-3xl"></i>
             </div>
             <h1 class="text-3xl font-bold text-gray-900">TugasMerah</h1>
@@ -52,7 +122,7 @@
                 </label>
                 <input type="text" id="username" required 
                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
-                       placeholder="Masukkan username" value="KhoirulWangi">
+                       placeholder="Masukkan username">
             </div>
 
             <div>
@@ -61,7 +131,7 @@
                 </label>
                 <input type="password" id="password" required 
                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
-                       placeholder="Masukkan password" value="2509">
+                       placeholder="Masukkan password">
             </div>
 
             <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl font-semibold text-lg">
@@ -84,20 +154,20 @@
         </div>
 
         <!-- Features Preview -->
-        <div class="mt-8 grid grid-cols-2 gap-4 text-center">
-            <div class="p-3 bg-white rounded-lg border border-gray-200">
+        <div class="mt-8 grid grid-cols-2 gap-4 text-center feature-grid">
+            <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.1s">
                 <i class="fas fa-bell text-red-500 text-lg mb-2"></i>
                 <p class="text-xs font-medium text-gray-700">Reminder</p>
             </div>
-            <div class="p-3 bg-white rounded-lg border border-gray-200">
+            <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.2s">
                 <i class="fas fa-mobile-alt text-red-500 text-lg mb-2"></i>
                 <p class="text-xs font-medium text-gray-700">Responsive</p>
             </div>
-            <div class="p-3 bg-white rounded-lg border border-gray-200">
+            <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.3s">
                 <i class="fas fa-chart-line text-red-500 text-lg mb-2"></i>
                 <p class="text-xs font-medium text-gray-700">Progress</p>
             </div>
-            <div class="p-3 bg-white rounded-lg border border-gray-200">
+            <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.4s">
                 <i class="fas fa-paper-plane text-red-500 text-lg mb-2"></i>
                 <p class="text-xs font-medium text-gray-700">Telegram</p>
             </div>
@@ -105,14 +175,7 @@
     </div>
 
     <script>
-        // Supabase Configuration - GANTI DENGAN URL DAN KEY ANDA
-        const SUPABASE_URL = 'https://your-project.supabase.co';
-        const SUPABASE_ANON_KEY = 'your-anon-key';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Auth System dengan Supabase
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -123,34 +186,21 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
             submitBtn.disabled = true;
             
-            try {
-                // Check user in database
-                const { data: users, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .single();
-                
-                if (error || !users) {
-                    throw new Error('Login gagal');
+            // Simulate API call
+            setTimeout(() => {
+                if (username === 'KhoirulWangi' && password === '2509') {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', username);
+                    showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    showNotification('Username atau password salah!', 'error');
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
+                    submitBtn.disabled = false;
                 }
-                
-                // Login berhasil
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                localStorage.setItem('user_id', users.id);
-                
-                showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-                
-            } catch (error) {
-                showNotification('Username atau password salah!', 'error');
-                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
-                submitBtn.disabled = false;
-            }
+            }, 1500);
         });
 
         function showNotification(message, type) {
@@ -174,6 +224,14 @@
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'dashboard.html';
         }
+
+        // Add animation delays to feature cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+            });
+        });
     </script>
 </body>
 </html>
