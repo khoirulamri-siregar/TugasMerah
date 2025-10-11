@@ -7,143 +7,55 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
-            --primary-red: #E63946;
-            --dark-red: #D13440;
-            --light-red: #fef2f2;
-            --sidebar-width: 280px;
+            --red-primary: #E63946;
+            --red-light: #fef2f2;
+            --white: #FFFFFF;
         }
         
         body { 
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             min-height: 100vh;
-            color: #f8fafc;
-        }
-        
-        .glass-sidebar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         
         .nav-active {
-            background: linear-gradient(135deg, var(--primary-red) 0%, #f97316 100%);
+            background: var(--red-primary);
             color: white;
-            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3);
+            transform: scale(1.05);
         }
         
         .task-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
         .task-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
-        .progress-gradient {
-            background: linear-gradient(90deg, var(--primary-red) 0%, #f97316 100%);
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        .progress-bar {
+            background: linear-gradient(90deg, var(--red-primary) 0%, #f97316 100%);
+            transition: width 0.5s ease-in-out;
         }
         
         .floating-btn {
-            background: linear-gradient(135deg, var(--primary-red) 0%, #f97316 100%);
-            box-shadow: 0 15px 35px rgba(230, 57, 70, 0.4);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--red-primary);
+            box-shadow: 0 10px 25px -5px rgba(230, 57, 70, 0.4);
+            transition: all 0.3s ease;
         }
         
         .floating-btn:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 25px 50px rgba(230, 57, 70, 0.6);
-        }
-        
-        .motivation-glow {
-            background: linear-gradient(135deg, var(--primary-red) 0%, #f97316 100%);
-            box-shadow: 0 20px 40px rgba(230, 57, 70, 0.3);
-        }
-        
-        /* Animations */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .animate-slide-in {
-            animation: slideIn 0.6s ease-out;
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--primary-red) 0%, #f97316 100%);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--dark-red);
-        }
-        
-        .page-hidden {
-            display: none;
-        }
-        
-        .stats-card {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stats-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-        
-        .stats-card:hover::before {
-            left: 100%;
+            transform: scale(1.1);
+            box-shadow: 0 20px 40px -10px rgba(230, 57, 70, 0.6);
         }
         
         /* Mobile Bottom Navigation */
@@ -153,9 +65,8 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(20px);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                background: white;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
                 z-index: 50;
             }
             
@@ -164,83 +75,72 @@
             }
         }
         
-        /* Loading animations */
-        .loading-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .page-hidden {
+            display: none;
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        /* Progress ring animation */
-        .progress-ring {
-            transition: stroke-dashoffset 0.8s ease-in-out;
+
+        .telegram-setup {
+            background: linear-gradient(135deg, #0088cc 0%, #00aced 100%);
         }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- Desktop Sidebar -->
-    <div class="hidden md:flex fixed left-0 top-0 h-full w-80 glass-sidebar z-40">
+    <div class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200">
         <div class="w-full p-6 flex flex-col">
             <!-- Logo -->
-            <div class="flex items-center space-x-4 mb-8 animate-slide-in">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl">
-                    <i class="fas fa-tasks text-white text-xl"></i>
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-tasks text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-white">TugasMerah</h1>
-                    <p class="text-red-300 text-sm font-medium">#SemangatBelajar</p>
+                    <h1 class="text-xl font-bold text-gray-900">TugasMerah</h1>
+                    <p class="text-xs text-red-500 font-medium">#SemangatBelajar</p>
                 </div>
             </div>
             
             <!-- Navigation -->
             <nav class="space-y-2 flex-1">
-                <a href="#" class="nav-active flex items-center space-x-4 p-4 rounded-2xl transition-all duration-300 animate-slide-in" onclick="showPage('dashboard')" style="animation-delay: 0.1s">
-                    <i class="fas fa-home w-6 text-center"></i>
-                    <span class="font-semibold">Dashboard</span>
+                <a href="#" class="nav-active flex items-center space-x-3 p-3 rounded-xl transition-all duration-200" onclick="showPage('dashboard')">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 p-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 animate-slide-in" onclick="showPage('calendar')" style="animation-delay: 0.2s">
-                    <i class="fas fa-calendar-alt w-6 text-center"></i>
-                    <span class="font-semibold">Kalender</span>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('calendar')">
+                    <i class="fas fa-calendar-alt w-5"></i>
+                    <span>Kalender</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 p-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 animate-slide-in" onclick="showPage('notes')" style="animation-delay: 0.3s">
-                    <i class="fas fa-sticky-note w-6 text-center"></i>
-                    <span class="font-semibold">Catatan</span>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('notes')">
+                    <i class="fas fa-sticky-note w-5"></i>
+                    <span>Catatan</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 p-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 animate-slide-in" onclick="showPage('analytics')" style="animation-delay: 0.4s">
-                    <i class="fas fa-chart-bar w-6 text-center"></i>
-                    <span class="font-semibold">Analytics</span>
-                </a>
-                <a href="#" class="flex items-center space-x-4 p-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 animate-slide-in" onclick="showPage('settings')" style="animation-delay: 0.5s">
-                    <i class="fas fa-cog w-6 text-center"></i>
-                    <span class="font-semibold">Pengaturan</span>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('settings')">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Pengaturan</span>
                 </a>
             </nav>
             
             <!-- Progress Section -->
-            <div class="glass-card p-6 mb-6 animate-slide-in" style="animation-delay: 0.6s">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-sm font-semibold text-gray-300">Progress Hari Ini</span>
-                    <span class="text-sm font-bold text-red-400" id="progressPercent">0%</span>
+            <div class="mt-auto p-4 bg-red-50 rounded-xl border border-red-200">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-700">Progress Hari Ini</span>
+                    <span class="text-sm font-bold text-red-500" id="progressPercent">0%</span>
                 </div>
-                <div class="w-full bg-gray-600/30 rounded-full h-3">
-                    <div class="progress-gradient h-3 rounded-full" id="progressBar" style="width: 0%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="progress-bar h-2 rounded-full" id="progressBar" style="width: 0%"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-3" id="progressText">Mulai kerjakan tugasmu!</p>
+                <p class="text-xs text-gray-600 mt-2" id="progressText">Mulai kerjakan tugasmu!</p>
             </div>
             
             <!-- User Info -->
-            <div class="glass-card p-4 flex items-center space-x-4 animate-slide-in" style="animation-delay: 0.7s">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <span class="text-white font-bold text-lg">K</span>
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg flex items-center space-x-3">
+                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">K</span>
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-semibold text-white" id="sidebarUsername">KhoirulWangi</p>
-                    <p class="text-xs text-gray-400">Pelajar Premium</p>
+                    <p class="text-sm font-medium text-gray-900" id="sidebarUsername">KhoirulWangi</p>
+                    <p class="text-xs text-gray-500">Pelajar</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition duration-300 p-2 hover:bg-white/10 rounded-lg">
+                <button onclick="logout()" class="text-gray-400 hover:text-red-500 transition duration-200">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -248,30 +148,30 @@
     </div>
 
     <!-- Main Content -->
-    <div class="md:ml-80 main-content">
+    <div class="md:ml-64 main-content">
         <!-- Header -->
-        <header class="glass-card mx-6 mt-6 sticky top-6 z-30 animate-fade-in">
-            <div class="px-6 py-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+            <div class="px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
                     <!-- Welcome & Date -->
                     <div>
-                        <h1 class="text-3xl font-bold text-white">Hai, <span id="welcomeName" class="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">KhoirulWangi</span>! 👋</h1>
-                        <p class="text-gray-400" id="currentDate">Mengambil tanggal...</p>
+                        <h1 class="text-2xl font-bold text-gray-900">Hai, <span id="welcomeName">KhoirulWangi</span>! 👋</h1>
+                        <p class="text-gray-600" id="currentDate">Mengambil tanggal...</p>
                     </div>
                     
                     <!-- Quick Stats -->
-                    <div class="flex items-center space-x-6">
-                        <div class="stats-card text-center p-4 rounded-2xl min-w-20">
-                            <div class="text-2xl font-bold text-red-400" id="todayTasks">0</div>
-                            <div class="text-xs text-gray-400">Tugas Hari Ini</div>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-red-500" id="todayTasks">0</div>
+                            <div class="text-xs text-gray-500">Tugas Hari Ini</div>
                         </div>
-                        <div class="stats-card text-center p-4 rounded-2xl min-w-20">
-                            <div class="text-2xl font-bold text-orange-400" id="upcomingTasks">0</div>
-                            <div class="text-xs text-gray-400">Mendatang</div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="upcomingTasks">0</div>
+                            <div class="text-xs text-gray-500">Mendatang</div>
                         </div>
-                        <div class="stats-card text-center p-4 rounded-2xl min-w-20">
-                            <div class="text-2xl font-bold text-green-400" id="completedCount">0</div>
-                            <div class="text-xs text-gray-400">Selesai</div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-500" id="completedCount">0</div>
+                            <div class="text-xs text-gray-500">Selesai</div>
                         </div>
                     </div>
                 </div>
@@ -279,78 +179,96 @@
         </header>
 
         <!-- DASHBOARD PAGE -->
-        <div id="dashboard-page" class="animate-fade-in">
+        <div id="dashboard-page">
             <!-- Motivation Section -->
-            <div class="px-6 py-6">
-                <div class="motivation-glow rounded-2xl p-8 text-white animate-slide-in">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
-                            <h2 class="text-2xl font-bold mb-3" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
-                            <p class="text-red-100 opacity-90 text-lg" id="motivationSubtext">Kamu bisa, satu per satu tugas akan selesai!</p>
+                            <h2 class="text-xl font-bold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
+                            <p class="text-red-100 opacity-90" id="motivationSubtext">Kamu bisa, satu per satu tugas akan selesai!</p>
                         </div>
-                        <div class="text-5xl ml-6 animate-bounce" style="animation-duration: 2s">💪</div>
+                        <div class="text-4xl ml-4">💪</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Stats & Charts -->
-            <div class="px-6 py-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            <!-- Quick Actions & Reminder -->
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Reminder Harian -->
-                    <div class="glass-card p-6 lg:col-span-2 xl:col-span-1">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="font-bold text-white text-lg flex items-center">
-                                <i class="fas fa-bell text-red-400 mr-3"></i>Reminder Hari Ini
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center">
+                                <i class="fas fa-bell text-red-500 mr-2"></i>Reminder Hari Ini
                             </h3>
-                            <span class="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-400/20" id="reminderCount">0 tugas</span>
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full" id="reminderCount">0 tugas</span>
                         </div>
-                        <div id="dailyReminder" class="space-y-4 max-h-60 overflow-y-auto">
+                        <div id="dailyReminder" class="space-y-3 max-h-40 overflow-y-auto">
                             <!-- Reminder items will be loaded here -->
                         </div>
                     </div>
 
-                    <!-- Progress Chart -->
-                    <div class="glass-card p-6 lg:col-span-2 xl:col-span-1">
-                        <h3 class="font-bold text-white text-lg mb-6 flex items-center">
-                            <i class="fas fa-chart-line text-red-400 mr-3"></i>Progress Mingguan
+                    <!-- Progress Ringan -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
                         </h3>
                         <div class="flex items-center justify-center">
-                            <div class="relative w-40 h-40">
-                                <canvas id="weeklyProgressChart"></canvas>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="text-2xl font-bold text-white" id="weeklyProgressText">0%</span>
-                                </div>
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#e5e7eb"
+                                        stroke-width="3"/>
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#E63946"
+                                        stroke-width="3"
+                                        stroke-dasharray="0, 100"
+                                        id="weeklyProgress"/>
+                                    <text x="18" y="20.5" text-anchor="middle" font-size="8" fill="#E63946" font-weight="bold" id="weeklyProgressText">0%</text>
+                                </svg>
                             </div>
                         </div>
-                        <p class="text-center text-gray-400 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
+                        <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                     </div>
 
-                    <!-- Activity Stats -->
-                    <div class="glass-card p-6 lg:col-span-2 xl:col-span-2">
-                        <h3 class="font-bold text-white text-lg mb-6 flex items-center">
-                            <i class="fas fa-chart-bar text-red-400 mr-3"></i>Aktivitas 7 Hari Terakhir
+                    <!-- Kalender Mini -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-calendar text-red-500 mr-2"></i>Kalender Mini
                         </h3>
-                        <div class="h-48">
-                            <canvas id="activityChart"></canvas>
+                        <div class="text-center mb-4">
+                            <div class="text-3xl font-bold text-red-500 mb-2" id="currentDay">...</div>
+                            <div class="text-lg font-medium text-gray-900 mb-1" id="currentMonth">...</div>
+                            <div class="text-sm text-gray-600" id="currentYear">...</div>
+                        </div>
+                        <div class="mt-4 space-y-2" id="upcomingDeadlines">
+                            <!-- Upcoming deadlines -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Task List Section -->
-            <div class="px-6 py-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <h2 class="text-3xl font-bold text-white flex items-center">
-                        <i class="fas fa-tasks text-red-400 mr-4"></i>Daftar Tugas Aktif
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-tasks text-red-500 mr-3"></i>Daftar Tugas Aktif
                     </h2>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <select id="filterPriority" class="glass-card border-0 text-white px-4 py-3 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200">
+                        <select id="filterPriority" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
                             <option value="all">Semua Prioritas</option>
                             <option value="high">Tinggi</option>
                             <option value="medium">Sedang</option>
                             <option value="low">Rendah</option>
                         </select>
-                        <select id="filterStatus" class="glass-card border-0 text-white px-4 py-3 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200">
+                        <select id="filterStatus" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
                             <option value="all">Semua Status</option>
                             <option value="active">Aktif</option>
                             <option value="completed">Selesai</option>
@@ -363,13 +281,13 @@
                 </div>
 
                 <!-- Empty State -->
-                <div id="emptyState" class="text-center py-16 animate-fade-in">
-                    <div class="w-32 h-32 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-400/20">
-                        <i class="fas fa-tasks text-red-400 text-5xl"></i>
+                <div id="emptyState" class="text-center py-12">
+                    <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tasks text-red-500 text-3xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">Belum ada tugas nih!</h3>
-                    <p class="text-gray-400 text-lg mb-8">Yuk tambah tugas pertama kamu dan mulai kerjakan dengan semangat! 🔥</p>
-                    <button onclick="openAddTaskModal()" class="floating-btn text-white px-8 py-4 rounded-2xl font-semibold text-lg inline-flex items-center space-x-3">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Belum ada tugas nih!</h3>
+                    <p class="text-gray-600 mb-6">Yuk tambah tugas pertama kamu dan mulai kerjakan dengan semangat! 🔥</p>
+                    <button onclick="openAddTaskModal()" class="floating-btn text-white px-6 py-3 rounded-xl font-medium inline-flex items-center space-x-2">
                         <i class="fas fa-plus"></i>
                         <span>Tambah Tugas Pertama</span>
                     </button>
@@ -378,28 +296,28 @@
         </div>
 
         <!-- KALENDER PAGE -->
-        <div id="calendar-page" class="page-hidden animate-fade-in">
-            <div class="px-6 py-6">
-                <div class="glass-card p-8">
-                    <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
-                        <i class="fas fa-calendar-alt text-red-400 mr-4"></i>Kalender Akademik
+        <div id="calendar-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender Akademik
                     </h2>
                     
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Calendar View -->
-                        <div class="xl:col-span-2">
-                            <div class="bg-white/5 rounded-2xl p-6">
-                                <h3 class="text-xl font-bold text-white mb-6">Kalender Bulan Ini</h3>
-                                <div id="calendar" class="text-center">
-                                    <!-- Calendar will be generated here -->
-                                </div>
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Kalender Bulan Ini</h3>
+                            <div class="text-center py-8">
+                                <i class="fas fa-calendar-day text-4xl text-red-500 mb-4"></i>
+                                <p class="text-gray-600">Fitur kalender lengkap akan segera hadir!</p>
+                                <p class="text-sm text-gray-500 mt-2">Sementara, gunakan reminder di dashboard</p>
                             </div>
                         </div>
 
                         <!-- Upcoming Events -->
-                        <div class="bg-white/5 rounded-2xl p-6">
-                            <h3 class="text-xl font-bold text-white mb-6">Deadline Mendatang</h3>
-                            <div id="calendar-deadlines" class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Deadline Mendatang</h3>
+                            <div id="calendar-deadlines" class="space-y-3">
                                 <!-- Upcoming deadlines will be loaded here -->
                             </div>
                         </div>
@@ -409,28 +327,28 @@
         </div>
 
         <!-- CATATAN PAGE -->
-        <div id="notes-page" class="page-hidden animate-fade-in">
-            <div class="px-6 py-6">
-                <div class="glass-card p-8">
-                    <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
-                        <i class="fas fa-sticky-note text-red-400 mr-4"></i>Catatan Cepat
+        <div id="notes-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan Cepat
                     </h2>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Add Note -->
-                        <div class="space-y-6">
-                            <textarea id="quickNote" rows="12" 
-                                class="glass-card w-full px-6 py-4 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0"
-                                placeholder="Tulis catatan penting di sini... ✨"></textarea>
-                            <button onclick="saveQuickNote()" class="floating-btn text-white px-8 py-4 rounded-2xl font-semibold transition duration-200 w-full">
-                                <i class="fas fa-save mr-3"></i>Simpan Catatan
+                        <div class="space-y-4">
+                            <textarea id="quickNote" rows="8" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                placeholder="Tulis catatan penting di sini..."></textarea>
+                            <button onclick="saveQuickNote()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 w-full">
+                                <i class="fas fa-save mr-2"></i>Simpan Catatan
                             </button>
                         </div>
 
                         <!-- Saved Notes -->
                         <div>
-                            <h3 class="text-xl font-bold text-white mb-6">Catatan Tersimpan</h3>
-                            <div id="savedNotes" class="space-y-4 max-h-96 overflow-y-auto">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Catatan Tersimpan</h3>
+                            <div id="savedNotes" class="space-y-3 max-h-96 overflow-y-auto">
                                 <!-- Saved notes will appear here -->
                             </div>
                         </div>
@@ -439,138 +357,68 @@
             </div>
         </div>
 
-        <!-- ANALYTICS PAGE -->
-        <div id="analytics-page" class="page-hidden animate-fade-in">
-            <div class="px-6 py-6">
-                <div class="glass-card p-8">
-                    <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
-                        <i class="fas fa-chart-bar text-red-400 mr-4"></i>Analytics & Statistik
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                        <!-- Productivity Chart -->
-                        <div class="bg-white/5 rounded-2xl p-6">
-                            <h3 class="text-lg font-bold text-white mb-4">Produktivitas Harian</h3>
-                            <div class="h-64">
-                                <canvas id="productivityChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Priority Distribution -->
-                        <div class="bg-white/5 rounded-2xl p-6">
-                            <h3 class="text-lg font-bold text-white mb-4">Distribusi Prioritas</h3>
-                            <div class="h-64">
-                                <canvas id="priorityChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Monthly Stats -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="stats-card text-center p-6 rounded-2xl">
-                            <div class="text-3xl font-bold text-red-400 mb-2" id="monthlyCompleted">0</div>
-                            <div class="text-gray-400">Selesai Bulan Ini</div>
-                        </div>
-                        <div class="stats-card text-center p-6 rounded-2xl">
-                            <div class="text-3xl font-bold text-orange-400 mb-2" id="monthlyPending">0</div>
-                            <div class="text-gray-400">Pending</div>
-                        </div>
-                        <div class="stats-card text-center p-6 rounded-2xl">
-                            <div class="text-3xl font-bold text-yellow-400 mb-2" id="averageCompletion">0h</div>
-                            <div class="text-gray-400">Rata-rata Waktu</div>
-                        </div>
-                        <div class="stats-card text-center p-6 rounded-2xl">
-                            <div class="text-3xl font-bold text-green-400 mb-2" id="successRate">0%</div>
-                            <div class="text-gray-400">Tingkat Kesuksesan</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- PENGATURAN PAGE -->
-        <div id="settings-page" class="page-hidden animate-fade-in">
-            <div class="px-6 py-6">
-                <div class="glass-card p-8">
-                    <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
-                        <i class="fas fa-cog text-red-400 mr-4"></i>Pengaturan
+        <div id="settings-page" class="page-hidden">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-cog text-red-500 mr-3"></i>Pengaturan
                     </h2>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Account Settings -->
-                        <div class="space-y-6">
-                            <h3 class="text-2xl font-bold text-white">Akun</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Username</span>
-                                        <p class="text-white font-semibold">KhoirulWangi</p>
-                                    </div>
-                                    <i class="fas fa-user text-red-400"></i>
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Akun</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Username</span>
+                                    <span class="font-medium">KhoirulWangi</span>
                                 </div>
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Status</span>
-                                        <p class="text-green-400 font-semibold">Aktif</p>
-                                    </div>
-                                    <i class="fas fa-check-circle text-green-400"></i>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Bergabung Sejak</span>
-                                        <p class="text-white font-semibold" id="joinDate">-</p>
-                                    </div>
-                                    <i class="fas fa-calendar-plus text-blue-400"></i>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Status</span>
+                                    <span class="font-medium text-green-600">Aktif</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- App Settings -->
-                        <div class="space-y-6">
-                            <h3 class="text-2xl font-bold text-white">Aplikasi</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Notifikasi</span>
-                                        <p class="text-white font-semibold">Aktif</p>
+                        <!-- Telegram Settings -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Integrasi Telegram</h3>
+                            <div class="telegram-setup rounded-xl p-6 text-white">
+                                <h4 class="font-bold mb-3 flex items-center">
+                                    <i class="fab fa-telegram mr-2"></i>Setup Bot Telegram
+                                </h4>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-robot"></i>
+                                        <span>Buat bot di @BotFather</span>
                                     </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-12 h-6 bg-gray-600 peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                                    </label>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Tema</span>
-                                        <p class="text-white font-semibold">Dark Red</p>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-key"></i>
+                                        <span>Dapatkan bot token</span>
                                     </div>
-                                    <i class="fas fa-palette text-purple-400"></i>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                                    <div>
-                                        <span class="text-gray-300">Bahasa</span>
-                                        <p class="text-white font-semibold">Indonesia</p>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-id-card"></i>
+                                        <span>Dapatkan chat ID</span>
                                     </div>
-                                    <i class="fas fa-language text-yellow-400"></i>
                                 </div>
+                                <button onclick="setupTelegram()" class="mt-4 bg-white text-blue-500 px-4 py-2 rounded-lg font-medium w-full">
+                                    Setup Telegram Bot
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Security Section -->
-                    <div class="mt-8 pt-8 border-t border-white/10">
-                        <h3 class="text-2xl font-bold text-white mb-6">Keamanan</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <button onclick="changePassword()" class="p-4 bg-white/5 rounded-2xl text-left hover:bg-white/10 transition duration-200 border border-white/10 hover:border-red-400/30">
-                                <i class="fas fa-key text-red-400 text-lg mb-2"></i>
-                                <p class="font-semibold text-white">Ubah Password</p>
-                                <p class="text-gray-400 text-sm">Perbarui password akun Anda</p>
-                            </button>
-                            <button onclick="exportData()" class="p-4 bg-white/5 rounded-2xl text-left hover:bg-white/10 transition duration-200 border border-white/10 hover:border-green-400/30">
-                                <i class="fas fa-download text-green-400 text-lg mb-2"></i>
-                                <p class="font-semibold text-white">Export Data</p>
-                                <p class="text-gray-400 text-sm">Download semua data tugas</p>
-                            </button>
+                    <!-- Database Info -->
+                    <div class="mt-8 p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-database text-green-500 mt-1"></i>
+                            <div>
+                                <p class="text-sm font-medium text-green-800">Database Supabase Active</p>
+                                <p class="text-xs text-green-600 mt-1">
+                                    Data tersimpan di cloud dan sync otomatis antar devices!
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -580,108 +428,105 @@
 
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-nav md:hidden">
-        <div class="flex justify-around items-center py-4">
-            <a href="#" class="nav-active flex flex-col items-center p-3 rounded-2xl transition duration-300" onclick="showPage('dashboard')">
-                <i class="fas fa-home mb-1 text-sm"></i>
-                <span class="text-xs font-semibold">Home</span>
+        <div class="flex justify-around items-center py-3">
+            <a href="#" class="nav-active flex flex-col items-center p-2 rounded-xl transition duration-200" onclick="showPage('dashboard')">
+                <i class="fas fa-home mb-1"></i>
+                <span class="text-xs">Home</span>
             </a>
-            <a href="#" class="flex flex-col items-center p-3 rounded-2xl text-gray-300 hover:text-white transition duration-300" onclick="showPage('calendar')">
-                <i class="fas fa-calendar-alt mb-1 text-sm"></i>
-                <span class="text-xs font-semibold">Kalender</span>
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('calendar')">
+                <i class="fas fa-calendar-alt mb-1"></i>
+                <span class="text-xs">Kalender</span>
             </a>
-            <button onclick="openAddTaskModal()" class="floating-btn w-14 h-14 rounded-2xl flex items-center justify-center text-white -mt-8">
-                <i class="fas fa-plus text-xl"></i>
+            <button onclick="openAddTaskModal()" class="floating-btn w-12 h-12 rounded-full flex items-center justify-center text-white -mt-6">
+                <i class="fas fa-plus text-lg"></i>
             </button>
-            <a href="#" class="flex flex-col items-center p-3 rounded-2xl text-gray-300 hover:text-white transition duration-300" onclick="showPage('analytics')">
-                <i class="fas fa-chart-bar mb-1 text-sm"></i>
-                <span class="text-xs font-semibold">Stats</span>
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('notes')">
+                <i class="fas fa-sticky-note mb-1"></i>
+                <span class="text-xs">Catatan</span>
             </a>
-            <a href="#" class="flex flex-col items-center p-3 rounded-2xl text-gray-300 hover:text-white transition duration-300" onclick="showPage('settings')">
-                <i class="fas fa-cog mb-1 text-sm"></i>
-                <span class="text-xs font-semibold">Settings</span>
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('settings')">
+                <i class="fas fa-cog mb-1"></i>
+                <span class="text-xs">Settings</span>
             </a>
         </div>
     </div>
 
     <!-- Add Task Modal -->
-    <div id="addTaskModal" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4 backdrop-blur-sm">
-        <div class="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/20">
-            <div class="p-8 border-b border-white/10 sticky top-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-t-3xl">
-                <h3 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-plus-circle text-red-400 mr-3"></i>Tambah Tugas Baru
+    <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-plus-circle text-red-500 mr-2"></i>Tambah Tugas Baru
                 </h3>
             </div>
             
-            <form id="taskForm" onsubmit="addTask(event)" class="p-8 space-y-6">
+            <form id="taskForm" onsubmit="addTask(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-lg font-semibold text-white mb-4 flex items-center">
-                        <i class="fas fa-pencil-alt text-red-400 mr-3"></i>Judul Tugas
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-pencil-alt text-red-500 mr-2"></i>Judul Tugas
                     </label>
                     <input type="text" id="taskTitle" required 
-                           class="glass-card w-full px-6 py-4 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0"
-                           placeholder="Apa yang perlu dikerjakan? ✨">
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                           placeholder="Apa yang perlu dikerjakan?">
                 </div>
                 
                 <div>
-                    <label class="block text-lg font-semibold text-white mb-4 flex items-center">
-                        <i class="fas fa-align-left text-red-400 mr-3"></i>Deskripsi
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-align-left text-red-500 mr-2"></i>Deskripsi
                     </label>
-                    <textarea id="taskDescription" rows="4"
-                              class="glass-card w-full px-6 py-4 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0"
-                              placeholder="Detail tugas (opsional) 📝"></textarea>
+                    <textarea id="taskDescription" rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                              placeholder="Detail tugas (opsional)"></textarea>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-lg font-semibold text-white mb-4 flex items-center">
-                            <i class="fas fa-calendar-day text-red-400 mr-3"></i>Deadline
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-day text-red-500 mr-2"></i>Deadline
                         </label>
                         <input type="date" id="taskDeadline" required
-                               class="glass-card w-full px-6 py-4 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0">
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
                     </div>
                     
                     <div>
-                        <label class="block text-lg font-semibold text-white mb-4 flex items-center">
-                            <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>Prioritas
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Prioritas
                         </label>
                         <select id="taskPriority" 
-                                class="glass-card w-full px-6 py-4 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0">
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
                             <option value="low">🟢 Rendah</option>
                             <option value="medium" selected>🟡 Sedang</option>
                             <option value="high">🔴 Tinggi</option>
                         </select>
                     </div>
                 </div>
-
-                <div>
-                    <label class="block text-lg font-semibold text-white mb-4 flex items-center">
-                        <i class="fas fa-tags text-red-400 mr-3"></i>Kategori
-                    </label>
-                    <select id="taskCategory"
-                            class="glass-card w-full px-6 py-4 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 border-0">
-                        <option value="academic">🎓 Akademik</option>
-                        <option value="personal">💼 Personal</option>
-                        <option value="work">💻 Pekerjaan</option>
-                        <option value="other">📌 Lainnya</option>
-                    </select>
-                </div>
             </form>
             
-            <div class="flex justify-end space-x-4 p-8 border-t border-white/10 sticky bottom-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-b-3xl">
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white rounded-b-2xl">
                 <button type="button" onclick="closeAddTaskModal()" 
-                        class="px-8 py-4 text-gray-300 hover:text-white font-semibold transition duration-200 rounded-2xl border border-white/20 hover:border-white/40 hover:bg-white/5">
+                        class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
                     Batal
                 </button>
                 <button type="submit" form="taskForm"
-                        class="floating-btn text-white px-8 py-4 rounded-2xl font-semibold transition duration-200">
-                    <i class="fas fa-save mr-3"></i>Simpan Tugas
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-save mr-2"></i>Simpan Tugas
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== ENHANCED AUTHENTICATION ====================
+        // ==================== CONFIGURATION ====================
+        // GANTI DENGAN SUPABASE URL DAN KEY ANDA
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Telegram Bot Configuration - GANTI DENGAN BOT ANDA
+        const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';
+
+        // ==================== AUTHENTICATION ====================
         function checkAuth() {
             if (localStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'index.html';
@@ -689,76 +534,49 @@
             }
             return {
                 username: localStorage.getItem('username') || 'KhoirulWangi',
-                id: 1,
-                joinDate: localStorage.getItem('joinDate') || new Date().toISOString()
+                id: localStorage.getItem('user_id') || '1'
             };
         }
 
         function logout() {
             if (confirm('Yakin ingin logout?')) {
-                // Clear all sensitive data
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
-                localStorage.removeItem('rememberMe');
-                localStorage.removeItem('lastLogin');
-                
-                // Redirect to login
+                localStorage.removeItem('user_id');
                 window.location.href = 'index.html';
             }
         }
 
-        // ==================== ENHANCED PAGE NAVIGATION ====================
+        // ==================== PAGE NAVIGATION ====================
         function showPage(pageName) {
             // Hide all pages
-            const pages = ['dashboard', 'calendar', 'notes', 'analytics', 'settings'];
-            pages.forEach(page => {
-                const element = document.getElementById(`${page}-page`);
-                if (element) {
-                    element.classList.add('page-hidden');
-                }
-            });
+            document.getElementById('dashboard-page').classList.add('page-hidden');
+            document.getElementById('calendar-page').classList.add('page-hidden');
+            document.getElementById('notes-page').classList.add('page-hidden');
+            document.getElementById('settings-page').classList.add('page-hidden');
             
             // Show selected page
-            const selectedPage = document.getElementById(`${pageName}-page`);
-            if (selectedPage) {
-                selectedPage.classList.remove('page-hidden');
-                selectedPage.classList.add('animate-fade-in');
-            }
+            document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
             
             // Update navigation active states
             updateNavigationActiveState(pageName);
             
             // Load page-specific content
-            loadPageContent(pageName);
-        }
-
-        function loadPageContent(pageName) {
-            switch(pageName) {
-                case 'calendar':
-                    loadCalendar();
-                    loadCalendarDeadlines();
-                    break;
-                case 'notes':
-                    loadSavedNotes();
-                    break;
-                case 'analytics':
-                    loadAnalytics();
-                    break;
-                case 'settings':
-                    loadSettings();
-                    break;
+            if (pageName === 'calendar') {
+                loadCalendarDeadlines();
+            } else if (pageName === 'notes') {
+                loadSavedNotes();
             }
         }
 
         function updateNavigationActiveState(activePage) {
             // Desktop navigation
-            const desktopItems = document.querySelectorAll('.glass-sidebar nav a');
+            const desktopItems = document.querySelectorAll('nav a');
             desktopItems.forEach(item => {
                 const linkText = item.querySelector('span').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'dashboard') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
                     (activePage === 'notes' && linkText === 'catatan') ||
-                    (activePage === 'analytics' && linkText === 'analytics') ||
                     (activePage === 'settings' && linkText === 'pengaturan')) {
                     item.classList.add('nav-active');
                 } else {
@@ -772,7 +590,7 @@
                 const linkText = item.querySelector('.text-xs').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'home') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
-                    (activePage === 'analytics' && linkText === 'stats') ||
+                    (activePage === 'notes' && linkText === 'catatan') ||
                     (activePage === 'settings' && linkText === 'settings')) {
                     item.classList.add('nav-active');
                 } else {
@@ -781,13 +599,101 @@
             });
         }
 
-        // ==================== ENHANCED TASK MANAGEMENT ====================
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        let currentUser = null;
-        let charts = {};
+        // ==================== TELEGRAM BOT ====================
+        async function sendTelegramNotification(task) {
+            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+                console.log('Telegram bot not configured');
+                return false;
+            }
 
-        // Initialize dashboard dengan enhancements
-        function initDashboard() {
+            const message = `🔔 **TUGAS BARU DITAMBAHKAN**\n\n` +
+                           `📚 *${task.title}*\n` +
+                           `📅 Deadline: ${formatDate(task.deadline)}\n` +
+                           `🚨 Prioritas: ${getPriorityText(task.priority)}\n` +
+                           `\n_Jangan lupa dikerjakan ya!_`;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('Error sending Telegram notification:', error);
+                return false;
+            }
+        }
+
+        async function sendTelegramReminder(task) {
+            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+                return false;
+            }
+
+            const message = `⏰ **REMINDER TUGAS**\n\n` +
+                           `📚 *${task.title}*\n` +
+                           `📅 Deadline: ${formatDate(task.deadline)}\n` +
+                           `🚨 Prioritas: ${getPriorityText(task.priority)}\n` +
+                           `\n_Segera selesaikan tugas ini!_`;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('Error sending Telegram reminder:', error);
+                return false;
+            }
+        }
+
+        function setupTelegram() {
+            showNotification('📝 Buka @BotFather di Telegram untuk membuat bot', 'info');
+            
+            const instructions = `
+Cara Setup Telegram Bot:
+1. Buka @BotFather di Telegram
+2. Ketik /newbot
+3. Ikuti instruksi sampai dapat token
+4. Simpan token dan chat ID di code
+            `;
+            
+            setTimeout(() => {
+                alert(instructions);
+            }, 1000);
+        }
+
+        function getPriorityText(priority) {
+            const priorities = {
+                'high': '🔴 TINGGI',
+                'medium': '🟡 SEDANG', 
+                'low': '🟢 RENDAH'
+            };
+            return priorities[priority] || priority;
+        }
+
+        // ==================== TASK MANAGEMENT WITH SUPABASE ====================
+        let tasks = [];
+        let currentUser = null;
+
+        // Initialize dashboard
+        async function initDashboard() {
             currentUser = checkAuth();
             if (!currentUser) return;
 
@@ -795,133 +701,184 @@
             document.getElementById('welcomeName').textContent = currentUser.username;
             document.getElementById('sidebarUsername').textContent = currentUser.username;
             
-            // Set join date
-            const joinDate = new Date(currentUser.joinDate);
-            document.getElementById('joinDate').textContent = joinDate.toLocaleDateString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
+            await loadTasksFromSupabase();
             updateUI();
             
-            // Initialize charts
-            initCharts();
-            
-            // Load sample tasks if empty
-            if (tasks.length === 0) {
-                loadSampleTasks();
+            // Start reminder checker
+            startReminderChecker();
+        }
+
+        // Load tasks from Supabase
+        async function loadTasksFromSupabase() {
+            try {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                
+                tasks = data || [];
+                
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showNotification('Gagal memuat tugas dari database', 'error');
+                tasks = [];
             }
         }
 
-        function initCharts() {
-            // Weekly Progress Chart
-            const weeklyCtx = document.getElementById('weeklyProgressChart').getContext('2d');
-            charts.weeklyProgress = new Chart(weeklyCtx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [0, 100],
-                        backgroundColor: ['#E63946', 'rgba(255,255,255,0.1)'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '70%',
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } }
-                }
-            });
+        // Save task to Supabase
+        async function saveTaskToSupabase(task) {
+            try {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .insert([task])
+                    .select()
+                    .single();
 
-            // Activity Chart
-            const activityCtx = document.getElementById('activityChart').getContext('2d');
-            charts.activity = new Chart(activityCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                    datasets: [{
-                        label: 'Tugas Selesai',
-                        data: [0, 0, 0, 0, 0, 0, 0],
-                        backgroundColor: '#E63946',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
-                }
-            });
+                if (error) throw error;
+                return data;
+
+            } catch (error) {
+                console.error('Error saving task:', error);
+                showNotification('Gagal menyimpan tugas', 'error');
+                return null;
+            }
         }
 
-        // Load sample tasks for demo
-        function loadSampleTasks() {
-            const sampleTasks = [
-                {
-                    id: 1,
-                    user_id: 1,
-                    title: "Tugas Matematika - Aljabar Linear",
-                    description: "Mengerjakan soal aljabar halaman 45-50 tentang matriks dan vektor",
-                    deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    priority: "high",
-                    category: "academic",
-                    completed: false,
-                    created_at: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    user_id: 1,
-                    title: "Essay Sejarah Indonesia Modern",
-                    description: "Menulis essay tentang perjuangan kemerdekaan Indonesia 1945-1950",
-                    deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    priority: "medium",
-                    category: "academic",
-                    completed: true,
-                    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    id: 3,
-                    user_id: 1,
-                    title: "Project Web Development",
-                    description: "Membuat dashboard responsive dengan Vue.js dan Tailwind",
-                    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    priority: "high",
-                    category: "work",
-                    completed: false,
-                    created_at: new Date().toISOString()
-                }
-            ];
+        // Update task in Supabase
+        async function updateTaskInSupabase(taskId, updates) {
+            try {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .update(updates)
+                    .eq('id', taskId)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                return data;
+
+            } catch (error) {
+                console.error('Error updating task:', error);
+                return null;
+            }
+        }
+
+        // Delete task from Supabase
+        async function deleteTaskFromSupabase(taskId) {
+            try {
+                const { error } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .eq('id', taskId);
+
+                if (error) throw error;
+                return true;
+
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                return false;
+            }
+        }
+
+        // ==================== TASK ACTIONS ====================
+        async function addTask(e) {
+            e.preventDefault();
             
-            tasks = sampleTasks;
-            saveTasks();
+            const newTask = {
+                user_id: currentUser.id,
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDescription').value,
+                deadline: document.getElementById('taskDeadline').value,
+                priority: document.getElementById('taskPriority').value,
+                completed: false
+            };
+            
+            const savedTask = await saveTaskToSupabase(newTask);
+            
+            if (savedTask) {
+                await loadTasksFromSupabase();
+                updateUI();
+                closeAddTaskModal();
+                
+                // Send Telegram notification
+                await sendTelegramNotification(savedTask);
+                
+                showNotification('🎉 Tugas berhasil ditambahkan! Notifikasi dikirim ke Telegram.', 'success');
+            }
         }
 
-        // Save tasks to localStorage
-        function saveTasks() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+        async function toggleTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const updatedTask = await updateTaskInSupabase(taskId, {
+                completed: !task.completed
+            });
+            
+            if (updatedTask) {
+                await loadTasksFromSupabase();
+                updateUI();
+                
+                showNotification(
+                    updatedTask.completed ? '✅ Tugas diselesaikan!' : '↩️ Tugas dikembalikan',
+                    'success'
+                );
+            }
         }
 
-        // ==================== ENHANCED UI UPDATES ====================
+        async function deleteTask(taskId) {
+            if (confirm('Yakin ingin menghapus tugas ini?')) {
+                const success = await deleteTaskFromSupabase(taskId);
+                
+                if (success) {
+                    await loadTasksFromSupabase();
+                    updateUI();
+                    showNotification('🗑️ Tugas berhasil dihapus', 'warning');
+                }
+            }
+        }
+
+        // ==================== REMINDER SYSTEM ====================
+        function startReminderChecker() {
+            // Check for reminders every 5 minutes
+            setInterval(async () => {
+                await checkReminders();
+            }, 5 * 60 * 1000);
+            
+            // Check immediately
+            setTimeout(checkReminders, 2000);
+        }
+
+        async function checkReminders() {
+            const now = new Date();
+            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+            
+            const tasksNeedingReminder = tasks.filter(task => {
+                if (task.completed) return false;
+                
+                const taskDeadline = new Date(task.deadline);
+                return taskDeadline <= oneHourLater && taskDeadline > now;
+            });
+            
+            for (const task of tasksNeedingReminder) {
+                const reminderSent = localStorage.getItem(`reminder_${task.id}`);
+                if (!reminderSent) {
+                    await sendTelegramReminder(task);
+                    localStorage.setItem(`reminder_${task.id}`, 'true');
+                }
+            }
+        }
+
+        // ==================== UI UPDATES ====================
         function updateUI() {
             updateDate();
             updateStats();
             updateProgress();
             updateReminders();
             updateWeeklyProgress();
-            updateCharts();
             renderTasks();
         }
 
@@ -930,6 +887,9 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             
             document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+            document.getElementById('currentDay').textContent = now.getDate();
+            document.getElementById('currentMonth').textContent = now.toLocaleDateString('id-ID', { month: 'long' });
+            document.getElementById('currentYear').textContent = now.getFullYear();
         }
 
         function updateStats() {
@@ -967,15 +927,11 @@
 
         function updateWeeklyProgress() {
             const weeklyProgress = calculateWeeklyProgress();
+            const progressElement = document.getElementById('weeklyProgress');
             const progressText = document.getElementById('weeklyProgressText');
             const progressLabel = document.getElementById('weeklyProgressLabel');
             
-            // Update chart
-            if (charts.weeklyProgress) {
-                charts.weeklyProgress.data.datasets[0].data = [weeklyProgress, 100 - weeklyProgress];
-                charts.weeklyProgress.update();
-            }
-            
+            progressElement.style.strokeDasharray = `${weeklyProgress}, 100`;
             progressText.textContent = `${weeklyProgress}%`;
             
             if (weeklyProgress === 0) {
@@ -987,15 +943,6 @@
             }
         }
 
-        function updateCharts() {
-            // Update activity chart
-            const weeklyData = getWeeklyActivity();
-            if (charts.activity) {
-                charts.activity.data.datasets[0].data = weeklyData;
-                charts.activity.update();
-            }
-        }
-
         function calculateWeeklyProgress() {
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -1004,20 +951,6 @@
             const completedWeekly = weeklyTasks.filter(task => task.completed);
             
             return weeklyTasks.length > 0 ? Math.round((completedWeekly.length / weeklyTasks.length) * 100) : 0;
-        }
-
-        function getWeeklyActivity() {
-            const days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dayTasks = tasks.filter(task => {
-                    const taskDate = new Date(task.created_at);
-                    return taskDate.toDateString() === date.toDateString() && task.completed;
-                });
-                days.push(dayTasks.length);
-            }
-            return days;
         }
 
         function updateReminders() {
@@ -1033,19 +966,19 @@
             
             if (todayTasks.length === 0) {
                 reminderContainer.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-check-circle text-green-400 text-3xl mb-3"></i>
-                        <p class="text-gray-400">Tidak ada tugas untuk hari ini!</p>
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                        <p class="text-sm text-gray-600">Tidak ada tugas untuk hari ini!</p>
                     </div>
                 `;
             } else {
                 reminderContainer.innerHTML = todayTasks.map(task => `
-                    <div class="flex items-center justify-between p-4 bg-red-500/10 rounded-2xl border border-red-400/20 hover:border-red-400/40 transition duration-200">
-                        <div class="flex items-center space-x-4 flex-1">
-                            <div class="w-3 h-3 bg-red-400 rounded-full flex-shrink-0 animate-pulse"></div>
-                            <span class="text-white font-medium truncate">${task.title}</span>
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
+                            <span class="text-sm font-medium truncate">${task.title}</span>
                         </div>
-                        <span class="text-xs text-red-400 font-semibold bg-red-500/20 px-3 py-1 rounded-full border border-red-400/20 whitespace-nowrap">
+                        <span class="text-xs text-red-600 font-medium bg-red-100 px-2 py-1 rounded-full whitespace-nowrap">
                             Hari ini
                         </span>
                     </div>
@@ -1064,35 +997,27 @@
                 new Date(task.deadline) > new Date() && 
                 new Date(task.deadline) <= nextWeek && 
                 !task.completed
-            ).slice(0, 5);
+            ).slice(0, 3);
             
             if (upcomingTasks.length === 0) {
                 upcomingContainer.innerHTML = `
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-calendar-check text-2xl mb-3"></i>
-                        <p>Tidak ada deadline mendatang</p>
+                    <div class="text-center py-2">
+                        <p class="text-sm text-gray-600">Tidak ada deadline mendatang</p>
                     </div>
                 `;
             } else {
                 upcomingContainer.innerHTML = upcomingTasks.map(task => `
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition duration-200 group">
-                        <div class="flex-1">
-                            <p class="font-semibold text-white group-hover:text-red-400 transition duration-200">${task.title}</p>
-                            <p class="text-sm text-gray-400">${formatDate(task.deadline)}</p>
-                        </div>
-                        <span class="text-xs px-3 py-1 rounded-full ${
-                            task.priority === 'high' ? 'bg-red-500/20 text-red-400 border border-red-400/20' : 
-                            task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-400/20' : 
-                            'bg-green-500/20 text-green-400 border border-green-400/20'
-                        }">
-                            ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                    <div class="flex items-center justify-between text-sm p-2 hover:bg-gray-50 rounded-lg transition duration-200">
+                        <span class="truncate flex-1">${task.title}</span>
+                        <span class="text-red-500 font-medium text-xs bg-red-50 px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                            ${formatDate(task.deadline)}
                         </span>
                     </div>
                 `).join('');
             }
         }
 
-        // ==================== ENHANCED TASK RENDERING ====================
+        // ==================== TASK RENDERING ====================
         function renderTasks() {
             const priorityFilter = document.getElementById('filterPriority').value;
             const statusFilter = document.getElementById('filterStatus').value;
@@ -1120,72 +1045,58 @@
             taskList.classList.remove('hidden');
             emptyState.classList.add('hidden');
             
-            taskList.innerHTML = filteredTasks.map((task, index) => `
-                <div class="task-card p-6 animate-slide-in ${task.completed ? 'opacity-60' : ''}" style="animation-delay: ${index * 0.1}s">
+            taskList.innerHTML = filteredTasks.map(task => `
+                <div class="task-card p-6 ${task.completed ? 'opacity-70' : ''}">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="font-bold text-xl text-white ${task.completed ? 'line-through' : ''}">
+                        <h3 class="font-bold text-lg text-gray-900 ${task.completed ? 'line-through' : ''}">
                             ${task.title}
                         </h3>
-                        <span class="text-xs px-3 py-2 rounded-full border ${
-                            task.priority === 'high' ? 'bg-red-500/20 text-red-400 border-red-400/30' : 
-                            task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' : 
-                            'bg-green-500/20 text-green-400 border-green-400/30'
+                        <span class="text-xs px-3 py-1 rounded-full border ${
+                            task.priority === 'high' ? 'bg-red-100 text-red-800 border-red-200' : 
+                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 
+                            'bg-green-100 text-green-800 border-green-200'
                         }">
                             ${task.priority === 'high' ? '🔴 Tinggi' : task.priority === 'medium' ? '🟡 Sedang' : '🟢 Rendah'}
                         </span>
                     </div>
                     
-                    <p class="text-gray-300 text-sm mb-4 leading-relaxed min-h-[4rem]">
-                        ${task.description || '<span class="text-gray-500">Tidak ada deskripsi</span>'}
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed min-h-[3rem]">
+                        ${task.description || '<span class="text-gray-400">Tidak ada deskripsi</span>'}
                     </p>
                     
-                    <div class="flex items-center justify-between text-sm text-gray-400 mb-4">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas ${getCategoryIcon(task.category)} ${isOverdue(task) ? 'text-red-400' : ''}"></i>
-                            <span class="${isOverdue(task) ? 'text-red-400 font-semibold' : ''}">
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500' : ''}"></i>
+                            <span class="${isOverdue(task) ? 'text-red-500 font-medium' : ''}">
                                 ${formatDate(task.deadline)}
                             </span>
                         </div>
                         ${isOverdue(task) ? 
-                            '<span class="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-400/30 animate-pulse">Terlambat</span>' : 
+                            '<span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Terlambat</span>' : 
                             ''
                         }
                     </div>
                     
                     <div class="flex justify-between items-center">
-                        <button onclick="toggleTask(${task.id})" 
-                                class="px-5 py-2 rounded-xl text-sm font-semibold transition duration-200 ${
+                        <button onclick="toggleTask('${task.id}')" 
+                                class="px-4 py-2 rounded-lg text-sm font-medium transition duration-200 ${
                                     task.completed ? 
-                                    'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-400/30' : 
-                                    'bg-gray-500/20 text-gray-300 hover:bg-gray-500/30 border border-gray-400/30'
+                                    'bg-green-100 text-green-800 hover:bg-green-200' : 
+                                    'bg-gray-100 text-gray-800 hover:bg-gray-200'
                                 }">
                             <i class="fas ${task.completed ? 'fa-undo' : 'fa-check'} mr-2"></i>
                             ${task.completed ? 'Batal Selesai' : 'Tandai Selesai'}
                         </button>
                         
                         <div class="flex space-x-2">
-                            <button onclick="editTask(${task.id})" 
-                                    class="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center hover:bg-blue-500/30 border border-blue-400/30 transition duration-200">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteTask(${task.id})" 
-                                    class="w-12 h-12 bg-red-500/20 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-500/30 border border-red-400/30 transition duration-200">
+                            <button onclick="deleteTask('${task.id}')" 
+                                    class="w-10 h-10 bg-red-100 text-red-800 rounded-lg flex items-center justify-center hover:bg-red-200 transition duration-200">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `).join('');
-        }
-
-        function getCategoryIcon(category) {
-            const icons = {
-                'academic': 'fa-graduation-cap',
-                'personal': 'fa-user',
-                'work': 'fa-briefcase',
-                'other': 'fa-star'
-            };
-            return icons[category] || 'fa-tag';
         }
 
         function isOverdue(task) {
@@ -1200,228 +1111,91 @@
             });
         }
 
-        // ==================== ENHANCED TASK ACTIONS ====================
-        function addTask(e) {
-            e.preventDefault();
-            
-            const newTask = {
-                id: Date.now(),
-                user_id: 1,
-                title: document.getElementById('taskTitle').value,
-                description: document.getElementById('taskDescription').value,
-                deadline: document.getElementById('taskDeadline').value,
-                priority: document.getElementById('taskPriority').value,
-                category: document.getElementById('taskCategory').value,
-                completed: false,
-                created_at: new Date().toISOString()
-            };
-            
-            tasks.push(newTask);
-            saveTasks();
-            updateUI();
-            closeAddTaskModal();
-            
-            showNotification('🎉 Tugas berhasil ditambahkan!', 'success');
-        }
-
-        function editTask(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                document.getElementById('taskTitle').value = task.title;
-                document.getElementById('taskDescription').value = task.description || '';
-                document.getElementById('taskDeadline').value = task.deadline;
-                document.getElementById('taskPriority').value = task.priority;
-                document.getElementById('taskCategory').value = task.category;
-                
-                // Change form to edit mode
-                const form = document.getElementById('taskForm');
-                form.onsubmit = function(e) {
-                    e.preventDefault();
-                    updateTask(taskId);
-                };
-                
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-edit mr-2"></i>Update Tugas';
-                
-                openAddTaskModal();
-            }
-        }
-
-        function updateTask(taskId) {
-            const taskIndex = tasks.findIndex(t => t.id === taskId);
-            if (taskIndex !== -1) {
-                tasks[taskIndex] = {
-                    ...tasks[taskIndex],
-                    title: document.getElementById('taskTitle').value,
-                    description: document.getElementById('taskDescription').value,
-                    deadline: document.getElementById('taskDeadline').value,
-                    priority: document.getElementById('taskPriority').value,
-                    category: document.getElementById('taskCategory').value
-                };
-                
-                saveTasks();
-                updateUI();
-                closeAddTaskModal();
-                
-                // Reset form
-                const form = document.getElementById('taskForm');
-                form.onsubmit = function(e) {
-                    e.preventDefault();
-                    addTask(e);
-                };
-                
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Tugas';
-                
-                showNotification('✏️ Tugas berhasil diupdate!', 'success');
-            }
-        }
-
-        function toggleTask(taskId) {
-            tasks = tasks.map(task => 
-                task.id === taskId ? { ...task, completed: !task.completed } : task
-            );
-            saveTasks();
-            updateUI();
-            
-            const task = tasks.find(t => t.id === taskId);
-            showNotification(
-                task.completed ? '✅ Tugas diselesaikan! Good job!' : '↩️ Tugas dikembalikan ke pending',
-                'success'
-            );
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('Yakin ingin menghapus tugas ini?')) {
-                tasks = tasks.filter(task => task.id !== taskId);
-                saveTasks();
-                updateUI();
-                showNotification('🗑️ Tugas berhasil dihapus', 'warning');
-            }
-        }
-
-        // ==================== ENHANCED NOTES SYSTEM ====================
-        function saveQuickNote() {
+        // ==================== NOTES SYSTEM ====================
+        async function saveQuickNote() {
             const noteText = document.getElementById('quickNote').value;
             if (noteText.trim()) {
-                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-                const newNote = {
-                    id: Date.now(),
-                    text: noteText,
-                    created: new Date().toISOString()
-                };
-                notes.unshift(newNote); // Add to beginning
-                localStorage.setItem('quickNotes', JSON.stringify(notes));
+                try {
+                    const { data, error } = await supabase
+                        .from('notes')
+                        .insert([{
+                            user_id: currentUser.id,
+                            text: noteText
+                        }])
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    document.getElementById('quickNote').value = '';
+                    loadSavedNotes();
+                    showNotification('📝 Catatan disimpan!', 'success');
+
+                } catch (error) {
+                    console.error('Error saving note:', error);
+                    showNotification('Gagal menyimpan catatan', 'error');
+                }
+            }
+        }
+
+        async function loadSavedNotes() {
+            try {
+                const { data, error } = await supabase
+                    .from('notes')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const notes = data || [];
+                const notesContainer = document.getElementById('savedNotes');
                 
-                document.getElementById('quickNote').value = '';
-                loadSavedNotes();
-                showNotification('📝 Catatan disimpan!', 'success');
-            }
-        }
-
-        function loadSavedNotes() {
-            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-            const notesContainer = document.getElementById('savedNotes');
-            
-            if (notes.length === 0) {
-                notesContainer.innerHTML = `
-                    <div class="text-center py-12 text-gray-400">
-                        <i class="fas fa-sticky-note text-4xl mb-4"></i>
-                        <p class="text-lg">Belum ada catatan</p>
-                        <p class="text-sm mt-2">Mulai tulis catatan pertama Anda</p>
-                    </div>
-                `;
-            } else {
-                notesContainer.innerHTML = notes.map((note, index) => `
-                    <div class="glass-card p-6 animate-slide-in" style="animation-delay: ${index * 0.1}s">
-                        <div class="flex justify-between items-start mb-4">
-                            <p class="text-white flex-1 leading-relaxed">${note.text}</p>
-                            <button onclick="deleteNote(${note.id})" class="text-red-400 hover:text-red-300 ml-4 transition duration-200">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                if (notes.length === 0) {
+                    notesContainer.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            <i class="fas fa-sticky-note text-2xl mb-2"></i>
+                            <p>Belum ada catatan</p>
                         </div>
-                        <div class="flex justify-between items-center text-sm text-gray-400">
-                            <span>${new Date(note.created).toLocaleDateString('id-ID')}</span>
-                            <span>${new Date(note.created).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function deleteNote(noteId) {
-            let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-            notes = notes.filter(note => note.id !== noteId);
-            localStorage.setItem('quickNotes', JSON.stringify(notes));
-            loadSavedNotes();
-            showNotification('Catatan dihapus', 'warning');
-        }
-
-        // ==================== ENHANCED CALENDAR SYSTEM ====================
-        function loadCalendar() {
-            const calendarContainer = document.getElementById('calendar');
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            
-            let calendarHTML = `
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-lg font-semibold text-white">
-                        ${firstDay.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                    </h4>
-                    <div class="flex space-x-2">
-                        <button class="p-2 hover:bg-white/10 rounded-lg transition duration-200">
-                            <i class="fas fa-chevron-left text-white"></i>
-                        </button>
-                        <button class="p-2 hover:bg-white/10 rounded-lg transition duration-200">
-                            <i class="fas fa-chevron-right text-white"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-7 gap-2 mb-4">
-                    ${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => `
-                        <div class="text-center text-sm font-semibold text-gray-400 py-2">${day}</div>
-                    `).join('')}
-                </div>
-                <div class="grid grid-cols-7 gap-2">
-            `;
-            
-            // Empty cells for days before first day of month
-            for (let i = 0; i < firstDay.getDay(); i++) {
-                calendarHTML += `<div class="h-12"></div>`;
-            }
-            
-            // Days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayTasks = tasks.filter(task => task.deadline === dateStr);
-                const isToday = day === now.getDate() && month === now.getMonth();
-                
-                calendarHTML += `
-                    <div class="h-12 flex items-center justify-center relative group cursor-pointer ${
-                        isToday ? 'bg-red-500 rounded-lg' : 'hover:bg-white/10 rounded-lg'
-                    } transition duration-200">
-                        <span class="text-sm font-medium ${isToday ? 'text-white' : 'text-gray-300'}">${day}</span>
-                        ${dayTasks.length > 0 ? `
-                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></div>
-                        ` : ''}
-                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                            <div class="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                                ${dayTasks.length} tugas
+                    `;
+                } else {
+                    notesContainer.innerHTML = notes.map(note => `
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-gray-700 flex-1">${note.text}</p>
+                                <button onclick="deleteNote('${note.id}')" class="text-red-500 hover:text-red-700 ml-2">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
+                            <p class="text-xs text-gray-500">${new Date(note.created_at).toLocaleDateString('id-ID')}</p>
                         </div>
-                    </div>
-                `;
+                    `).join('');
+                }
+
+            } catch (error) {
+                console.error('Error loading notes:', error);
             }
-            
-            calendarHTML += `</div>`;
-            calendarContainer.innerHTML = calendarHTML;
         }
 
+        async function deleteNote(noteId) {
+            try {
+                const { error } = await supabase
+                    .from('notes')
+                    .delete()
+                    .eq('id', noteId);
+
+                if (error) throw error;
+
+                loadSavedNotes();
+                showNotification('Catatan dihapus', 'warning');
+
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                showNotification('Gagal menghapus catatan', 'error');
+            }
+        }
+
+        // ==================== CALENDAR SYSTEM ====================
         function loadCalendarDeadlines() {
             const upcomingTasks = tasks.filter(task => 
                 new Date(task.deadline) > new Date() && !task.completed
@@ -1431,185 +1205,28 @@
             
             if (upcomingTasks.length === 0) {
                 calendarContainer.innerHTML = `
-                    <div class="text-center py-12 text-gray-400">
-                        <i class="fas fa-calendar-check text-4xl mb-4"></i>
-                        <p class="text-lg">Tidak ada deadline mendatang</p>
+                    <div class="text-center py-4 text-gray-500">
+                        <i class="fas fa-calendar-check text-2xl mb-2"></i>
+                        <p>Tidak ada deadline mendatang</p>
                     </div>
                 `;
             } else {
-                calendarContainer.innerHTML = upcomingTasks.map((task, index) => `
-                    <div class="glass-card p-6 animate-slide-in" style="animation-delay: ${index * 0.1}s">
-                        <div class="flex justify-between items-start mb-3">
-                            <p class="font-semibold text-white flex-1">${task.title}</p>
-                            <span class="text-xs px-3 py-1 rounded-full ${
-                                task.priority === 'high' ? 'bg-red-500/20 text-red-400 border border-red-400/20' : 
-                                task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-400/20' : 
-                                'bg-green-500/20 text-green-400 border border-green-400/20'
-                            }">
-                                ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
-                            </span>
+                calendarContainer.innerHTML = upcomingTasks.map(task => `
+                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">${task.title}</p>
+                            <p class="text-sm text-gray-600">${formatDate(task.deadline)}</p>
                         </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-400">${formatDate(task.deadline)}</span>
-                            <span class="text-${getCategoryColor(task.category)}-400">
-                                <i class="fas ${getCategoryIcon(task.category)} mr-1"></i>
-                                ${getCategoryName(task.category)}
-                            </span>
-                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            task.priority === 'high' ? 'bg-red-100 text-red-800' : 
+                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-green-100 text-green-800'
+                        }">
+                            ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                        </span>
                     </div>
                 `).join('');
             }
-        }
-
-        function getCategoryColor(category) {
-            const colors = {
-                'academic': 'red',
-                'personal': 'blue',
-                'work': 'green',
-                'other': 'purple'
-            };
-            return colors[category] || 'gray';
-        }
-
-        function getCategoryName(category) {
-            const names = {
-                'academic': 'Akademik',
-                'personal': 'Personal',
-                'work': 'Pekerjaan',
-                'other': 'Lainnya'
-            };
-            return names[category] || 'Lainnya';
-        }
-
-        // ==================== ANALYTICS SYSTEM ====================
-        function loadAnalytics() {
-            updateAnalyticsCharts();
-            updateMonthlyStats();
-        }
-
-        function updateAnalyticsCharts() {
-            // Productivity Chart
-            const productivityCtx = document.getElementById('productivityChart').getContext('2d');
-            if (charts.productivity) {
-                charts.productivity.destroy();
-            }
-            
-            const productivityData = getProductivityData();
-            charts.productivity = new Chart(productivityCtx, {
-                type: 'line',
-                data: {
-                    labels: productivityData.labels,
-                    datasets: [{
-                        label: 'Produktivitas',
-                        data: productivityData.data,
-                        borderColor: '#E63946',
-                        backgroundColor: 'rgba(230, 57, 70, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
-                }
-            });
-
-            // Priority Chart
-            const priorityCtx = document.getElementById('priorityChart').getContext('2d');
-            if (charts.priority) {
-                charts.priority.destroy();
-            }
-            
-            const priorityData = getPriorityData();
-            charts.priority = new Chart(priorityCtx, {
-                type: 'pie',
-                data: {
-                    labels: ['Tinggi', 'Sedang', 'Rendah'],
-                    datasets: [{
-                        data: priorityData,
-                        backgroundColor: ['#E63946', '#F59E0B', '#10B981']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: '#94a3b8' }
-                        }
-                    }
-                }
-            });
-        }
-
-        function getProductivityData() {
-            // Generate sample productivity data
-            return {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
-                data: [65, 78, 90, 82]
-            };
-        }
-
-        function getPriorityData() {
-            const high = tasks.filter(t => t.priority === 'high').length;
-            const medium = tasks.filter(t => t.priority === 'medium').length;
-            const low = tasks.filter(t => t.priority === 'low').length;
-            return [high, medium, low];
-        }
-
-        function updateMonthlyStats() {
-            const currentMonth = new Date().getMonth();
-            const monthlyTasks = tasks.filter(task => 
-                new Date(task.created_at).getMonth() === currentMonth
-            );
-            
-            const completed = monthlyTasks.filter(t => t.completed).length;
-            const pending = monthlyTasks.filter(t => !t.completed).length;
-            
-            document.getElementById('monthlyCompleted').textContent = completed;
-            document.getElementById('monthlyPending').textContent = pending;
-            document.getElementById('averageCompletion').textContent = '24h';
-            document.getElementById('successRate').textContent = monthlyTasks.length > 0 ? 
-                Math.round((completed / monthlyTasks.length) * 100) + '%' : '0%';
-        }
-
-        // ==================== SETTINGS SYSTEM ====================
-        function loadSettings() {
-            // Settings are loaded from DOM
-        }
-
-        function changePassword() {
-            showNotification('Fitur ubah password akan segera hadir!', 'info');
-        }
-
-        function exportData() {
-            const data = {
-                tasks: tasks,
-                notes: JSON.parse(localStorage.getItem('quickNotes')) || [],
-                exportDate: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `tugasmerah-export-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            showNotification('📥 Data berhasil diexport!', 'success');
         }
 
         // ==================== MODAL FUNCTIONS ====================
@@ -1627,35 +1244,24 @@
         function closeAddTaskModal() {
             document.getElementById('addTaskModal').classList.add('hidden');
             document.getElementById('taskForm').reset();
-            
-            // Reset form to add mode
-            const form = document.getElementById('taskForm');
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                addTask(e);
-            };
-            
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Tugas';
         }
 
         // ==================== NOTIFICATION SYSTEM ====================
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `fixed top-6 right-6 p-6 rounded-2xl text-white font-semibold z-50 transform transition-all duration-500 glass-card border ${
-                type === 'success' ? 'border-green-400/20' : 
-                type === 'warning' ? 'border-yellow-400/20' : 
-                type === 'error' ? 'border-red-400/20' : 'border-blue-400/20'
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'warning' ? 'bg-yellow-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
             }`;
-            
             notification.innerHTML = `
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     <i class="fas ${
-                        type === 'success' ? 'fa-check-circle text-green-400' :
-                        type === 'warning' ? 'fa-exclamation-triangle text-yellow-400' :
-                        type === 'error' ? 'fa-times-circle text-red-400' : 'fa-info-circle text-blue-400'
-                    } text-xl"></i>
-                    <span class="text-lg">${message}</span>
+                        type === 'success' ? 'fa-check-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' :
+                        type === 'error' ? 'fa-times-circle' : 'fa-info-circle'
+                    }"></i>
+                    <span>${message}</span>
                 </div>
             `;
             
@@ -1664,15 +1270,13 @@
             // Animate in
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
-                notification.style.opacity = '1';
             }, 100);
             
-            // Remove after 4 seconds
+            // Remove after 3 seconds
             setTimeout(() => {
                 notification.style.transform = 'translateX(100%)';
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 500);
-            }, 4000);
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // ==================== EVENT LISTENERS ====================
@@ -1701,17 +1305,6 @@
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
-            
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'n') {
-                    e.preventDefault();
-                    openAddTaskModal();
-                }
-                if (e.key === 'Escape') {
-                    closeAddTaskModal();
-                }
-            });
         });
     </script>
 </body>
