@@ -48,7 +48,7 @@
                 </label>
                 <input type="text" id="username" required 
                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
-                       placeholder="Masukkan username" value="student">
+                       placeholder="Masukkan username">
             </div>
 
             <div>
@@ -57,7 +57,7 @@
                 </label>
                 <input type="password" id="password" required 
                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
-                       placeholder="Masukkan password" value="123">
+                       placeholder="Masukkan password">
             </div>
 
             <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl font-semibold text-lg">
@@ -70,9 +70,10 @@
             <div class="flex items-start space-x-3">
                 <i class="fas fa-info-circle text-red-500 mt-1"></i>
                 <div>
-                    <p class="text-sm font-medium text-red-800">Info Demo</p>
+                    <p class="text-sm font-medium text-red-800">Login untuk KhoirulWangi</p>
                     <p class="text-xs text-red-600 mt-1">
-                        Gunakan username: <strong>student</strong> / password: <strong>123</strong>
+                        Username: <strong>KhoirulWangi</strong><br>
+                        Password: <strong>2509</strong>
                     </p>
                 </div>
             </div>
@@ -100,7 +101,7 @@
     </div>
 
     <script>
-        // Simple Auth System untuk Demo
+        // Auth System untuk KhoirulWangi
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -114,10 +115,10 @@
             
             // Simulate API call
             setTimeout(() => {
-                if (username === 'student' && password === '123') {
+                if (username === 'KhoirulWangi' && password === '2509') {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', username);
-                    showNotification('Login berhasil!', 'success');
+                    showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
