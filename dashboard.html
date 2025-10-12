@@ -63,6 +63,7 @@
             background-clip: text;
         }
 
+        /* FIXED HEADER */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -72,6 +73,7 @@
             animation: slideDown 0.3s ease-out;
         }
 
+        /* Animations */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -87,8 +89,30 @@
             to { opacity: 1; }
         }
 
-        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .animate-bounce-in { animation: bounceIn 0.6s ease-out; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        .animate-pulse-custom { animation: pulse 2s infinite; }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
+
+        /* Mobile Bottom Navigation */
         @media (max-width: 768px) {
             .mobile-nav {
                 position: fixed;
@@ -104,12 +128,78 @@
         }
 
         .page-hidden { display: none; }
+        .sync-indicator { animation: pulse 2s infinite; }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--red-primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Priority Badge Animations */
+        .priority-high {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .priority-medium {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .priority-low {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        /* Floating Animation */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--red-primary);
+            top: 0;
+            opacity: 0;
+            z-index: 100;
+        }
+        
+        @keyframes confettiRain {
+            0% { opacity: 1; transform: translateY(-100px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen">
+    <!-- Supabase Configuration -->
     <script>
-        const SUPABASE_URL = 'https://cdizlgogpwpbjulobkjq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaXpsZ29ncHdwYmp1bG9ia2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTcwNzEsImV4cCI6MjA3NTc3MzA3MX0._LyaIk2ubgc7rSqMJeW6_RfhGERO4ET7o8m-6VUp6Fs';
+        // Ganti dengan URL dan Key Supabase Anda
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        // Ganti dengan token bot Telegram dan chat ID Anda
+        const TELEGRAM_BOT_TOKEN = 'your-telegram-bot-token';
+        const TELEGRAM_CHAT_ID = 'your-chat-id';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     </script>
@@ -117,15 +207,16 @@
     <!-- Desktop Sidebar -->
     <div class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200">
         <div class="w-full p-6 flex flex-col">
-            <!-- Logo -->
+            <!-- Logo & Sync Status -->
             <div class="flex items-center space-x-3 mb-8">
-                <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg floating">
                     <i class="fas fa-tasks text-white"></i>
                 </div>
-                <div>
+                <div class="flex-1">
                     <h1 class="text-xl font-bold text-gray-900">TugasMerah</h1>
                     <p class="text-xs text-red-500 font-medium">#SemangatBelajar</p>
                 </div>
+                <div id="syncStatus" class="w-3 h-3 bg-green-500 rounded-full sync-indicator" title="Terhubung ke Cloud"></div>
             </div>
             
             <!-- Navigation -->
@@ -141,6 +232,10 @@
                 <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('notes')">
                     <i class="fas fa-sticky-note w-5"></i>
                     <span>Catatan</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('settings')">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Pengaturan</span>
                 </a>
             </nav>
             
@@ -174,7 +269,7 @@
 
     <!-- Main Content -->
     <div class="md:ml-64 main-content">
-        <!-- Header -->
+        <!-- FIXED HEADER -->
         <header class="sticky-header">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
@@ -183,6 +278,7 @@
                         <p class="text-gray-600" id="currentDate">Mengambil tanggal...</p>
                     </div>
                     
+                    <!-- Quick Stats dengan Sync Info -->
                     <div class="hidden md:flex items-center space-x-6">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-red-500" id="todayTasks">0</div>
@@ -205,18 +301,18 @@
         <div id="dashboard-page" class="animate-fade-in">
             <!-- Motivation Section -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
-                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg animate-bounce-in">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <h2 class="text-xl font-bold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
                             <p class="text-red-100 opacity-90" id="motivationSubtext">Data tersimpan otomatis di cloud! ☁️</p>
                         </div>
-                        <div class="text-4xl ml-4 animate-bounce" style="animation-duration: 2s">💪</div>
+                        <div class="text-4xl ml-4 floating" style="animation-duration: 3s">💪</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Stats -->
+            <!-- Quick Actions & Reminder -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Reminder Harian -->
@@ -232,34 +328,55 @@
                         </div>
                     </div>
 
-                    <!-- Progress -->
+                    <!-- Progress Ringan -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress
+                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
                         </h3>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-red-500 mb-2" id="totalTasks">0</div>
-                            <p class="text-sm text-gray-600">Total Tugas</p>
+                        <div class="flex items-center justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none" stroke="#e5e7eb" stroke-width="3"/>
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none" stroke="#E63946" stroke-width="3"
+                                        stroke-dasharray="0, 100" id="weeklyProgress"/>
+                                    <text x="18" y="20.5" text-anchor="middle" font-size="8" fill="#E63946" font-weight="bold" id="weeklyProgressText">0%</text>
+                                </svg>
+                            </div>
                         </div>
+                        <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                     </div>
 
-                    <!-- Quick Add -->
+                    <!-- Sync Status -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-plus text-red-500 mr-2"></i>Tambah Cepat
+                            <i class="fas fa-cloud text-red-500 mr-2"></i>Status Sync
                         </h3>
-                        <button onclick="openAddTaskModal()" class="floating-btn text-white w-full py-3 rounded-xl font-medium">
-                            <i class="fas fa-plus mr-2"></i>Tambah Tugas Baru
-                        </button>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Cloud Connection</span>
+                                <span id="cloudStatus" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Connected</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Total Tugas</span>
+                                <span id="totalTasks" class="text-sm font-bold text-red-500">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Last Sync</span>
+                                <span id="lastSync" class="text-xs text-gray-500">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Task List -->
+            <!-- Task List Section -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 class="text-2xl font-bold text-gray-900 flex items-center">
                         <i class="fas fa-tasks text-red-500 mr-3"></i>Daftar Tugas Aktif
+                        <span id="realTimeIndicator" class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full hidden">Real-time</span>
                     </h2>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <select id="filterPriority" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
@@ -281,8 +398,8 @@
                 </div>
 
                 <!-- Empty State -->
-                <div id="emptyState" class="text-center py-12 animate-fade-in">
-                    <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div id="emptyState" class="text-center py-12 animate-fade-in hidden">
+                    <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 floating">
                         <i class="fas fa-tasks text-red-500 text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Belum ada tugas nih!</h3>
@@ -292,6 +409,12 @@
                         <span>Tambah Tugas Pertama</span>
                     </button>
                 </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-600">Memuat tugas...</p>
+                </div>
             </div>
         </div>
 
@@ -300,9 +423,26 @@
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender
+                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender Akademik
                     </h2>
-                    <p class="text-gray-600">Fitur kalender akan datang soon! 📅</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Calendar View -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Kalender Bulan Ini</h3>
+                            <div id="calendar" class="text-center">
+                                <!-- Calendar akan di-generate di sini -->
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Events -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Deadline Mendatang</h3>
+                            <div id="calendar-deadlines" class="space-y-3">
+                                <!-- Upcoming deadlines akan dimuat di sini -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -312,9 +452,107 @@
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan
+                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan Cepat
                     </h2>
-                    <p class="text-gray-600">Fitur catatan akan datang soon! 📝</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Add Note -->
+                        <div class="space-y-4">
+                            <textarea id="quickNote" rows="8" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                placeholder="Tulis catatan penting di sini..."></textarea>
+                            <button onclick="saveQuickNote()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 w-full transform hover:scale-105">
+                                <i class="fas fa-save mr-2"></i>Simpan Catatan
+                            </button>
+                        </div>
+
+                        <!-- Saved Notes -->
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Catatan Tersimpan</h3>
+                            <div id="savedNotes" class="space-y-3 max-h-96 overflow-y-auto">
+                                <!-- Saved notes akan muncul di sini -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS PAGE -->
+        <div id="settings-page" class="page-hidden animate-fade-in">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-cog text-red-500 mr-3"></i>Pengaturan
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Account Settings -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Akun</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Username</span>
+                                    <span class="font-medium" id="settingsUsername">Khoirul Amri Siregar</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Status</span>
+                                    <span class="font-medium text-green-600">Aktif</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- App Settings -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900">Aplikasi</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Notifikasi Telegram</span>
+                                    <button id="telegramToggle" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm" onclick="toggleTelegramNotifications()">Aktif</button>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-700">Tema</span>
+                                    <span class="font-medium">Merah</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telegram Configuration -->
+                    <div class="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                            <i class="fab fa-telegram text-blue-500 mr-2"></i>Konfigurasi Telegram
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bot Token</label>
+                                <input type="text" id="telegramToken" value="your-telegram-bot-token" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Chat ID</label>
+                                <input type="text" id="telegramChatId" value="your-chat-id"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button onclick="testTelegramConnection()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                Test Koneksi Telegram
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Demo Info -->
+                    <div class="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-info-circle text-green-500 mt-1"></i>
+                            <div>
+                                <p class="text-sm font-medium text-green-800">Info Aplikasi</p>
+                                <p class="text-xs text-green-600 mt-1">
+                                    Aplikasi TugasMerah dengan fitur real-time sync menggunakan Supabase dan reminder Telegram.
+                                    Semua data tersimpan otomatis di cloud dan tersinkronisasi antar perangkat.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -331,19 +569,23 @@
                 <i class="fas fa-calendar-alt mb-1"></i>
                 <span class="text-xs">Kalender</span>
             </a>
-            <button onclick="openAddTaskModal()" class="floating-btn w-12 h-12 rounded-full flex items-center justify-center text-white -mt-6">
+            <button onclick="openAddTaskModal()" class="floating-btn w-12 h-12 rounded-full flex items-center justify-center text-white -mt-6 transform hover:scale-110">
                 <i class="fas fa-plus text-lg"></i>
             </button>
             <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('notes')">
                 <i class="fas fa-sticky-note mb-1"></i>
                 <span class="text-xs">Catatan</span>
             </a>
+            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('settings')">
+                <i class="fas fa-cog mb-1"></i>
+                <span class="text-xs">Settings</span>
+            </a>
         </div>
     </div>
 
     <!-- Add Task Modal -->
     <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-bounce-in">
             <div class="p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center">
                     <i class="fas fa-plus-circle text-red-500 mr-2"></i>Tambah Tugas Baru
@@ -390,6 +632,11 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="sendTelegramReminder" class="rounded text-red-500" checked>
+                    <label for="sendTelegramReminder" class="text-sm text-gray-700">Kirim reminder Telegram</label>
+                </div>
             </form>
             
             <div class="flex justify-end space-x-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white rounded-b-2xl">
@@ -398,41 +645,26 @@
                     Batal
                 </button>
                 <button type="submit" form="taskForm"
-                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-save mr-2"></i>Simpan Tugas
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105 shadow-lg flex items-center">
+                    <i class="fas fa-save mr-2"></i>Simpan ke Cloud
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== AUTHENTICATION ====================
-        function checkAuth() {
-            if (localStorage.getItem('isLoggedIn') !== 'true') {
-                window.location.href = 'index.html';
-                return null;
-            }
-            return {
-                username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
-                user_id: localStorage.getItem('user_id') || 'khoirul-amri'
-            };
-        }
-
-        function logout() {
-            if (confirm('Yakin ingin logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
-                window.location.href = 'index.html';
-            }
-        }
-
-        // ==================== TASK MANAGEMENT ====================
+        // ==================== REAL-TIME SYNC SYSTEM ====================
         let tasks = [];
         let currentUser = null;
+        let realtimeSubscription = null;
+        let telegramEnabled = true;
 
+        // Load tasks dengan real-time subscription
         async function loadTasks() {
             try {
+                showLoadingState(true);
+                
+                // Load initial data
                 const { data, error } = await supabase
                     .from('tasks')
                     .select('*')
@@ -443,13 +675,85 @@
                 
                 tasks = data || [];
                 updateUI();
+                updateLastSync();
+                
+                // Setup real-time subscription
+                setupRealtimeSubscription();
+                
+                showNotification('✅ Tugas berhasil dimuat!', 'success');
                 
             } catch (error) {
                 console.error('Error loading tasks:', error);
-                showNotification('Gagal memuat tugas', 'error');
+                showNotification('❌ Gagal memuat tugas: ' + error.message, 'error');
+            } finally {
+                showLoadingState(false);
             }
         }
 
+        // Setup real-time listener
+        function setupRealtimeSubscription() {
+            if (realtimeSubscription) {
+                supabase.removeChannel(realtimeSubscription);
+            }
+
+            realtimeSubscription = supabase
+                .channel('tasks-changes')
+                .on('postgres_changes', 
+                    { 
+                        event: '*', // Listen to all events: INSERT, UPDATE, DELETE
+                        schema: 'public', 
+                        table: 'tasks',
+                        filter: `user_id=eq.${currentUser.user_id}`
+                    }, 
+                    handleRealtimeUpdate
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('Real-time sync activated!');
+                        document.getElementById('realTimeIndicator').classList.remove('hidden');
+                        document.getElementById('cloudStatus').textContent = 'Connected';
+                        document.getElementById('cloudStatus').className = 'text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full';
+                    } else {
+                        document.getElementById('cloudStatus').textContent = 'Disconnected';
+                        document.getElementById('cloudStatus').className = 'text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full';
+                    }
+                });
+        }
+
+        // Handle real-time updates dari device lain
+        function handleRealtimeUpdate(payload) {
+            console.log('Real-time update received:', payload);
+            updateLastSync();
+            
+            const { eventType, new: newData, old: oldData } = payload;
+            
+            switch (eventType) {
+                case 'INSERT':
+                    // Task baru ditambah di device lain
+                    tasks.unshift(newData);
+                    showNotification(`📱 Tugas baru: "${newData.title}"`, 'info');
+                    break;
+                    
+                case 'UPDATE':
+                    // Task diupdate di device lain
+                    const index = tasks.findIndex(t => t.id === newData.id);
+                    if (index !== -1) {
+                        tasks[index] = newData;
+                        showNotification(`📱 Tugas diupdate: "${newData.title}"`, 'info');
+                    }
+                    break;
+                    
+                case 'DELETE':
+                    // Task dihapus di device lain
+                    tasks = tasks.filter(task => task.id !== oldData.id);
+                    showNotification(`📱 Tugas dihapus`, 'warning');
+                    break;
+            }
+            
+            updateUI();
+        }
+
+        // ==================== CRUD OPERATIONS ====================
         async function addTask(e) {
             e.preventDefault();
             
@@ -460,10 +764,12 @@
                 deadline: document.getElementById('taskDeadline').value,
                 priority: document.getElementById('taskPriority').value,
                 completed: false,
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                reminder_sent: false
             };
             
             try {
+                showLoadingState(true);
                 const { data, error } = await supabase
                     .from('tasks')
                     .insert([newTask])
@@ -471,15 +777,19 @@
 
                 if (error) throw error;
                 
-                tasks.unshift(data[0]);
-                updateUI();
                 closeAddTaskModal();
+                showNotification('🎉 Tugas berhasil disimpan ke cloud!', 'success');
                 
-                showNotification('🎉 Tugas berhasil ditambahkan!', 'success');
+                // Kirim reminder Telegram jika diaktifkan
+                if (document.getElementById('sendTelegramReminder').checked && telegramEnabled) {
+                    checkSingleTaskDeadline(data[0]);
+                }
                 
             } catch (error) {
                 console.error('Error adding task:', error);
-                showNotification('Gagal menambah tugas', 'error');
+                showNotification('❌ Gagal menambah tugas: ' + error.message, 'error');
+            } finally {
+                showLoadingState(false);
             }
         }
 
@@ -495,16 +805,17 @@
                 
                 if (error) throw error;
                 
-                task.completed = newStatus;
-                updateUI();
+                // Play celebration animation jika tugas selesai
+                if (newStatus) {
+                    playCelebration();
+                    showNotification('🎉 Tugas diselesaikan! Mantap!', 'success');
+                } else {
+                    showNotification('↩️ Tugas dikembalikan ke aktif', 'info');
+                }
                 
-                showNotification(
-                    newStatus ? '✅ Tugas diselesaikan!' : '↩️ Tugas dikembalikan',
-                    'success'
-                );
             } catch (error) {
                 console.error('Error updating task:', error);
-                showNotification('Gagal mengupdate tugas', 'error');
+                showNotification('❌ Gagal mengupdate tugas', 'error');
             }
         }
 
@@ -518,14 +829,318 @@
                     
                     if (error) throw error;
                     
-                    tasks = tasks.filter(task => task.id !== taskId);
-                    updateUI();
-                    showNotification('🗑️ Tugas berhasil dihapus', 'warning');
+                    showNotification('🗑️ Tugas dihapus', 'warning');
+                    
                 } catch (error) {
                     console.error('Error deleting task:', error);
-                    showNotification('Gagal menghapus tugas', 'error');
+                    showNotification('❌ Gagal menghapus tugas', 'error');
                 }
             }
+        }
+
+        // ==================== TELEGRAM NOTIFICATION SYSTEM ====================
+        async function sendTelegramNotification(message) {
+            if (!telegramEnabled) return;
+            
+            const token = document.getElementById('telegramToken').value;
+            const chatId = document.getElementById('telegramChatId').value;
+            
+            if (!token || !chatId || token === 'your-telegram-bot-token' || chatId === 'your-chat-id') {
+                console.log('Telegram bot not configured properly');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Telegram API error: ' + response.status);
+                }
+                
+                console.log('Telegram notification sent successfully');
+                return true;
+            } catch (error) {
+                console.error('Error sending Telegram notification:', error);
+                return false;
+            }
+        }
+
+        function checkDeadlines() {
+            const now = new Date();
+            const threeDaysLater = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000));
+            
+            tasks.forEach(task => {
+                if (!task.completed && !task.reminder_sent) {
+                    const taskDeadline = new Date(task.deadline);
+                    const daysUntilDeadline = Math.ceil((taskDeadline - now) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysUntilDeadline >= 1 && daysUntilDeadline <= 3) {
+                        sendDeadlineReminder(task, daysUntilDeadline);
+                    }
+                }
+            });
+        }
+
+        function checkSingleTaskDeadline(task) {
+            const now = new Date();
+            const taskDeadline = new Date(task.deadline);
+            const daysUntilDeadline = Math.ceil((taskDeadline - now) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilDeadline >= 1 && daysUntilDeadline <= 3) {
+                sendDeadlineReminder(task, daysUntilDeadline);
+            }
+        }
+
+        async function sendDeadlineReminder(task, daysLeft) {
+            const emoji = daysLeft === 1 ? '🚨' : daysLeft === 2 ? '⚠️' : '📅';
+            const urgency = daysLeft === 1 ? 'BESOK' : `${daysLeft} HARI LAGI`;
+            
+            const message = `
+${emoji} <b>REMINDER TUGAS - ${urgency}</b> ${emoji}
+
+📚 <b>${task.title}</b>
+⏰ Deadline: ${new Date(task.deadline).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+📅 Sisa waktu: <b>${daysLeft} hari</b>
+🎯 Prioritas: ${task.priority === 'high' ? '🔴 TINGGI' : task.priority === 'medium' ? '🟡 SEDANG' : '🟢 RENDAH'}
+${task.description ? `📝 ${task.description}` : ''}
+
+💪 Ayo selesaikan tugasnya sebelum deadline!
+#TugasMerah #Deadline
+            `.trim();
+
+            const sent = await sendTelegramNotification(message);
+            
+            if (sent) {
+                // Mark as reminder sent
+                try {
+                    await supabase
+                        .from('tasks')
+                        .update({ reminder_sent: true })
+                        .eq('id', task.id);
+                } catch (error) {
+                    console.error('Error updating reminder status:', error);
+                }
+            }
+        }
+
+        async function testTelegramConnection() {
+            const message = `
+🤖 <b>TEST NOTIFIKASI TELEGRAM</b>
+
+✅ Koneksi Telegram berhasil!
+📱 Aplikasi TugasMerah terhubung
+⏰ Notifikasi deadline akan dikirim otomatis
+☁️ Data tersimpan aman di cloud
+
+Tetap semangat belajar! 💪
+            `.trim();
+            
+            const sent = await sendTelegramNotification(message);
+            if (sent) {
+                showNotification('✅ Koneksi Telegram berhasil!', 'success');
+            } else {
+                showNotification('❌ Gagal mengirim test ke Telegram', 'error');
+            }
+        }
+
+        function toggleTelegramNotifications() {
+            telegramEnabled = !telegramEnabled;
+            const button = document.getElementById('telegramToggle');
+            if (telegramEnabled) {
+                button.textContent = 'Aktif';
+                button.className = 'bg-red-500 text-white px-3 py-1 rounded-lg text-sm';
+                showNotification('🔔 Notifikasi Telegram diaktifkan', 'success');
+            } else {
+                button.textContent = 'Nonaktif';
+                button.className = 'bg-gray-500 text-white px-3 py-1 rounded-lg text-sm';
+                showNotification('🔕 Notifikasi Telegram dinonaktifkan', 'warning');
+            }
+        }
+
+        // ==================== CALENDAR SYSTEM ====================
+        function loadCalendar() {
+            const calendarContainer = document.getElementById('calendar');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            let calendarHTML = `
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-lg font-semibold text-gray-900">
+                        ${firstDay.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                    </h4>
+                </div>
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    ${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => `
+                        <div class="text-center text-sm font-semibold text-gray-500 py-2">${day}</div>
+                    `).join('')}
+                </div>
+                <div class="grid grid-cols-7 gap-2">
+            `;
+            
+            // Empty cells for days before first day of month
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                calendarHTML += `<div class="h-12"></div>`;
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayTasks = tasks.filter(task => task.deadline === dateStr && !task.completed);
+                const isToday = day === now.getDate() && month === now.getMonth();
+                const hasTasks = dayTasks.length > 0;
+                
+                calendarHTML += `
+                    <div class="h-12 flex items-center justify-center relative group cursor-pointer ${
+                        isToday ? 'bg-red-500 text-white rounded-lg shadow-lg' : 
+                        hasTasks ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-100'
+                    } rounded-lg transition duration-200 transform hover:scale-105" 
+                    onclick="showDayTasks('${dateStr}')">
+                        <span class="text-sm font-medium ${isToday ? 'text-white' : 'text-gray-700'}">${day}</span>
+                        ${hasTasks ? `
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse-custom"></div>
+                            <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                                <div class="w-1 h-1 bg-red-400 rounded-full"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            calendarHTML += `</div>`;
+            calendarContainer.innerHTML = calendarHTML;
+        }
+
+        function showDayTasks(dateStr) {
+            const dayTasks = tasks.filter(task => task.deadline === dateStr && !task.completed);
+            if (dayTasks.length > 0) {
+                const taskTitles = dayTasks.map(task => `• ${task.title}`).join('\n');
+                alert(`Tugas untuk ${formatDate(dateStr)}:\n\n${taskTitles}`);
+            } else {
+                showNotification(`Tidak ada tugas untuk ${formatDate(dateStr)}`, 'info');
+            }
+        }
+
+        function loadCalendarDeadlines() {
+            const upcomingTasks = tasks.filter(task => 
+                new Date(task.deadline) > new Date() && !task.completed
+            ).sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+            .slice(0, 5);
+            
+            const calendarContainer = document.getElementById('calendar-deadlines');
+            
+            if (upcomingTasks.length === 0) {
+                calendarContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-check text-3xl mb-3 text-green-400"></i>
+                        <p class="font-medium">Tidak ada deadline mendatang</p>
+                        <p class="text-sm mt-1">Semua tugas sudah selesai! 🎉</p>
+                    </div>
+                `;
+            } else {
+                calendarContainer.innerHTML = upcomingTasks.map(task => `
+                    <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-red-300 transition duration-200 transform hover:scale-105">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">${task.title}</p>
+                            <p class="text-sm text-gray-600 flex items-center mt-1">
+                                <i class="fas fa-calendar-day text-red-400 mr-2"></i>
+                                ${formatDate(task.deadline)}
+                            </p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            task.priority === 'high' ? 'priority-high animate-pulse-custom' : 
+                            task.priority === 'medium' ? 'priority-medium' : 
+                            'priority-low'
+                        } font-medium">
+                            ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==================== NOTES SYSTEM ====================
+        function saveQuickNote() {
+            const noteText = document.getElementById('quickNote').value.trim();
+            if (noteText) {
+                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+                const newNote = {
+                    id: Date.now(),
+                    text: noteText,
+                    created: new Date().toISOString()
+                };
+                notes.unshift(newNote);
+                localStorage.setItem('quickNotes', JSON.stringify(notes));
+                
+                document.getElementById('quickNote').value = '';
+                loadSavedNotes();
+                showNotification('📝 Catatan disimpan!', 'success');
+                
+                // Animasi save
+                const button = event.target;
+                button.classList.add('animate-pulse-custom');
+                setTimeout(() => button.classList.remove('animate-pulse-custom'), 1000);
+            } else {
+                showNotification('❌ Catatan tidak boleh kosong', 'error');
+            }
+        }
+
+        function loadSavedNotes() {
+            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            const notesContainer = document.getElementById('savedNotes');
+            
+            if (notes.length === 0) {
+                notesContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-sticky-note text-3xl mb-3 text-gray-400"></i>
+                        <p class="font-medium">Belum ada catatan</p>
+                        <p class="text-sm mt-1">Tulis catatan penting di kolom sebelah</p>
+                    </div>
+                `;
+            } else {
+                notesContainer.innerHTML = notes.map(note => `
+                    <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-300 transition duration-200 transform hover:scale-105">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-gray-700 flex-1">${note.text}</p>
+                            <button onclick="deleteNote(${note.id})" class="text-red-400 hover:text-red-600 ml-2 transition duration-200">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 flex items-center">
+                            <i class="fas fa-clock mr-1"></i>
+                            ${new Date(note.created).toLocaleDateString('id-ID', { 
+                                day: 'numeric', 
+                                month: 'short', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function deleteNote(noteId) {
+            let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            notes = notes.filter(note => note.id !== noteId);
+            localStorage.setItem('quickNotes', JSON.stringify(notes));
+            loadSavedNotes();
+            showNotification('🗑️ Catatan dihapus', 'warning');
         }
 
         // ==================== UI MANAGEMENT ====================
@@ -534,16 +1149,22 @@
             updateStats();
             updateProgress();
             updateReminders();
+            updateWeeklyProgress();
             renderTasks();
         }
 
         function updateDate() {
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
             
-            const currentDateElement = document.getElementById('currentDate');
-            if (currentDateElement) {
-                currentDateElement.textContent = now.toLocaleDateString('id-ID', options);
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('id-ID', options);
             }
         }
 
@@ -563,6 +1184,11 @@
             document.getElementById('totalTasks').textContent = tasks.length;
         }
 
+        function updateLastSync() {
+            const now = new Date();
+            document.getElementById('lastSync').textContent = now.toLocaleTimeString('id-ID');
+        }
+
         function updateProgress() {
             const totalTasks = tasks.length;
             const completedTasks = tasks.filter(task => task.completed).length;
@@ -579,6 +1205,42 @@
             } else {
                 progressText.textContent = `Lanjutkan, kamu sudah ${Math.round(progress)}%!`;
             }
+        }
+
+        function updateWeeklyProgress() {
+            const weeklyProgress = calculateWeeklyProgress();
+            const progressElement = document.getElementById('weeklyProgress');
+            const progressText = document.getElementById('weeklyProgressText');
+            const progressLabel = document.getElementById('weeklyProgressLabel');
+            
+            if (progressElement) {
+                progressElement.style.strokeDasharray = `${weeklyProgress}, 100`;
+                progressText.textContent = `${weeklyProgress}%`;
+                
+                if (weeklyProgress === 100) {
+                    progressLabel.textContent = 'Minggu sempurna! 🎉';
+                    progressLabel.className = 'text-center text-sm text-green-600 font-medium mt-4';
+                } else if (weeklyProgress >= 70) {
+                    progressLabel.textContent = 'Progress bagus! 💪';
+                    progressLabel.className = 'text-center text-sm text-green-600 mt-4';
+                } else if (weeklyProgress >= 40) {
+                    progressLabel.textContent = 'Tetap semangat! 🔥';
+                    progressLabel.className = 'text-center text-sm text-yellow-600 mt-4';
+                } else {
+                    progressLabel.textContent = 'Progress minggu ini';
+                    progressLabel.className = 'text-center text-sm text-gray-600 mt-4';
+                }
+            }
+        }
+
+        function calculateWeeklyProgress() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            const weeklyTasks = tasks.filter(task => new Date(task.created_at) >= oneWeekAgo);
+            const completedWeekly = weeklyTasks.filter(task => task.completed);
+            
+            return weeklyTasks.length > 0 ? Math.round((completedWeekly.length / weeklyTasks.length) * 100) : 0;
         }
 
         function updateReminders() {
@@ -601,12 +1263,12 @@
                 `;
             } else {
                 reminderContainer.innerHTML = todayTasks.map(task => `
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200 hover:border-red-300 transition duration-200">
                         <div class="flex items-center space-x-3 flex-1">
-                            <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
+                            <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 animate-pulse-custom"></div>
                             <span class="text-sm font-medium truncate">${task.title}</span>
                         </div>
-                        <span class="text-xs text-red-600 font-medium bg-red-100 px-2 py-1 rounded-full whitespace-nowrap">
+                        <span class="text-xs text-red-600 font-medium bg-red-100 px-2 py-1 rounded-full whitespace-nowrap animate-pulse-custom">
                             Hari ini
                         </span>
                     </div>
@@ -630,15 +1292,18 @@
             
             const taskList = document.getElementById('taskList');
             const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
             
             if (filteredTasks.length === 0) {
                 taskList.classList.add('hidden');
                 emptyState.classList.remove('hidden');
+                loadingState.classList.add('hidden');
                 return;
             }
             
             taskList.classList.remove('hidden');
             emptyState.classList.add('hidden');
+            loadingState.classList.add('hidden');
             
             taskList.innerHTML = filteredTasks.map((task, index) => `
                 <div class="task-card p-6 ${task.completed ? 'opacity-70' : ''}" style="animation-delay: ${index * 0.1}s">
@@ -646,35 +1311,35 @@
                         <h3 class="font-bold text-lg text-gray-900 ${task.completed ? 'line-through' : ''}">
                             ${task.title}
                         </h3>
-                        <span class="text-xs px-3 py-1 rounded-full border ${
-                            task.priority === 'high' ? 'bg-red-100 text-red-800 border-red-200' : 
-                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 
-                            'bg-green-100 text-green-800 border-green-200'
+                        <span class="text-xs px-3 py-1 rounded-full border font-medium ${
+                            task.priority === 'high' ? 'priority-high animate-pulse-custom' : 
+                            task.priority === 'medium' ? 'priority-medium' : 
+                            'priority-low'
                         }">
                             ${task.priority === 'high' ? '🔴 Tinggi' : task.priority === 'medium' ? '🟡 Sedang' : '🟢 Rendah'}
                         </span>
                     </div>
                     
                     <p class="text-gray-600 text-sm mb-4 leading-relaxed min-h-[3rem]">
-                        ${task.description || '<span class="text-gray-400">Tidak ada deskripsi</span>'}
+                        ${task.description || '<span class="text-gray-400 italic">Tidak ada deskripsi</span>'}
                     </p>
                     
                     <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
                         <div class="flex items-center space-x-2">
-                            <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500' : ''}"></i>
+                            <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500 animate-shake' : ''}"></i>
                             <span class="${isOverdue(task) ? 'text-red-500 font-medium' : ''}">
                                 ${formatDate(task.deadline)}
                             </span>
                         </div>
                         ${isOverdue(task) ? 
-                            '<span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Terlambat</span>' : 
+                            '<span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full animate-pulse-custom">Terlambat</span>' : 
                             ''
                         }
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <button onclick="toggleTask(${task.id})" 
-                                class="px-4 py-2 rounded-lg text-sm font-medium transition duration-200 ${
+                                class="px-4 py-2 rounded-lg text-sm font-medium transition duration-200 transform hover:scale-105 ${
                                     task.completed ? 
                                     'bg-green-100 text-green-800 hover:bg-green-200' : 
                                     'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -685,7 +1350,7 @@
                         
                         <div class="flex space-x-2">
                             <button onclick="deleteTask(${task.id})" 
-                                    class="w-10 h-10 bg-red-100 text-red-800 rounded-lg flex items-center justify-center hover:bg-red-200 transition duration-200">
+                                    class="w-10 h-10 bg-red-100 text-red-800 rounded-lg flex items-center justify-center hover:bg-red-200 transition duration-200 transform hover:scale-110">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -706,40 +1371,115 @@
             });
         }
 
+        // ==================== ANIMATION EFFECTS ====================
+        function playCelebration() {
+            createConfetti();
+            showNotification('🎉 Yeay! Tugas selesai!', 'success');
+        }
+
+        function createConfetti() {
+            const colors = ['#E63946', '#f97316', '#f59e0b', '#10b981', '#3b82f6'];
+            const container = document.body;
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `confettiRain ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        function showLoadingState(show) {
+            const loadingState = document.getElementById('loadingState');
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (show) {
+                loadingState.classList.remove('hidden');
+                taskList.classList.add('hidden');
+                emptyState.classList.add('hidden');
+            } else {
+                loadingState.classList.add('hidden');
+            }
+        }
+
         // ==================== PAGE NAVIGATION ====================
         function showPage(pageName) {
+            // Hide all pages
             document.getElementById('dashboard-page').classList.add('page-hidden');
             document.getElementById('calendar-page').classList.add('page-hidden');
             document.getElementById('notes-page').classList.add('page-hidden');
+            document.getElementById('settings-page').classList.add('page-hidden');
             
+            // Show selected page
             document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
             updateNavigationActiveState(pageName);
+            
+            // Load page-specific content
+            if (pageName === 'calendar') {
+                loadCalendar();
+                loadCalendarDeadlines();
+            } else if (pageName === 'notes') {
+                loadSavedNotes();
+            } else if (pageName === 'settings') {
+                document.getElementById('settingsUsername').textContent = currentUser.username;
+            }
         }
 
         function updateNavigationActiveState(activePage) {
+            // Update desktop navigation
             const desktopItems = document.querySelectorAll('nav a');
             desktopItems.forEach(item => {
                 const linkText = item.querySelector('span').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'dashboard') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
-                    (activePage === 'notes' && linkText === 'catatan')) {
+                    (activePage === 'notes' && linkText === 'catatan') ||
+                    (activePage === 'settings' && linkText === 'pengaturan')) {
                     item.classList.add('nav-active');
                 } else {
                     item.classList.remove('nav-active');
                 }
             });
 
+            // Update mobile navigation
             const mobileItems = document.querySelectorAll('.mobile-nav a');
             mobileItems.forEach(item => {
                 const linkText = item.querySelector('.text-xs').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'home') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
-                    (activePage === 'notes' && linkText === 'catatan')) {
+                    (activePage === 'notes' && linkText === 'catatan') ||
+                    (activePage === 'settings' && linkText === 'settings')) {
                     item.classList.add('nav-active');
                 } else {
                     item.classList.remove('nav-active');
                 }
             });
+        }
+
+        // ==================== AUTHENTICATION ====================
+        function checkAuth() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return null;
+            }
+            return {
+                username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
+                user_id: localStorage.getItem('user_id') || 'khoirul-amri'
+            };
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+                window.location.href = 'index.html';
+            }
         }
 
         // ==================== MODAL FUNCTIONS ====================
@@ -750,6 +1490,7 @@
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('taskDeadline').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('taskTitle').focus();
         }
 
         function closeAddTaskModal() {
@@ -760,7 +1501,7 @@
         // ==================== NOTIFICATION SYSTEM ====================
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-all duration-300 shadow-lg ${
                 type === 'success' ? 'bg-green-500' : 
                 type === 'warning' ? 'bg-yellow-500' : 
                 type === 'error' ? 'bg-red-500' : 'bg-blue-500'
@@ -778,6 +1519,12 @@
             
             document.body.appendChild(notification);
             
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Animate out after 3 seconds
             setTimeout(() => {
                 notification.style.transform = 'translateX(100%)';
                 setTimeout(() => notification.remove(), 300);
@@ -789,18 +1536,32 @@
             currentUser = checkAuth();
             if (!currentUser) return;
 
+            // Update user info
             document.getElementById('welcomeName').textContent = currentUser.username;
             document.getElementById('sidebarUsername').textContent = currentUser.username;
+            document.getElementById('settingsUsername').textContent = currentUser.username;
             
-            await loadTasks();
-            
+            // Set random motivation message
             const messages = [
                 { text: "Semangat menyelesaikan tugas hari ini! 🚀", sub: "Kamu bisa, satu per satu tugas akan selesai!" },
                 { text: "Progress kecil tetap progress! 💪", sub: "Langkah kecil membawa hasil besar!" },
+                { text: "Kamu lebih kuat dari deadline! 🔥", sub: "Fokus dan selesaikan dengan baik!" },
+                { text: "Setiap tugas yang selesai adalah kemenangan! 🏆", sub: "Terus lanjutkan perjuangan!" },
+                { text: "Hari ini adalah kesempatan untuk berkembang! 🌟", sub: "Manfaatkan waktumu sebaik mungkin!" }
             ];
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
+
+            // Load initial data
+            await loadTasks();
+            
+            // Setup periodic checks
+            setInterval(checkDeadlines, 60 * 60 * 1000); // Check every hour
+            setInterval(updateLastSync, 30000); // Update sync time every 30 seconds
+            
+            // Initial deadline check
+            checkDeadlines();
         }
 
         // Event Listeners
@@ -808,6 +1569,14 @@
         document.getElementById('filterStatus').addEventListener('change', renderTasks);
         document.getElementById('addTaskModal').addEventListener('click', function(e) {
             if (e.target === this) closeAddTaskModal();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                openAddTaskModal();
+            }
         });
 
         // Initialize
