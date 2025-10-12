@@ -147,18 +147,18 @@
             submitBtn.disabled = true;
             
             try {
-                // Check credentials
-                if (username === 'Khoirul Amri Siregar' && password === '2509') {
+                // Simple authentication - accept any username/password for demo
+                if (username && password) {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', username);
-                    localStorage.setItem('user_id', 'khoirul-amri'); // Unique user ID
+                    localStorage.setItem('user_id', username.toLowerCase().replace(/\s+/g, '-'));
                     
-                    showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
+                    showNotification(`Login berhasil! Selamat datang ${username}!`, 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
-                    throw new Error('Username atau password salah!');
+                    throw new Error('Username dan password harus diisi!');
                 }
             } catch (error) {
                 showNotification(error.message, 'error');
