@@ -1463,25 +1463,15 @@ Tetap semangat belajar! 💪
 
         // ==================== AUTHENTICATION ====================
         function checkAuth() {
-            if (localStorage.getItem('isLoggedIn') !== 'true') {
-                window.location.href = 'index.html';
-                return null;
-            }
-            return {
-                username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
-                user_id: localStorage.getItem('user_id') || 'khoirul-amri'
-            };
-        }
-
-        function logout() {
-            if (confirm('Yakin ingin logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
-                window.location.href = 'index.html';
-            }
-        }
-
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'login.html';  // ← UBAH INI dari index.html ke login.html
+        return null;
+    }
+    return {
+        username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
+        user_id: localStorage.getItem('user_id') || 'khoirul-amri'
+    };
+}
         // ==================== MODAL FUNCTIONS ====================
         function openAddTaskModal() {
             document.getElementById('addTaskModal').classList.remove('hidden');
@@ -1584,4 +1574,5 @@ Tetap semangat belajar! 💪
     </script>
 </body>
 </html>
+
 
