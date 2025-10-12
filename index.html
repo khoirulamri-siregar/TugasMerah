@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TugasMerah - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -37,25 +38,14 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Animations */
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes float {
@@ -67,39 +57,17 @@
             animation: float 3s ease-in-out infinite;
         }
 
-        /* Responsive Design */
         @media (max-width: 640px) {
             .login-card {
                 margin: 1rem;
                 padding: 1.5rem !important;
                 border-radius: 16px;
             }
-            .logo-container {
-                width: 80px !important;
-                height: 80px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 1.25rem !important;
-            }
-            .feature-grid {
-                grid-template-columns: 1fr 1fr !important;
-                gap: 0.5rem !important;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .login-card {
-                padding: 1rem !important;
-                margin: 0.5rem;
-            }
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
-    <!-- Animated Background Elements -->
+    <!-- Animated Background -->
     <div class="fixed top-10 left-10 w-6 h-6 bg-white rounded-full opacity-20 floating" style="animation-delay: 0s;"></div>
     <div class="fixed top-20 right-20 w-8 h-8 bg-white rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
     <div class="fixed bottom-20 left-20 w-10 h-10 bg-white rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
@@ -107,7 +75,7 @@
     <div class="login-card w-full max-w-md p-8">
         <!-- Logo & Header -->
         <div class="text-center mb-8">
-            <div class="logo-container w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg floating">
+            <div class="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg floating">
                 <i class="fas fa-tasks text-white text-3xl"></i>
             </div>
             <h1 class="text-3xl font-bold text-gray-900">TugasMerah</h1>
@@ -139,25 +107,11 @@
             </button>
         </form>
 
-        <!-- Demo Info -->
-        <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-200">
-            <div class="flex items-start space-x-3">
-                <i class="fas fa-info-circle text-red-500 mt-1"></i>
-                <div>
-                    <p class="text-sm font-medium text-red-800">Login untuk KhoirulWangi</p>
-                    <p class="text-xs text-red-600 mt-1">
-                        Username: <strong>KhoirulWangi</strong><br>
-                        Password: <strong>2509</strong>
-                    </p>
-                </div>
-            </div>
-        </div>
-
         <!-- Features Preview -->
-        <div class="mt-8 grid grid-cols-2 gap-4 text-center feature-grid">
+        <div class="mt-8 grid grid-cols-2 gap-4 text-center">
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.1s">
                 <i class="fas fa-bell text-red-500 text-lg mb-2"></i>
-                <p class="text-xs font-medium text-gray-700">Reminder</p>
+                <p class="text-xs font-medium text-gray-700">Telegram Reminder</p>
             </div>
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.2s">
                 <i class="fas fa-mobile-alt text-red-500 text-lg mb-2"></i>
@@ -165,17 +119,23 @@
             </div>
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.3s">
                 <i class="fas fa-chart-line text-red-500 text-lg mb-2"></i>
-                <p class="text-xs font-medium text-gray-700">Progress</p>
+                <p class="text-xs font-medium text-gray-700">Real-time Sync</p>
             </div>
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.4s">
-                <i class="fas fa-paper-plane text-red-500 text-lg mb-2"></i>
-                <p class="text-xs font-medium text-gray-700">Telegram</p>
+                <i class="fas fa-cloud text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Cloud Storage</p>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://cdizlgogpwpbjulobkjq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaXpsZ29ncHdwYmp1bG9ia2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTcwNzEsImV4cCI6MjA3NTc3MzA3MX0._LyaIk2ubgc7rSqMJeW6_RfhGERO4ET7o8m-6VUp6Fs';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -186,21 +146,25 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
             submitBtn.disabled = true;
             
-            // Simulate API call
-            setTimeout(() => {
-                if (username === 'KhoirulWangi' && password === '2509') {
+            try {
+                // Check credentials
+                if (username === 'Khoirul Amri Siregar' && password === '2509') {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', username);
+                    localStorage.setItem('user_id', 'khoirul-amri'); // Unique user ID
+                    
                     showNotification('Login berhasil! Selamat datang Khoirul!', 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
-                    showNotification('Username atau password salah!', 'error');
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
-                    submitBtn.disabled = false;
+                    throw new Error('Username atau password salah!');
                 }
-            }, 1500);
+            } catch (error) {
+                showNotification(error.message, 'error');
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
+                submitBtn.disabled = false;
+            }
         });
 
         function showNotification(message, type) {
@@ -216,7 +180,6 @@
             `;
             
             document.body.appendChild(notification);
-            
             setTimeout(() => notification.remove(), 3000);
         }
 
@@ -225,7 +188,7 @@
             window.location.href = 'dashboard.html';
         }
 
-        // Add animation delays to feature cards
+        // Add animation delays
         document.addEventListener('DOMContentLoaded', function() {
             const featureCards = document.querySelectorAll('.feature-card');
             featureCards.forEach((card, index) => {
