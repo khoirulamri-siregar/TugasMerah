@@ -63,7 +63,6 @@
             background-clip: text;
         }
 
-        /* FIXED HEADER */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -73,7 +72,6 @@
             animation: slideDown 0.3s ease-out;
         }
 
-        /* Animations */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -89,17 +87,8 @@
             to { opacity: 1; }
         }
 
-        @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0.3); }
-            50% { opacity: 1; transform: scale(1.05); }
-            70% { transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .animate-bounce-in { animation: bounceIn 0.6s ease-out; }
         .animate-fade-in { animation: fadeIn 0.5s ease-out; }
 
-        /* Mobile Bottom Navigation */
         @media (max-width: 768px) {
             .mobile-nav {
                 position: fixed;
@@ -115,17 +104,12 @@
         }
 
         .page-hidden { display: none; }
-        .sync-indicator { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Supabase Configuration -->
     <script>
         const SUPABASE_URL = 'https://cdizlgogpwpbjulobkjq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaXpsZ29ncHdwYmp1bG9ia2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTcwNzEsImV4cCI6MjA3NTc3MzA3MX0._LyaIk2ubgc7rSqMJeW6_RfhGERO4ET7o8m-6VUp6Fs';
-        const TELEGRAM_BOT_TOKEN = 'your-telegram-bot-token'; // Ganti dengan token bot Telegram Anda
-        const TELEGRAM_CHAT_ID = 'your-chat-id'; // Ganti dengan chat ID Anda
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     </script>
@@ -133,16 +117,15 @@
     <!-- Desktop Sidebar -->
     <div class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200">
         <div class="w-full p-6 flex flex-col">
-            <!-- Logo & Sync Status -->
+            <!-- Logo -->
             <div class="flex items-center space-x-3 mb-8">
                 <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fas fa-tasks text-white"></i>
                 </div>
-                <div class="flex-1">
+                <div>
                     <h1 class="text-xl font-bold text-gray-900">TugasMerah</h1>
                     <p class="text-xs text-red-500 font-medium">#SemangatBelajar</p>
                 </div>
-                <div id="syncStatus" class="w-3 h-3 bg-green-500 rounded-full sync-indicator" title="Terhubung ke Cloud"></div>
             </div>
             
             <!-- Navigation -->
@@ -158,10 +141,6 @@
                 <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('notes')">
                     <i class="fas fa-sticky-note w-5"></i>
                     <span>Catatan</span>
-                </a>
-                <a href="#" class="flex items-center space-x-3 p-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200" onclick="showPage('settings')">
-                    <i class="fas fa-cog w-5"></i>
-                    <span>Pengaturan</span>
                 </a>
             </nav>
             
@@ -195,7 +174,7 @@
 
     <!-- Main Content -->
     <div class="md:ml-64 main-content">
-        <!-- FIXED HEADER -->
+        <!-- Header -->
         <header class="sticky-header">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
@@ -204,7 +183,6 @@
                         <p class="text-gray-600" id="currentDate">Mengambil tanggal...</p>
                     </div>
                     
-                    <!-- Quick Stats dengan Sync Info -->
                     <div class="hidden md:flex items-center space-x-6">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-red-500" id="todayTasks">0</div>
@@ -227,7 +205,7 @@
         <div id="dashboard-page" class="animate-fade-in">
             <!-- Motivation Section -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
-                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg animate-bounce-in">
+                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <h2 class="text-xl font-bold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</h2>
@@ -238,7 +216,7 @@
                 </div>
             </div>
 
-            <!-- Quick Actions & Reminder -->
+            <!-- Quick Stats -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Reminder Harian -->
@@ -254,55 +232,34 @@
                         </div>
                     </div>
 
-                    <!-- Progress Ringan -->
+                    <!-- Progress -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
+                            <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress
                         </h3>
-                        <div class="flex items-center justify-center">
-                            <div class="relative w-32 h-32">
-                                <svg class="w-full h-full" viewBox="0 0 36 36">
-                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        fill="none" stroke="#e5e7eb" stroke-width="3"/>
-                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        fill="none" stroke="#E63946" stroke-width="3"
-                                        stroke-dasharray="0, 100" id="weeklyProgress"/>
-                                    <text x="18" y="20.5" text-anchor="middle" font-size="8" fill="#E63946" font-weight="bold" id="weeklyProgressText">0%</text>
-                                </svg>
-                            </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-red-500 mb-2" id="totalTasks">0</div>
+                            <p class="text-sm text-gray-600">Total Tugas</p>
                         </div>
-                        <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                     </div>
 
-                    <!-- Sync Status -->
+                    <!-- Quick Add -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                            <i class="fas fa-cloud text-red-500 mr-2"></i>Status Sync
+                            <i class="fas fa-plus text-red-500 mr-2"></i>Tambah Cepat
                         </h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Cloud Connection</span>
-                                <span id="cloudStatus" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Connected</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Total Tugas</span>
-                                <span id="totalTasks" class="text-sm font-bold text-red-500">0</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Last Sync</span>
-                                <span id="lastSync" class="text-xs text-gray-500">-</span>
-                            </div>
-                        </div>
+                        <button onclick="openAddTaskModal()" class="floating-btn text-white w-full py-3 rounded-xl font-medium">
+                            <i class="fas fa-plus mr-2"></i>Tambah Tugas Baru
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Task List Section -->
+            <!-- Task List -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 class="text-2xl font-bold text-gray-900 flex items-center">
                         <i class="fas fa-tasks text-red-500 mr-3"></i>Daftar Tugas Aktif
-                        <span id="realTimeIndicator" class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full hidden">Real-time</span>
                     </h2>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <select id="filterPriority" class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
@@ -343,26 +300,9 @@
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender Akademik
+                        <i class="fas fa-calendar-alt text-red-500 mr-3"></i>Kalender
                     </h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Calendar View -->
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Kalender Bulan Ini</h3>
-                            <div id="calendar" class="text-center">
-                                <!-- Calendar akan di-generate di sini -->
-                            </div>
-                        </div>
-
-                        <!-- Upcoming Events -->
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Deadline Mendatang</h3>
-                            <div id="calendar-deadlines" class="space-y-3">
-                                <!-- Upcoming deadlines akan dimuat di sini -->
-                            </div>
-                        </div>
-                    </div>
+                    <p class="text-gray-600">Fitur kalender akan datang soon! 📅</p>
                 </div>
             </div>
         </div>
@@ -372,84 +312,9 @@
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan Cepat
+                        <i class="fas fa-sticky-note text-red-500 mr-3"></i>Catatan
                     </h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Add Note -->
-                        <div class="space-y-4">
-                            <textarea id="quickNote" rows="8" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
-                                placeholder="Tulis catatan penting di sini..."></textarea>
-                            <button onclick="saveQuickNote()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-save mr-2"></i>Simpan Catatan
-                            </button>
-                        </div>
-
-                        <!-- Saved Notes -->
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Catatan Tersimpan</h3>
-                            <div id="savedNotes" class="space-y-3 max-h-96 overflow-y-auto">
-                                <!-- Saved notes akan muncul di sini -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS PAGE -->
-        <div id="settings-page" class="page-hidden animate-fade-in">
-            <div class="px-4 sm:px-6 lg:px-8 py-6">
-                <div class="bg-white rounded-2xl p-6 shadow-sm">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-cog text-red-500 mr-3"></i>Pengaturan
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Account Settings -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-bold text-gray-900">Akun</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span class="text-gray-700">Username</span>
-                                    <span class="font-medium">Khoirul Amri Siregar</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span class="text-gray-700">Status</span>
-                                    <span class="font-medium text-green-600">Aktif</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- App Settings -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-bold text-gray-900">Aplikasi</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span class="text-gray-700">Notifikasi Telegram</span>
-                                    <button class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm">Aktif</button>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span class="text-gray-700">Tema</span>
-                                    <span class="font-medium">Merah</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Demo Info -->
-                    <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                        <div class="flex items-start space-x-3">
-                            <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                            <div>
-                                <p class="text-sm font-medium text-blue-800">Info Aplikasi</p>
-                                <p class="text-xs text-blue-600 mt-1">
-                                    Aplikasi TugasMerah dengan fitur real-time sync menggunakan Supabase dan reminder Telegram.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="text-gray-600">Fitur catatan akan datang soon! 📝</p>
                 </div>
             </div>
         </div>
@@ -473,16 +338,12 @@
                 <i class="fas fa-sticky-note mb-1"></i>
                 <span class="text-xs">Catatan</span>
             </a>
-            <a href="#" class="flex flex-col items-center p-2 rounded-xl text-gray-600 hover:text-red-500 transition duration-200" onclick="showPage('settings')">
-                <i class="fas fa-cog mb-1"></i>
-                <span class="text-xs">Settings</span>
-            </a>
         </div>
     </div>
 
     <!-- Add Task Modal -->
     <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-bounce-in">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center">
                     <i class="fas fa-plus-circle text-red-500 mr-2"></i>Tambah Tugas Baru
@@ -538,24 +399,40 @@
                 </button>
                 <button type="submit" form="taskForm"
                         class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-save mr-2"></i>Simpan ke Cloud
+                    <i class="fas fa-save mr-2"></i>Simpan Tugas
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== REAL-TIME SYNC SYSTEM ====================
+        // ==================== AUTHENTICATION ====================
+        function checkAuth() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return null;
+            }
+            return {
+                username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
+                user_id: localStorage.getItem('user_id') || 'khoirul-amri'
+            };
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ==================== TASK MANAGEMENT ====================
         let tasks = [];
         let currentUser = null;
-        let realtimeSubscription = null;
 
-        // Load tasks dengan real-time subscription
         async function loadTasks() {
             try {
-                showNotification('🔄 Memuat tugas dari cloud...', 'info');
-                
-                // Load initial data
                 const { data, error } = await supabase
                     .from('tasks')
                     .select('*')
@@ -566,83 +443,13 @@
                 
                 tasks = data || [];
                 updateUI();
-                updateLastSync();
-                
-                // Setup real-time subscription
-                setupRealtimeSubscription();
-                
-                showNotification('✅ Tugas berhasil dimuat!', 'success');
                 
             } catch (error) {
                 console.error('Error loading tasks:', error);
-                showNotification('❌ Gagal memuat tugas', 'error');
+                showNotification('Gagal memuat tugas', 'error');
             }
         }
 
-        // Setup real-time listener
-        function setupRealtimeSubscription() {
-            if (realtimeSubscription) {
-                supabase.removeChannel(realtimeSubscription);
-            }
-
-            realtimeSubscription = supabase
-                .channel('tasks-changes')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', // Listen to all events: INSERT, UPDATE, DELETE
-                        schema: 'public', 
-                        table: 'tasks',
-                        filter: `user_id=eq.${currentUser.user_id}`
-                    }, 
-                    handleRealtimeUpdate
-                )
-                .subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        console.log('Real-time sync activated!');
-                        document.getElementById('realTimeIndicator').classList.remove('hidden');
-                        document.getElementById('cloudStatus').textContent = 'Connected';
-                        document.getElementById('cloudStatus').className = 'text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full';
-                    } else {
-                        document.getElementById('cloudStatus').textContent = 'Disconnected';
-                        document.getElementById('cloudStatus').className = 'text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full';
-                    }
-                });
-        }
-
-        // Handle real-time updates dari device lain
-        function handleRealtimeUpdate(payload) {
-            console.log('Real-time update received:', payload);
-            updateLastSync();
-            
-            const { eventType, new: newData, old: oldData } = payload;
-            
-            switch (eventType) {
-                case 'INSERT':
-                    // Task baru ditambah di device lain
-                    tasks.unshift(newData);
-                    showNotification(`📱 Tugas baru: "${newData.title}"`, 'info');
-                    break;
-                    
-                case 'UPDATE':
-                    // Task diupdate di device lain
-                    const index = tasks.findIndex(t => t.id === newData.id);
-                    if (index !== -1) {
-                        tasks[index] = newData;
-                        showNotification(`📱 Tugas diupdate: "${newData.title}"`, 'info');
-                    }
-                    break;
-                    
-                case 'DELETE':
-                    // Task dihapus di device lain
-                    tasks = tasks.filter(task => task.id !== oldData.id);
-                    showNotification(`📱 Tugas dihapus`, 'warning');
-                    break;
-            }
-            
-            updateUI();
-        }
-
-        // ==================== CRUD OPERATIONS ====================
         async function addTask(e) {
             e.preventDefault();
             
@@ -664,18 +471,15 @@
 
                 if (error) throw error;
                 
-                // Note: tasks akan otomatis update via real-time subscription
-                // Jadi kita tidak perlu manually update tasks array
-                
+                tasks.unshift(data[0]);
+                updateUI();
                 closeAddTaskModal();
-                showNotification('🎉 Tugas berhasil disimpan ke cloud!', 'success');
                 
-                // Check deadline untuk reminder
-                checkSingleTaskDeadline(data[0]);
+                showNotification('🎉 Tugas berhasil ditambahkan!', 'success');
                 
             } catch (error) {
                 console.error('Error adding task:', error);
-                showNotification('❌ Gagal menambah tugas', 'error');
+                showNotification('Gagal menambah tugas', 'error');
             }
         }
 
@@ -691,15 +495,16 @@
                 
                 if (error) throw error;
                 
-                // Status akan otomatis update via real-time
+                task.completed = newStatus;
+                updateUI();
+                
                 showNotification(
                     newStatus ? '✅ Tugas diselesaikan!' : '↩️ Tugas dikembalikan',
                     'success'
                 );
-                
             } catch (error) {
                 console.error('Error updating task:', error);
-                showNotification('❌ Gagal mengupdate tugas', 'error');
+                showNotification('Gagal mengupdate tugas', 'error');
             }
         }
 
@@ -713,233 +518,14 @@
                     
                     if (error) throw error;
                     
-                    // Task akan otomatis hilang via real-time
-                    showNotification('🗑️ Tugas dihapus', 'warning');
-                    
+                    tasks = tasks.filter(task => task.id !== taskId);
+                    updateUI();
+                    showNotification('🗑️ Tugas berhasil dihapus', 'warning');
                 } catch (error) {
                     console.error('Error deleting task:', error);
-                    showNotification('❌ Gagal menghapus tugas', 'error');
+                    showNotification('Gagal menghapus tugas', 'error');
                 }
             }
-        }
-
-        // ==================== TELEGRAM NOTIFICATION ====================
-        async function sendTelegramNotification(message) {
-            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-                console.log('Telegram bot not configured');
-                return;
-            }
-
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Telegram API error');
-                }
-                
-                console.log('Telegram notification sent');
-            } catch (error) {
-                console.error('Error sending Telegram notification:', error);
-            }
-        }
-
-        function checkDeadlines() {
-            const now = new Date();
-            const threeDaysLater = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000));
-            
-            tasks.forEach(task => {
-                if (!task.completed && !task.reminder_sent) {
-                    const taskDeadline = new Date(task.deadline);
-                    const daysUntilDeadline = Math.ceil((taskDeadline - now) / (1000 * 60 * 60 * 24));
-                    
-                    if (daysUntilDeadline >= 1 && daysUntilDeadline <= 3) {
-                        sendDeadlineReminder(task, daysUntilDeadline);
-                    }
-                }
-            });
-        }
-
-        function checkSingleTaskDeadline(task) {
-            const now = new Date();
-            const taskDeadline = new Date(task.deadline);
-            const daysUntilDeadline = Math.ceil((taskDeadline - now) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntilDeadline >= 1 && daysUntilDeadline <= 3) {
-                sendDeadlineReminder(task, daysUntilDeadline);
-            }
-        }
-
-        async function sendDeadlineReminder(task, daysLeft) {
-            const message = `
-🚨 <b>REMINDER TUGAS</b> 🚨
-
-📚 <b>${task.title}</b>
-⏰ Deadline: ${new Date(task.deadline).toLocaleDateString('id-ID')}
-📅 Sisa waktu: <b>${daysLeft} hari</b>
-${task.description ? `📝 ${task.description}` : ''}
-
-💪 Ayo selesaikan tugasnya!
-            `.trim();
-
-            await sendTelegramNotification(message);
-            
-            // Mark as reminder sent
-            try {
-                await supabase
-                    .from('tasks')
-                    .update({ reminder_sent: true })
-                    .eq('id', task.id);
-            } catch (error) {
-                console.error('Error updating reminder status:', error);
-            }
-        }
-
-        // ==================== CALENDAR SYSTEM ====================
-        function loadCalendar() {
-            const calendarContainer = document.getElementById('calendar');
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            
-            let calendarHTML = `
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-lg font-semibold text-gray-900">
-                        ${firstDay.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                    </h4>
-                </div>
-                <div class="grid grid-cols-7 gap-2 mb-4">
-                    ${['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => `
-                        <div class="text-center text-sm font-semibold text-gray-500 py-2">${day}</div>
-                    `).join('')}
-                </div>
-                <div class="grid grid-cols-7 gap-2">
-            `;
-            
-            // Empty cells for days before first day of month
-            for (let i = 0; i < firstDay.getDay(); i++) {
-                calendarHTML += `<div class="h-12"></div>`;
-            }
-            
-            // Days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayTasks = tasks.filter(task => task.deadline === dateStr);
-                const isToday = day === now.getDate() && month === now.getMonth();
-                
-                calendarHTML += `
-                    <div class="h-12 flex items-center justify-center relative group cursor-pointer ${
-                        isToday ? 'bg-red-500 rounded-lg' : 'hover:bg-gray-100 rounded-lg'
-                    } transition duration-200">
-                        <span class="text-sm font-medium ${isToday ? 'text-white' : 'text-gray-700'}">${day}</span>
-                        ${dayTasks.length > 0 ? `
-                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            
-            calendarHTML += `</div>`;
-            calendarContainer.innerHTML = calendarHTML;
-        }
-
-        function loadCalendarDeadlines() {
-            const upcomingTasks = tasks.filter(task => 
-                new Date(task.deadline) > new Date() && !task.completed
-            ).slice(0, 5);
-            
-            const calendarContainer = document.getElementById('calendar-deadlines');
-            
-            if (upcomingTasks.length === 0) {
-                calendarContainer.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-calendar-check text-2xl mb-3"></i>
-                        <p>Tidak ada deadline mendatang</p>
-                    </div>
-                `;
-            } else {
-                calendarContainer.innerHTML = upcomingTasks.map(task => `
-                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">${task.title}</p>
-                            <p class="text-sm text-gray-600">${formatDate(task.deadline)}</p>
-                        </div>
-                        <span class="text-xs px-2 py-1 rounded-full ${
-                            task.priority === 'high' ? 'bg-red-100 text-red-800' : 
-                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
-                            'bg-green-100 text-green-800'
-                        }">
-                            ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
-                        </span>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // ==================== NOTES SYSTEM ====================
-        function saveQuickNote() {
-            const noteText = document.getElementById('quickNote').value;
-            if (noteText.trim()) {
-                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-                const newNote = {
-                    id: Date.now(),
-                    text: noteText,
-                    created: new Date().toISOString()
-                };
-                notes.unshift(newNote);
-                localStorage.setItem('quickNotes', JSON.stringify(notes));
-                
-                document.getElementById('quickNote').value = '';
-                loadSavedNotes();
-                showNotification('📝 Catatan disimpan!', 'success');
-            }
-        }
-
-        function loadSavedNotes() {
-            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-            const notesContainer = document.getElementById('savedNotes');
-            
-            if (notes.length === 0) {
-                notesContainer.innerHTML = `
-                    <div class="text-center py-4 text-gray-500">
-                        <i class="fas fa-sticky-note text-2xl mb-2"></i>
-                        <p>Belum ada catatan</p>
-                    </div>
-                `;
-            } else {
-                notesContainer.innerHTML = notes.map(note => `
-                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-gray-700 flex-1">${note.text}</p>
-                            <button onclick="deleteNote(${note.id})" class="text-red-500 hover:text-red-700 ml-2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500">${new Date(note.created).toLocaleDateString('id-ID')}</p>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function deleteNote(noteId) {
-            let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
-            notes = notes.filter(note => note.id !== noteId);
-            localStorage.setItem('quickNotes', JSON.stringify(notes));
-            loadSavedNotes();
-            showNotification('Catatan dihapus', 'warning');
         }
 
         // ==================== UI MANAGEMENT ====================
@@ -948,7 +534,6 @@ ${task.description ? `📝 ${task.description}` : ''}
             updateStats();
             updateProgress();
             updateReminders();
-            updateWeeklyProgress();
             renderTasks();
         }
 
@@ -956,10 +541,10 @@ ${task.description ? `📝 ${task.description}` : ''}
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
-            document.getElementById('currentDay').textContent = now.getDate();
-            document.getElementById('currentMonth').textContent = now.toLocaleDateString('id-ID', { month: 'long' });
-            document.getElementById('currentYear').textContent = now.getFullYear();
+            const currentDateElement = document.getElementById('currentDate');
+            if (currentDateElement) {
+                currentDateElement.textContent = now.toLocaleDateString('id-ID', options);
+            }
         }
 
         function updateStats() {
@@ -978,11 +563,6 @@ ${task.description ? `📝 ${task.description}` : ''}
             document.getElementById('totalTasks').textContent = tasks.length;
         }
 
-        function updateLastSync() {
-            const now = new Date();
-            document.getElementById('lastSync').textContent = now.toLocaleTimeString('id-ID');
-        }
-
         function updateProgress() {
             const totalTasks = tasks.length;
             const completedTasks = tasks.filter(task => task.completed).length;
@@ -999,27 +579,6 @@ ${task.description ? `📝 ${task.description}` : ''}
             } else {
                 progressText.textContent = `Lanjutkan, kamu sudah ${Math.round(progress)}%!`;
             }
-        }
-
-        function updateWeeklyProgress() {
-            const weeklyProgress = calculateWeeklyProgress();
-            const progressElement = document.getElementById('weeklyProgress');
-            const progressText = document.getElementById('weeklyProgressText');
-            
-            if (progressElement) {
-                progressElement.style.strokeDasharray = `${weeklyProgress}, 100`;
-                progressText.textContent = `${weeklyProgress}%`;
-            }
-        }
-
-        function calculateWeeklyProgress() {
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            
-            const weeklyTasks = tasks.filter(task => new Date(task.created_at) >= oneWeekAgo);
-            const completedWeekly = weeklyTasks.filter(task => task.completed);
-            
-            return weeklyTasks.length > 0 ? Math.round((completedWeekly.length / weeklyTasks.length) * 100) : 0;
         }
 
         function updateReminders() {
@@ -1152,18 +711,9 @@ ${task.description ? `📝 ${task.description}` : ''}
             document.getElementById('dashboard-page').classList.add('page-hidden');
             document.getElementById('calendar-page').classList.add('page-hidden');
             document.getElementById('notes-page').classList.add('page-hidden');
-            document.getElementById('settings-page').classList.add('page-hidden');
             
             document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
             updateNavigationActiveState(pageName);
-            
-            // Load page-specific content
-            if (pageName === 'calendar') {
-                loadCalendar();
-                loadCalendarDeadlines();
-            } else if (pageName === 'notes') {
-                loadSavedNotes();
-            }
         }
 
         function updateNavigationActiveState(activePage) {
@@ -1172,8 +722,7 @@ ${task.description ? `📝 ${task.description}` : ''}
                 const linkText = item.querySelector('span').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'dashboard') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
-                    (activePage === 'notes' && linkText === 'catatan') ||
-                    (activePage === 'settings' && linkText === 'pengaturan')) {
+                    (activePage === 'notes' && linkText === 'catatan')) {
                     item.classList.add('nav-active');
                 } else {
                     item.classList.remove('nav-active');
@@ -1185,34 +734,12 @@ ${task.description ? `📝 ${task.description}` : ''}
                 const linkText = item.querySelector('.text-xs').textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'home') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
-                    (activePage === 'notes' && linkText === 'catatan') ||
-                    (activePage === 'settings' && linkText === 'settings')) {
+                    (activePage === 'notes' && linkText === 'catatan')) {
                     item.classList.add('nav-active');
                 } else {
                     item.classList.remove('nav-active');
                 }
             });
-        }
-
-        // ==================== AUTHENTICATION ====================
-        function checkAuth() {
-            if (localStorage.getItem('isLoggedIn') !== 'true') {
-                window.location.href = 'index.html';
-                return null;
-            }
-            return {
-                username: localStorage.getItem('username') || 'Khoirul Amri Siregar',
-                user_id: localStorage.getItem('user_id') || 'khoirul-amri'
-            };
-        }
-
-        function logout() {
-            if (confirm('Yakin ingin logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
-                window.location.href = 'index.html';
-            }
         }
 
         // ==================== MODAL FUNCTIONS ====================
@@ -1267,18 +794,13 @@ ${task.description ? `📝 ${task.description}` : ''}
             
             await loadTasks();
             
-            // Set random motivation message
             const messages = [
                 { text: "Semangat menyelesaikan tugas hari ini! 🚀", sub: "Kamu bisa, satu per satu tugas akan selesai!" },
                 { text: "Progress kecil tetap progress! 💪", sub: "Langkah kecil membawa hasil besar!" },
-                { text: "Kamu lebih kuat dari deadline! 🔥", sub: "Fokus dan selesaikan dengan baik!" },
             ];
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
-
-            // Check deadlines every hour
-            setInterval(checkDeadlines, 60 * 60 * 1000);
         }
 
         // Event Listeners
