@@ -107,6 +107,13 @@
             </button>
         </form>
 
+        <!-- Lupa Password -->
+        <div class="mt-4 text-center">
+            <button onclick="showResetPasswordModal()" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200">
+                <i class="fas fa-key mr-1"></i>Lupa Password?
+            </button>
+        </div>
+
         <!-- Features Preview -->
         <div class="mt-8 grid grid-cols-2 gap-4 text-center">
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.1s">
@@ -128,12 +135,83 @@
         </div>
     </div>
 
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-key text-red-500 mr-2"></i>Reset Password
+                </h3>
+            </div>
+            
+            <form id="resetPasswordForm" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-red-500"></i>Username
+                    </label>
+                    <input type="text" id="resetUsername" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                           placeholder="Masukkan username">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-red-500"></i>Password Baru
+                    </label>
+                    <input type="password" id="newPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                           placeholder="Password baru">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-red-500"></i>Konfirmasi Password
+                    </label>
+                    <input type="password" id="confirmPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                           placeholder="Konfirmasi password">
+                </div>
+            </form>
+            
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+                <button type="button" onclick="closeResetPasswordModal()" 
+                        class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
+                    Batal
+                </button>
+                <button type="submit" form="resetPasswordForm"
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                    <i class="fas fa-save mr-2"></i>Reset Password
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://cdizlgogpwpbjulobkjq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaXpsZ29ncHdwYmp1bG9ia2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTcwNzEsImV4cCI6MjA3NTc3MzA3MX0._LyaIk2ubgc7rSqMJeW6_RfhGERO4ET7o8m-6VUp6Fs';
+        // Supabase Configuration - GANTI DENGAN URL DAN KEY ANDA
+        const SUPABASE_URL = 'https://your-project-ref.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key-here';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Kredensial default - bisa direset melalui modal
+        let userCredentials = {
+            username: 'khoirul',
+            password: '2509',
+            user_id: 'khoirul-user'
+        };
+
+        // Load credentials dari localStorage jika ada
+        function loadCredentials() {
+            const saved = localStorage.getItem('tugasmerah_credentials');
+            if (saved) {
+                userCredentials = JSON.parse(saved);
+            }
+        }
+
+        // Save credentials ke localStorage
+        function saveCredentials() {
+            localStorage.setItem('tugasmerah_credentials', JSON.stringify(userCredentials));
+        }
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -142,29 +220,84 @@
             const password = document.getElementById('password').value;
             const submitBtn = this.querySelector('button[type="submit"]');
             
+            // Load credentials terbaru
+            loadCredentials();
+            
             // Show loading
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
             submitBtn.disabled = true;
             
             try {
-                // Simple authentication - accept any username/password for demo
-                if (username && password) {
+                // Validasi login
+                if (username === userCredentials.username && password === userCredentials.password) {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', username);
-                    localStorage.setItem('user_id', username.toLowerCase().replace(/\s+/g, '-'));
+                    localStorage.setItem('user_id', userCredentials.user_id);
                     
                     showNotification(`Login berhasil! Selamat datang ${username}!`, 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
-                    throw new Error('Username dan password harus diisi!');
+                    throw new Error('Username atau password salah!');
                 }
             } catch (error) {
                 showNotification(error.message, 'error');
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
                 submitBtn.disabled = false;
             }
+        });
+
+        // Reset Password Form
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('resetUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Load credentials terbaru
+            loadCredentials();
+            
+            if (username !== userCredentials.username) {
+                showNotification('Username tidak ditemukan!', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('Konfirmasi password tidak cocok!', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 4) {
+                showNotification('Password minimal 4 karakter!', 'error');
+                return;
+            }
+            
+            // Update password
+            userCredentials.password = newPassword;
+            saveCredentials();
+            
+            showNotification('✅ Password berhasil direset!', 'success');
+            closeResetPasswordModal();
+            
+            // Clear form
+            document.getElementById('resetPasswordForm').reset();
+        });
+
+        function showResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.remove('hidden');
+            document.getElementById('resetUsername').focus();
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.add('hidden');
+            document.getElementById('resetPasswordForm').reset();
+        }
+
+        // Modal click outside close
+        document.getElementById('resetPasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResetPasswordModal();
         });
 
         function showNotification(message, type) {
@@ -188,8 +321,10 @@
             window.location.href = 'dashboard.html';
         }
 
-        // Add animation delays
+        // Initialize credentials on load
         document.addEventListener('DOMContentLoaded', function() {
+            loadCredentials();
+            
             const featureCards = document.querySelectorAll('.feature-card');
             featureCards.forEach((card, index) => {
                 card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
