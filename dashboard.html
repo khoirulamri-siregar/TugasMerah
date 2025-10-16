@@ -181,25 +181,34 @@
             0% { opacity: 1; transform: translateY(-100px) rotate(0deg); }
             100% { opacity: 0; transform: translateY(100vh) rotate(360deg); }
         }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.5s infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Supabase Configuration -->
     <script>
         const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
         
-        // Ganti dengan token bot Telegram dan chat ID Anda
-        const TELEGRAM_BOT_TOKEN = '8461292737:AAFMVTHitpplPAPtfYfNaCxO7RibZMlcgNQ';
-        const TELEGRAM_CHAT_ID = '7767259426';
-        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     </script>
 
-    <!-- Desktop Sidebar -->
     <div class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200">
         <div class="w-full p-6 flex flex-col">
-            <!-- Logo & Sync Status -->
             <div class="flex items-center space-x-3 mb-8">
                 <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg floating">
                     <i class="fas fa-tasks text-white"></i>
@@ -211,7 +220,6 @@
                 <div id="syncStatus" class="w-3 h-3 bg-green-500 rounded-full sync-indicator" title="Terhubung ke Cloud"></div>
             </div>
             
-            <!-- Navigation -->
             <nav class="space-y-2 flex-1">
                 <a href="#" class="nav-active flex items-center space-x-3 p-3 rounded-xl transition-all duration-200" onclick="showPage('dashboard')">
                     <i class="fas fa-home w-5"></i>
@@ -231,7 +239,6 @@
                 </a>
             </nav>
             
-            <!-- Progress Section -->
             <div class="mt-auto p-4 bg-red-50 rounded-xl border border-red-200">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium text-gray-700">Progress Hari Ini</span>
@@ -243,7 +250,6 @@
                 <p class="text-xs text-gray-600 mt-2" id="progressText">Mulai kerjakan tugasmu!</p>
             </div>
             
-            <!-- User Info -->
             <div class="mt-4 p-3 bg-gray-50 rounded-lg flex items-center space-x-3">
                 <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                     <span class="text-white text-sm font-bold" id="sidebarUserInitial">K</span>
@@ -259,9 +265,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="md:ml-64 main-content">
-        <!-- FIXED HEADER -->
         <header class="sticky-header">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
@@ -270,7 +274,6 @@
                         <p class="text-gray-600" id="currentDate">Mengambil tanggal...</p>
                     </div>
                     
-                    <!-- Quick Stats -->
                     <div class="hidden md:flex items-center space-x-6">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-red-500" id="todayTasks">0</div>
@@ -289,9 +292,7 @@
             </div>
         </header>
 
-        <!-- DASHBOARD PAGE -->
         <div id="dashboard-page" class="animate-fade-in">
-            <!-- Motivation Section -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg animate-bounce-in">
                     <div class="flex items-center justify-between">
@@ -304,10 +305,8 @@
                 </div>
             </div>
 
-            <!-- Quick Actions & Reminder -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Reminder Harian -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-bold text-gray-900 flex items-center">
@@ -316,11 +315,9 @@
                             <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full" id="reminderCount">0 tugas</span>
                         </div>
                         <div id="dailyReminder" class="space-y-3 max-h-40 overflow-y-auto">
-                            <!-- Reminder items -->
-                        </div>
+                            </div>
                     </div>
 
-                    <!-- Progress Ringan -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
                             <i class="fas fa-chart-line text-red-500 mr-2"></i>Progress Mingguan
@@ -340,7 +337,6 @@
                         <p class="text-center text-sm text-gray-600 mt-4" id="weeklyProgressLabel">Progress minggu ini</p>
                     </div>
 
-                    <!-- Sync Status -->
                     <div class="bg-white rounded-2xl p-6 shadow-sm task-card">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
                             <i class="fas fa-cloud text-red-500 mr-2"></i>Status Sync
@@ -348,7 +344,7 @@
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-gray-600">Cloud Connection</span>
-                                <span id="cloudStatus" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Connected</span>
+                                <span id="cloudStatus" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Disconnected</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-gray-600">Total Tugas</span>
@@ -363,7 +359,6 @@
                 </div>
             </div>
 
-            <!-- Task List Section -->
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 class="text-2xl font-bold text-gray-900 flex items-center">
@@ -386,10 +381,8 @@
                 </div>
 
                 <div id="taskList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Tasks will be loaded here -->
-                </div>
+                    </div>
 
-                <!-- Empty State -->
                 <div id="emptyState" class="text-center py-12 animate-fade-in hidden">
                     <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 floating">
                         <i class="fas fa-tasks text-red-500 text-3xl"></i>
@@ -402,7 +395,6 @@
                     </button>
                 </div>
 
-                <!-- Loading State -->
                 <div id="loadingState" class="text-center py-12">
                     <div class="loading-spinner mx-auto mb-4"></div>
                     <p class="text-gray-600">Memuat tugas...</p>
@@ -410,7 +402,6 @@
             </div>
         </div>
 
-        <!-- CALENDAR PAGE -->
         <div id="calendar-page" class="page-hidden animate-fade-in">
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
@@ -419,27 +410,22 @@
                     </h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Calendar View -->
                         <div class="bg-gray-50 rounded-xl p-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-4">Kalender Bulan Ini</h3>
                             <div id="calendar" class="text-center">
-                                <!-- Calendar akan di-generate di sini -->
-                            </div>
+                                </div>
                         </div>
 
-                        <!-- Upcoming Events -->
                         <div class="bg-gray-50 rounded-xl p-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-4">Deadline Mendatang</h3>
                             <div id="calendar-deadlines" class="space-y-3">
-                                <!-- Upcoming deadlines akan dimuat di sini -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- NOTES PAGE -->
         <div id="notes-page" class="page-hidden animate-fade-in">
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
@@ -448,7 +434,6 @@
                     </h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Add Note -->
                         <div class="space-y-4">
                             <textarea id="quickNote" rows="8" 
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
@@ -458,19 +443,16 @@
                             </button>
                         </div>
 
-                        <!-- Saved Notes -->
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 mb-4">Catatan Tersimpan</h3>
                             <div id="savedNotes" class="space-y-3 max-h-96 overflow-y-auto">
-                                <!-- Saved notes akan muncul di sini -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SETTINGS PAGE -->
         <div id="settings-page" class="page-hidden animate-fade-in">
             <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="bg-white rounded-2xl p-6 shadow-sm">
@@ -479,7 +461,6 @@
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Account Settings -->
                         <div class="space-y-4">
                             <h3 class="text-lg font-bold text-gray-900">Akun</h3>
                             <div class="space-y-3">
@@ -500,7 +481,6 @@
                             </div>
                         </div>
 
-                        <!-- App Settings -->
                         <div class="space-y-4">
                             <h3 class="text-lg font-bold text-gray-900">Aplikasi</h3>
                             <div class="space-y-3">
@@ -516,7 +496,6 @@
                         </div>
                     </div>
 
-                    <!-- Telegram Configuration -->
                     <div class="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
                         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
                             <i class="fab fa-telegram text-blue-500 mr-2"></i>Konfigurasi Telegram
@@ -524,21 +503,23 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Bot Token</label>
-                                <input type="text" id="telegramToken" value="your-telegram-bot-token" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="telegramToken" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan Bot Token Anda">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Chat ID</label>
-                                <input type="text" id="telegramChatId" value="your-chat-id"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="telegramChatId"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan Chat ID Anda">
                             </div>
-                            <button onclick="testTelegramConnection()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                                Test Koneksi Telegram
+                            <button onclick="saveTelegramConfig()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-200 mr-2">
+                                Simpan Konfigurasi
+                            </button>
+                            <button onclick="testTelegramConnection()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition duration-200">
+                                <i class="fas fa-paper-plane mr-2"></i>Test Koneksi
                             </button>
                         </div>
                     </div>
 
-                    <!-- Data Management -->
                     <div class="mt-8 p-6 bg-yellow-50 rounded-xl border border-yellow-200">
                         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
                             <i class="fas fa-database text-yellow-500 mr-2"></i>Manajemen Data
@@ -556,7 +537,6 @@
                         </div>
                     </div>
 
-                    <!-- Logout Section - Tampil di mobile -->
                     <div class="mt-8 p-6 bg-red-50 rounded-xl border border-red-200 md:hidden">
                         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
                             <i class="fas fa-sign-out-alt text-red-500 mr-2"></i>Keluar
@@ -570,7 +550,6 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation -->
     <div class="mobile-nav md:hidden">
         <div class="flex justify-around items-center py-3">
             <a href="#" class="nav-active flex flex-col items-center p-2 rounded-xl transition duration-200" onclick="showPage('dashboard')">
@@ -595,7 +574,6 @@
         </div>
     </div>
 
-    <!-- Add Task Modal -->
     <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-bounce-in">
             <div class="p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
@@ -626,12 +604,22 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-calendar-day text-red-500 mr-2"></i>Deadline
+                            <i class="fas fa-calendar-day text-red-500 mr-2"></i>Deadline Tanggal
                         </label>
                         <input type="date" id="taskDeadline" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
                     </div>
                     
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-clock text-red-500 mr-2"></i>Waktu Tugas (Deadline)
+                        </label>
+                        <input type="time" id="taskTime" value="23:59"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Prioritas
@@ -643,24 +631,20 @@
                             <option value="high">🔴 Tinggi</option>
                         </select>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-bell text-red-500 mr-2"></i>Waktu Notifikasi (Jam Anda Ingin Notif Masuk)
+                        </label>
+                        <input type="time" id="taskNotificationTime" value="07:00"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
+                    </div>
                 </div>
 
-                <!-- Reminder Options -->
                 <div class="space-y-3">
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" id="sendTelegramReminder" class="rounded text-red-500" checked>
-                        <label for="sendTelegramReminder" class="text-sm text-gray-700">Kirim reminder Telegram</label>
-                    </div>
-                    
-                    <div id="reminderOptions" class="pl-6 space-y-2">
-                        <div class="flex items-center space-x-2">
-                            <input type="radio" id="reminderSmart" name="reminderType" value="smart" class="rounded text-red-500" checked>
-                            <label for="reminderSmart" class="text-sm text-gray-700">Reminder Smart (Otomatis)</label>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <input type="radio" id="reminderCustom" name="reminderType" value="custom" class="rounded text-red-500">
-                            <label for="reminderCustom" class="text-sm text-gray-700">Reminder Custom</label>
-                        </div>
+                        <label for="sendTelegramReminder" class="text-sm text-gray-700">Kirim reminder Telegram **(Notif akan dikirim segera)**</label>
                     </div>
                 </div>
             </form>
@@ -678,7 +662,6 @@
         </div>
     </div>
 
-    <!-- Change Password Modal -->
     <div id="changePasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
             <div class="p-6 border-b border-gray-200">
@@ -687,7 +670,7 @@
                 </h3>
             </div>
             
-            <form id="changePasswordForm" class="p-6 space-y-4">
+            <form id="changePasswordForm" onsubmit="changePassword(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock mr-2 text-red-500"></i>Password Lama
@@ -736,8 +719,12 @@
             const username = localStorage.getItem('username');
             
             if (isLoggedIn !== 'true' || !username) {
-                window.location.href = 'login.html';
-                return null;
+                // window.location.href = 'login.html'; // uncomment ini jika ada halaman login.html
+                console.log("Not logged in. Using default user."); // Default fallback for single-file demo
+                return {
+                    username: 'Khoirul',
+                    user_id: 'khoirul-user'
+                };
             }
             
             return {
@@ -751,7 +738,9 @@
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
                 localStorage.removeItem('user_id');
-                window.location.href = 'login.html';
+                // window.location.href = 'login.html'; // uncomment ini jika ada halaman login.html
+                showNotification('Anda telah logout.', 'info');
+                location.reload(); 
             }
         }
 
@@ -766,15 +755,16 @@
             document.getElementById('changePasswordForm').reset();
         }
 
-        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+        function changePassword(e) {
             e.preventDefault();
             
             const oldPassword = document.getElementById('oldPassword').value;
             const newPassword = document.getElementById('newPasswordDashboard').value;
             const confirmPassword = document.getElementById('confirmPasswordDashboard').value;
             
-            // Load credentials
-            const credentials = JSON.parse(localStorage.getItem('tugasmerah_credentials') || '{"password":"2509"}');
+            // Load credentials, default for demo
+            const defaultCreds = { username: 'khoirul', password: '2509' };
+            const credentials = JSON.parse(localStorage.getItem('tugasmerah_credentials')) || defaultCreds;
             
             if (oldPassword !== credentials.password) {
                 showNotification('Password lama salah!', 'error');
@@ -797,7 +787,7 @@
             
             showNotification('✅ Password berhasil diganti!', 'success');
             closeChangePasswordModal();
-        });
+        }
 
         // ==================== PAGE NAVIGATION ====================
         function showPage(pageName) {
@@ -819,6 +809,7 @@
                 loadSavedNotes();
             } else if (pageName === 'settings') {
                 document.getElementById('settingsUsername').textContent = currentUser.username;
+                loadTelegramConfigUI(); // Load telegram settings to UI
             }
         }
 
@@ -840,7 +831,7 @@
             // Update mobile navigation
             const mobileItems = document.querySelectorAll('.mobile-nav a');
             mobileItems.forEach(item => {
-                const linkText = item.querySelector('.text-xs').textContent.toLowerCase();
+                const linkText = item.querySelector('.text-xs')?.textContent.toLowerCase();
                 if ((activePage === 'dashboard' && linkText === 'home') ||
                     (activePage === 'calendar' && linkText === 'kalender') ||
                     (activePage === 'notes' && linkText === 'catatan') ||
@@ -856,7 +847,8 @@
         let tasks = [];
         let currentUser = null;
         let realtimeSubscription = null;
-        let telegramEnabled = true;
+        let telegramEnabled = localStorage.getItem('telegramEnabled') === 'true';
+        let scheduledNotifications = {};
 
         async function loadTasks() {
             try {
@@ -874,6 +866,9 @@
                 updateUI();
                 updateLastSync();
                 setupRealtimeSubscription();
+                
+                // Setup scheduled notifications for all tasks
+                setupAllScheduledNotifications();
                 
                 showNotification('✅ Tugas berhasil dimuat!', 'success');
                 
@@ -906,6 +901,9 @@
                         document.getElementById('realTimeIndicator').classList.remove('hidden');
                         document.getElementById('cloudStatus').textContent = 'Connected';
                         document.getElementById('cloudStatus').className = 'text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full';
+                    } else {
+                        document.getElementById('cloudStatus').textContent = 'Connecting...';
+                        document.getElementById('cloudStatus').className = 'text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full';
                     }
                 });
         }
@@ -918,6 +916,7 @@
             switch (eventType) {
                 case 'INSERT':
                     tasks.unshift(newData);
+                    setupScheduledNotification(newData);
                     showNotification(`📱 Tugas baru: "${newData.title}"`, 'info');
                     break;
                     
@@ -925,12 +924,18 @@
                     const index = tasks.findIndex(t => t.id === newData.id);
                     if (index !== -1) {
                         tasks[index] = newData;
-                        showNotification(`📱 Tugas diupdate: "${newData.title}"`, 'info');
+                        setupScheduledNotification(newData);
+                        if (newData.completed && oldData.completed !== newData.completed) {
+                             // Jangan tampilkan notif update saat hanya toggle complete
+                        } else {
+                            showNotification(`📱 Tugas diupdate: "${newData.title}"`, 'info');
+                        }
                     }
                     break;
                     
                 case 'DELETE':
                     tasks = tasks.filter(task => task.id !== oldData.id);
+                    cancelScheduledNotification(oldData.id);
                     showNotification(`📱 Tugas dihapus`, 'warning');
                     break;
             }
@@ -938,14 +943,137 @@
             updateUI();
         }
 
+        // ==================== FLEKSIBLE REMINDER SYSTEM (IMPROVED) ====================
+        
+        function setupAllScheduledNotifications() {
+            // Clear all existing notifications
+            Object.values(scheduledNotifications).forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            scheduledNotifications = {};
+
+            // Setup notifications for all active tasks
+            tasks.filter(task => !task.completed).forEach(task => {
+                setupScheduledNotification(task);
+            });
+        }
+
+        function setupScheduledNotification(task) {
+            if (task.completed) {
+                cancelScheduledNotification(task.id);
+                return;
+            }
+
+            const notificationTime = task.notification_time;
+            const taskDate = task.deadline;
+            
+            if (!notificationTime || !taskDate) return;
+
+            // Parse waktu notifikasi
+            const [notifHours, notifMinutes] = notificationTime.split(':').map(Number);
+            const notifDateTime = new Date(`${taskDate}T${notificationTime}:00`);
+            
+            // Hapus jadwal lama jika ada
+            cancelScheduledNotification(task.id);
+            
+            // Jadwalkan notifikasi pada waktu yang ditentukan
+            const now = new Date();
+            const timeUntilNotification = notifDateTime.getTime() - now.getTime();
+            
+            if (timeUntilNotification > 0 && timeUntilNotification < 7 * 24 * 60 * 60 * 1000) { // Max 7 hari
+                scheduledNotifications[task.id] = setTimeout(() => {
+                    sendScheduledReminder(task);
+                }, timeUntilNotification);
+                
+                console.log(`🔔 Notifikasi dijadwalkan untuk "${task.title}" pada ${notifDateTime}`);
+            } else if (timeUntilNotification <= 0) {
+                console.log(`⚠️ Waktu notifikasi untuk "${task.title}" sudah lewat`);
+            }
+        }
+
+        function cancelScheduledNotification(taskId) {
+            if (scheduledNotifications[taskId]) {
+                clearTimeout(scheduledNotifications[taskId]);
+                delete scheduledNotifications[taskId];
+                console.log(`❌ Notifikasi dibatalkan untuk task ${taskId}`);
+            }
+        }
+
+        async function sendScheduledReminder(task) {
+            const config = getTelegramConfig();
+            if (!config.token || !config.chatId) {
+                console.log('❌ Konfigurasi Telegram belum lengkap');
+                return;
+            }
+
+            const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
+            const urgency = task.priority === 'high' ? 'TINGGI' : task.priority === 'medium' ? 'SEDANG' : 'RENDAH';
+            
+            const message = `
+⏰ **REMINDER TUGAS - Sistem Fleksibel** ⏰
+
+📚 **${task.title}**
+📅 Deadline: ${formatDate(task.deadline)} ${task.deadline_time || ''}
+🎯 Prioritas: ${priorityEmoji} ${urgency}
+${task.description ? `📝 ${task.description}` : ''}
+
+💡 *Ini adalah pengingat otomatis berdasarkan waktu notifikasi yang Anda setel.*
+⏳ *Sisa waktu: ${calculateTimeRemaining(task)}*
+
+Semangat kerjakan sebelum waktunya! 💪
+#TugasMerah #${urgency}
+            `.trim();
+
+            const sent = await sendTelegramNotification(message);
+            
+            if (sent) {
+                console.log(`✅ Reminder terkirim untuk: "${task.title}"`);
+                // Update task to mark reminder as sent
+                await supabase
+                    .from('tasks')
+                    .update({ reminder_sent: true })
+                    .eq('id', task.id);
+            } else {
+                console.log(`❌ Gagal mengirim reminder untuk: "${task.title}"`);
+            }
+            
+            // Hapus dari scheduled notifications setelah dikirim
+            delete scheduledNotifications[task.id];
+        }
+
+        function calculateTimeRemaining(task) {
+            const deadline = new Date(`${task.deadline}T${task.deadline_time || '23:59:00'}`);
+            const now = new Date();
+            const diffMs = deadline - now;
+            
+            if (diffMs <= 0) return 'DEADLINE TERLEWAT!';
+            
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (diffDays > 0) {
+                return `${diffDays} hari ${diffHours} jam`;
+            } else if (diffHours > 0) {
+                return `${diffHours} jam`;
+            } else {
+                return 'Kurang dari 1 jam!';
+            }
+        }
+
         async function addTask(e) {
             e.preventDefault();
+
+            const taskDeadline = document.getElementById('taskDeadline').value;
+            const taskTime = document.getElementById('taskTime').value;
+            const taskNotificationTime = document.getElementById('taskNotificationTime').value;
             
             const newTask = {
                 user_id: currentUser.user_id,
                 title: document.getElementById('taskTitle').value,
                 description: document.getElementById('taskDescription').value,
-                deadline: document.getElementById('taskDeadline').value,
+                deadline: taskDeadline,
+                deadline_time: taskTime, // Menyimpan waktu deadline
+                notification_time: taskNotificationTime, // Menyimpan waktu notifikasi yang diinginkan
                 priority: document.getElementById('taskPriority').value,
                 completed: false,
                 created_at: new Date().toISOString(),
@@ -964,14 +1092,12 @@
                 closeAddTaskModal();
                 showNotification('🎉 Tugas berhasil disimpan ke cloud!', 'success');
                 
-                // Kirim reminder Telegram jika diaktifkan
+                // Kirim reminder Telegram jika diaktifkan (segera setelah dibuat)
                 const sendReminder = document.getElementById('sendTelegramReminder').checked;
-                console.log('🔔 Send reminder:', sendReminder);
-                console.log('🔔 Telegram enabled:', telegramEnabled);
                 
                 if (sendReminder && telegramEnabled) {
-                    console.log('🟡 Calling checkSingleTaskDeadline...');
-                    checkSingleTaskDeadline(data[0]);
+                    // Mengirim notif segera, dengan detail waktu notifikasi yang disetel
+                    sendImmediateReminder(data[0]);
                 }
                 
             } catch (error) {
@@ -982,162 +1108,84 @@
             }
         }
 
-        // ==================== FLEKSIBLE REMINDER SYSTEM ====================
-        function checkSingleTaskDeadline(task) {
-            console.log('🟡 Smart reminder check for task:', task.title);
-            
-            const now = new Date();
-            const taskDeadline = new Date(task.deadline);
-            const daysUntilDeadline = Math.ceil((taskDeadline - now) / (1000 * 60 * 60 * 24));
-            
-            console.log('📅 Days until deadline:', daysUntilDeadline);
-            
-            // Sistem reminder yang lebih fleksibel
-            let shouldSend = false;
-            let reminderType = '';
-            let daysLabel = '';
-            
-            // HIGH PRIORITY: Multiple reminders
-            if (task.priority === 'high') {
-                if (daysUntilDeadline === 7) {
-                    shouldSend = true;
-                    reminderType = 'HIGH_1WEEK';
-                    daysLabel = '1 MINGGU LAGI';
-                } else if (daysUntilDeadline === 3) {
-                    shouldSend = true;
-                    reminderType = 'HIGH_3DAYS';
-                    daysLabel = '3 HARI LAGI';
-                } else if (daysUntilDeadline === 1) {
-                    shouldSend = true;
-                    reminderType = 'HIGH_1DAY';
-                    daysLabel = 'BESOK';
-                } else if (daysUntilDeadline === 0) {
-                    shouldSend = true;
-                    reminderType = 'HIGH_TODAY';
-                    daysLabel = 'HARI INI';
-                }
+        // Fungsi untuk mengirim notifikasi segera setelah tugas dibuat
+        async function sendImmediateReminder(task) {
+            const config = getTelegramConfig();
+            if (!config.token || !config.chatId) {
+                 showNotification('🔔 Konfigurasi Telegram belum lengkap. Notifikasi tidak terkirim.', 'warning');
+                 return;
             }
-            // MEDIUM PRIORITY: Moderate reminders
-            else if (task.priority === 'medium') {
-                if (daysUntilDeadline === 3) {
-                    shouldSend = true;
-                    reminderType = 'MEDIUM_3DAYS';
-                    daysLabel = '3 HARI LAGI';
-                } else if (daysUntilDeadline === 1) {
-                    shouldSend = true;
-                    reminderType = 'MEDIUM_1DAY';
-                    daysLabel = 'BESOK';
-                } else if (daysUntilDeadline === 0) {
-                    shouldSend = true;
-                    reminderType = 'MEDIUM_TODAY';
-                    daysLabel = 'HARI INI';
-                }
-            }
-            // LOW PRIORITY: Minimal reminders
-            else if (task.priority === 'low') {
-                if (daysUntilDeadline === 1) {
-                    shouldSend = true;
-                    reminderType = 'LOW_1DAY';
-                    daysLabel = 'BESOK';
-                } else if (daysUntilDeadline === 0) {
-                    shouldSend = true;
-                    reminderType = 'LOW_TODAY';
-                    daysLabel = 'HARI INI';
-                }
-            }
-            
-            if (shouldSend) {
-                console.log(`🟡 Sending ${reminderType} reminder for:`, task.title);
-                sendSmartReminder(task, daysLabel, reminderType);
-                return true;
-            } else {
-                console.log('🔕 No reminder needed for this timeframe. Days:', daysUntilDeadline);
-                return false;
-            }
-        }
 
-        async function sendSmartReminder(task, daysLabel, reminderType) {
-            const emoji = getReminderEmoji(reminderType);
-            const urgency = getUrgencyLevel(reminderType);
+            const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
+            const urgency = task.priority === 'high' ? 'TINGGI' : task.priority === 'medium' ? 'SEDANG' : 'RENDAH';
             
             const message = `
-${emoji} <b>REMINDER TUGAS - ${daysLabel}</b> ${emoji}
+📋 **TUGAS BARU DIBUAT** 📋
 
-📚 <b>${task.title}</b>
-⏰ Deadline: ${new Date(task.deadline).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-📅 Sisa waktu: <b>${daysLabel}</b>
-🎯 Prioritas: ${task.priority === 'high' ? '🔴 TINGGI' : task.priority === 'medium' ? '🟡 SEDANG' : '🟢 RENDAH'}
+📚 **${task.title}**
+📅 Deadline: ${formatDate(task.deadline)} ${task.deadline_time || ''}
+🎯 Prioritas: ${priorityEmoji} ${urgency}
+⏰ Notifikasi dijadwalkan: ${task.notification_time}
 ${task.description ? `📝 ${task.description}` : ''}
 
-${getReminderMessage(reminderType)}
+💡 *Notifikasi akan dikirim otomatis pada waktu yang Anda tentukan.*
+✅ *Tugas sudah tersimpan aman di cloud!*
+
+Semangat kerjakan! 🚀
 #TugasMerah #${urgency}
             `.trim();
 
             const sent = await sendTelegramNotification(message);
             
             if (sent) {
-                // Update reminder status di database
-                try {
-                    const remindersSent = task.reminders_sent || [];
-                    remindersSent.push({
-                        type: reminderType,
-                        sent_at: new Date().toISOString(),
-                        days_label: daysLabel
-                    });
-                    
-                    await supabase
-                        .from('tasks')
-                        .update({ 
-                            reminders_sent: remindersSent,
-                            reminder_sent: true 
-                        })
-                        .eq('id', task.id);
-                } catch (error) {
-                    console.error('Error updating reminder status:', error);
-                }
+                showNotification('🔔 Notifikasi tugas baru terkirim!', 'info');
+            } else {
+                 showNotification('❌ Gagal mengirim notifikasi Telegram. Cek konfigurasi Anda.', 'error');
             }
         }
 
-        function getReminderEmoji(reminderType) {
-            if (reminderType.includes('HIGH')) return '🚨';
-            if (reminderType.includes('MEDIUM')) return '⚠️';
-            if (reminderType.includes('LOW')) return '📅';
-            return '🔔';
-        }
-
-        function getUrgencyLevel(reminderType) {
-            if (reminderType.includes('HIGH')) return 'URGENT';
-            if (reminderType.includes('MEDIUM')) return 'PENTING';
-            return 'REMINDER';
-        }
-
-        function getReminderMessage(reminderType) {
-            const messages = {
-                'HIGH_1WEEK': '💪 Masih ada waktu 1 minggu, tapi better selesaikan lebih awal!',
-                'HIGH_3DAYS': '🔥 Tinggal 3 hari lagi! Mulai kerjakan sekarang!',
-                'HIGH_1DAY': '🚨 BESOK DEADLINE! Fokus dan selesaikan!',
-                'HIGH_TODAY': '⏰ DEADLINE HARI INI! Cepat selesaikan!',
-                'MEDIUM_3DAYS': '📝 Tinggal 3 hari lagi, plan waktumu dengan baik!',
-                'MEDIUM_1DAY': '⚠️ Besok deadline, siap-siap menyelesaikan!',
-                'MEDIUM_TODAY': '🎯 Deadline hari ini, semangat!',
-                'LOW_1DAY': '📌 Besok deadline, jangan lupa ya!',
-                'LOW_TODAY': '✅ Deadline hari ini, semoga lancar!'
-            };
-            
-            return messages[reminderType] || '💪 Ayo selesaikan tugasnya sebelum deadline!';
-        }
-
         // ==================== TELEGRAM NOTIFICATION SYSTEM ====================
+        function getTelegramConfig() {
+            const token = localStorage.getItem('telegramToken');
+            const chatId = localStorage.getItem('telegramChatId');
+            return { token, chatId };
+        }
+
+        function loadTelegramConfigUI() {
+            const config = getTelegramConfig();
+            document.getElementById('telegramToken').value = config.token || '';
+            document.getElementById('telegramChatId').value = config.chatId || '';
+            
+            const button = document.getElementById('telegramToggle');
+            if (telegramEnabled) {
+                button.textContent = 'Aktif';
+                button.className = 'bg-red-500 text-white px-3 py-1 rounded-lg text-sm';
+            } else {
+                button.textContent = 'Nonaktif';
+                button.className = 'bg-gray-500 text-white px-3 py-1 rounded-lg text-sm';
+            }
+        }
+
+        function saveTelegramConfig() {
+            const token = document.getElementById('telegramToken').value.trim();
+            const chatId = document.getElementById('telegramChatId').value.trim();
+            
+            localStorage.setItem('telegramToken', token);
+            localStorage.setItem('telegramChatId', chatId);
+            
+            showNotification('✅ Konfigurasi Telegram disimpan!', 'success');
+        }
+
         async function sendTelegramNotification(message) {
             if (!telegramEnabled) {
                 console.log('🔕 Telegram notifications disabled');
                 return false;
             }
             
+            const config = getTelegramConfig();
+            
             // Validasi token & chat ID
-            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID || 
-                TELEGRAM_BOT_TOKEN === 'your-telegram-bot-token' || 
-                TELEGRAM_CHAT_ID === 'your-chat-id') {
+            if (!config.token || !config.chatId) {
                 console.log('❌ Telegram bot not configured properly');
                 return false;
             }
@@ -1145,22 +1193,21 @@ ${getReminderMessage(reminderType)}
             try {
                 console.log('🟡 Sending Telegram message...');
                 
-                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
+                        chat_id: config.chatId,
                         text: message,
-                        parse_mode: 'HTML'
+                        parse_mode: 'Markdown'
                     })
                 });
 
                 const result = await response.json();
-                console.log('Telegram API Response:', result);
 
-                if (!response.ok) {
+                if (!response.ok || !result.ok) {
                     throw new Error(`Telegram API error: ${result.description}`);
                 }
                 
@@ -1168,37 +1215,33 @@ ${getReminderMessage(reminderType)}
                 return true;
             } catch (error) {
                 console.error('❌ Error sending Telegram notification:', error);
+                showNotification('❌ Error kirim Telegram: Cek Token/Chat ID', 'error');
                 return false;
             }
         }
 
         async function testTelegramConnection() {
             const message = `
-🤖 <b>TEST NOTIFIKASI TELEGRAM</b>
+🤖 **TEST NOTIFIKASI TELEGRAM**
 
-✅ Koneksi Telegram berhasil!
-📱 Aplikasi TugasMerah terhubung
-⏰ Sistem reminder fleksibel aktif
-☁️ Data tersimpan aman di cloud
+✅ Koneksi TugasMerah ke Telegram berhasil!
+⏰ Reminder fleksibel siap digunakan.
+☁️ Data tersimpan aman di cloud.
 
-<b>Fitur Reminder:</b>
-• 🚨 High: 1 minggu, 3 hari, 1 hari, hari-H
-• ⚠️ Medium: 3 hari, 1 hari, hari-H  
-• 📅 Low: 1 hari, hari-H
-
-Tetap semangat belajar! 💪
+*Status: Aktif*
             `.trim();
             
             const sent = await sendTelegramNotification(message);
             if (sent) {
                 showNotification('✅ Koneksi Telegram berhasil!', 'success');
             } else {
-                showNotification('❌ Gagal mengirim test ke Telegram', 'error');
+                showNotification('❌ Gagal mengirim test ke Telegram. Cek Konfigurasi.', 'error');
             }
         }
 
         function toggleTelegramNotifications() {
             telegramEnabled = !telegramEnabled;
+            localStorage.setItem('telegramEnabled', telegramEnabled);
             const button = document.getElementById('telegramToggle');
             if (telegramEnabled) {
                 button.textContent = 'Aktif';
@@ -1225,8 +1268,12 @@ Tetap semangat belajar! 💪
                 if (error) throw error;
                 
                 if (newStatus) {
+                    cancelScheduledNotification(taskId);
                     playCelebration();
                     showNotification('🎉 Tugas diselesaikan! Mantap!', 'success');
+                } else {
+                    setupScheduledNotification({...task, completed: false});
+                    showNotification('↩️ Tugas diaktifkan kembali.', 'info');
                 }
                 
             } catch (error) {
@@ -1245,6 +1292,7 @@ Tetap semangat belajar! 💪
                     
                     if (error) throw error;
                     
+                    cancelScheduledNotification(taskId);
                     showNotification('🗑️ Tugas dihapus', 'warning');
                     
                 } catch (error) {
@@ -1261,6 +1309,13 @@ Tetap semangat belajar! 💪
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('taskDeadline').value = tomorrow.toISOString().split('T')[0];
+            
+            // Set default time to user's local time for better UX
+            const now = new Date();
+            const defaultTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('taskTime').value = '23:59';
+            document.getElementById('taskNotificationTime').value = defaultTime;
+
             document.getElementById('taskTitle').focus();
         }
 
@@ -1330,7 +1385,7 @@ Tetap semangat belajar! 💪
         function showDayTasks(dateStr) {
             const dayTasks = tasks.filter(task => task.deadline === dateStr && !task.completed);
             if (dayTasks.length > 0) {
-                const taskTitles = dayTasks.map(task => `• ${task.title}`).join('\n');
+                const taskTitles = dayTasks.map(task => `• ${task.title} (Jam: ${task.deadline_time || 'Tidak ada'})`).join('\n');
                 alert(`Tugas untuk ${formatDate(dateStr)}:\n\n${taskTitles}`);
             } else {
                 showNotification(`Tidak ada tugas untuk ${formatDate(dateStr)}`, 'info');
@@ -1360,7 +1415,7 @@ Tetap semangat belajar! 💪
                             <p class="font-medium text-gray-900">${task.title}</p>
                             <p class="text-sm text-gray-600 flex items-center mt-1">
                                 <i class="fas fa-calendar-day text-red-400 mr-2"></i>
-                                ${formatDate(task.deadline)}
+                                ${formatDate(task.deadline)} ${task.deadline_time || ''}
                             </p>
                         </div>
                         <span class="text-xs px-2 py-1 rounded-full ${
@@ -1379,7 +1434,7 @@ Tetap semangat belajar! 💪
         function saveQuickNote() {
             const noteText = document.getElementById('quickNote').value.trim();
             if (noteText) {
-                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+                const notes = JSON.parse(localStorage.getItem('quickNotes') || '[]') || [];
                 const newNote = {
                     id: Date.now(),
                     text: noteText,
@@ -1397,7 +1452,7 @@ Tetap semangat belajar! 💪
         }
 
         function loadSavedNotes() {
-            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            const notes = JSON.parse(localStorage.getItem('quickNotes') || '[]') || [];
             const notesContainer = document.getElementById('savedNotes');
             
             if (notes.length === 0) {
@@ -1472,7 +1527,7 @@ Tetap semangat belajar! 💪
                     reader.onload = function(e) {
                         try {
                             const data = JSON.parse(e.target.result);
-                            if (confirm(`Import ${data.tasks?.length || 0} tugas?`)) {
+                            if (confirm(`Import ${data.tasks?.length || 0} tugas? Ini akan MENGHAPUS semua tugas Anda saat ini!`)) {
                                 importData(data.tasks);
                             }
                         } catch (error) {
@@ -1510,7 +1565,9 @@ Tetap semangat belajar! 💪
                 
                 if (insertError) throw insertError;
                 
-                showNotification('✅ Data berhasil diimport!', 'success');
+                showNotification('✅ Data berhasil diimport! Memuat ulang...', 'success');
+                // Force reload tasks to show imported data
+                await loadTasks(); 
                 
             } catch (error) {
                 console.error('Error importing data:', error);
@@ -1537,7 +1594,8 @@ Tetap semangat belajar! 💪
                 
                 if (error) throw error;
                 
-                showNotification('✅ Semua data berhasil direset!', 'success');
+                showNotification('✅ Semua data berhasil direset! Memuat ulang...', 'success');
+                await loadTasks();
                 
             } catch (error) {
                 console.error('Error resetting data:', error);
@@ -1574,9 +1632,11 @@ Tetap semangat belajar! 💪
             const todayTasks = tasks.filter(task => 
                 new Date(task.deadline).toDateString() === today && !task.completed
             );
-            const upcomingTasks = tasks.filter(task => 
-                new Date(task.deadline) > new Date() && !task.completed
-            );
+            const upcomingTasks = tasks.filter(task => {
+                const deadlineDate = new Date(task.deadline);
+                const todayDate = new Date(new Date().toDateString());
+                return deadlineDate >= todayDate && !task.completed;
+            });
             const completedTasks = tasks.filter(task => task.completed);
 
             document.getElementById('todayTasks').textContent = todayTasks.length;
@@ -1669,7 +1729,7 @@ Tetap semangat belajar! 💪
                             <span class="text-sm font-medium truncate">${task.title}</span>
                         </div>
                         <span class="text-xs text-red-600 font-medium bg-red-100 px-2 py-1 rounded-full whitespace-nowrap animate-pulse-custom">
-                            Hari ini
+                            Hari ini ${task.deadline_time ? `(${task.deadline_time})` : ''}
                         </span>
                     </div>
                 `).join('');
@@ -1728,11 +1788,24 @@ Tetap semangat belajar! 💪
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500 animate-shake' : ''}"></i>
                             <span class="${isOverdue(task) ? 'text-red-500 font-medium' : ''}">
-                                ${formatDate(task.deadline)}
+                                ${formatDate(task.deadline)} ${task.deadline_time || ''}
                             </span>
                         </div>
                         ${isOverdue(task) ? 
                             '<span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full animate-pulse-custom">Terlambat</span>' : 
+                            ''
+                        }
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-bell ${hasScheduledNotification(task) ? 'text-green-500' : 'text-gray-400'}"></i>
+                            <span class="${hasScheduledNotification(task) ? 'text-green-600 font-medium' : 'text-gray-500'}">
+                                Notifikasi: ${task.notification_time || 'Tidak diatur'}
+                            </span>
+                        </div>
+                        ${hasScheduledNotification(task) ? 
+                            '<span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Terjadwal</span>' : 
                             ''
                         }
                     </div>
@@ -1759,8 +1832,15 @@ Tetap semangat belajar! 💪
             `).join('');
         }
 
+        function hasScheduledNotification(task) {
+            return scheduledNotifications[task.id] !== undefined;
+        }
+
         function isOverdue(task) {
-            return new Date(task.deadline) < new Date() && !task.completed;
+            if (task.completed) return false;
+            
+            const deadline = new Date(`${task.deadline}T${task.deadline_time || '23:59:00'}`);
+            return deadline < new Date();
         }
 
         function formatDate(dateString) {
@@ -1774,7 +1854,7 @@ Tetap semangat belajar! 💪
         // ==================== ANIMATION EFFECTS ====================
         function playCelebration() {
             createConfetti();
-            showNotification('🎉 Yeay! Tugas selesai!', 'success');
+            // showNotification('🎉 Yeay! Tugas selesai!', 'success'); // Already called in toggleTask
         }
 
         function createConfetti() {
@@ -1811,7 +1891,7 @@ Tetap semangat belajar! 💪
         // ==================== NOTIFICATION SYSTEM ====================
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-all duration-300 shadow-lg ${
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-all duration-300 shadow-lg translate-x-[120%] ${
                 type === 'success' ? 'bg-green-500' : 
                 type === 'warning' ? 'bg-yellow-500' : 
                 type === 'error' ? 'bg-red-500' : 'bg-blue-500'
@@ -1836,7 +1916,7 @@ Tetap semangat belajar! 💪
             
             // Animate out after 3 seconds
             setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
+                notification.style.transform = 'translateX(120%)';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
@@ -1851,6 +1931,10 @@ Tetap semangat belajar! 💪
             document.getElementById('sidebarUsername').textContent = currentUser.username;
             document.getElementById('sidebarUserInitial').textContent = currentUser.username.charAt(0).toUpperCase();
             document.getElementById('settingsUsername').textContent = currentUser.username;
+            
+            // Initial load for telegram enabled status
+            toggleTelegramNotifications();
+            loadTelegramConfigUI(); // Ensure UI reflects local storage value
 
             // Set random motivation message
             const messages = [
@@ -1869,6 +1953,20 @@ Tetap semangat belajar! 💪
             
             // Setup periodic checks
             setInterval(updateLastSync, 30000);
+            
+            // Check for notifications every minute
+            setInterval(checkPendingNotifications, 60000);
+        }
+
+        function checkPendingNotifications() {
+            const now = new Date();
+            console.log(`🔔 Checking notifications at ${now.toLocaleTimeString()}`);
+            
+            // Log scheduled notifications for debugging
+            const scheduledCount = Object.keys(scheduledNotifications).length;
+            if (scheduledCount > 0) {
+                console.log(`📋 ${scheduledCount} notifications scheduled`);
+            }
         }
 
         // Event Listeners
@@ -1880,6 +1978,9 @@ Tetap semangat belajar! 💪
         document.getElementById('changePasswordModal').addEventListener('click', function(e) {
             if (e.target === this) closeChangePasswordModal();
         });
+        
+        // Use the function name for the form submit handler
+        document.getElementById('changePasswordForm').addEventListener('submit', changePassword);
 
         // Initialize
         document.addEventListener('DOMContentLoaded', initDashboard);
