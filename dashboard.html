@@ -718,12 +718,11 @@
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const username = localStorage.getItem('username');
             
+            // PERBAIKAN: Validasi lebih ketat untuk login status
             if (isLoggedIn !== 'true' || !username) {
-                console.log("Not logged in. Using default user.");
-                return {
-                    username: 'Khoirul',
-                    user_id: 'khoirul-user'
-                };
+                console.log("Not logged in. Redirecting to login page.");
+                window.location.href = 'index.html';
+                return null;
             }
             
             return {
@@ -732,13 +731,25 @@
             };
         }
 
+        // PERBAIKAN: Fungsi logout yang benar-benar membersihkan session
         function logout() {
             if (confirm('Yakin ingin logout?')) {
+                // Clear semua data session
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
                 localStorage.removeItem('user_id');
+                
+                // Clear scheduled notifications
+                Object.values(scheduledNotifications).forEach(timeoutId => {
+                    clearTimeout(timeoutId);
+                });
+                scheduledNotifications = {};
+                
+                // Redirect ke halaman login
                 showNotification('Anda telah logout.', 'info');
-                location.reload(); 
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
             }
         }
 
@@ -838,7 +849,10 @@
         let tasks = [];
         let currentUser = null;
         let realtimeSubscription = null;
-        let telegramEnabled = localStorage.getItem('telegramEnabled') === 'true';
+        
+        // PERBAIKAN: Inisialisasi telegramEnabled dengan nilai default yang benar
+        let telegramEnabled = localStorage.getItem('telegramEnabled') !== 'false'; // Default true
+        
         let scheduledNotifications = {};
 
         async function loadTasks() {
@@ -1143,11 +1157,17 @@ Semangat kerjakan! 🚀
             return { token, chatId };
         }
 
+        // PERBAIKAN: Fungsi untuk memuat UI Telegram dengan status yang benar
         function loadTelegramConfigUI() {
             const config = getTelegramConfig();
             document.getElementById('telegramToken').value = config.token || '';
             document.getElementById('telegramChatId').value = config.chatId || '';
             
+            updateTelegramToggleButton();
+        }
+
+        // PERBAIKAN: Fungsi untuk update tombol Telegram toggle
+        function updateTelegramToggleButton() {
             const button = document.getElementById('telegramToggle');
             if (telegramEnabled) {
                 button.textContent = 'Aktif';
@@ -1230,17 +1250,15 @@ Semangat kerjakan! 🚀
             }
         }
 
+        // PERBAIKAN: Fungsi toggle yang menyimpan status dengan benar
         function toggleTelegramNotifications() {
             telegramEnabled = !telegramEnabled;
             localStorage.setItem('telegramEnabled', telegramEnabled);
-            const button = document.getElementById('telegramToggle');
+            updateTelegramToggleButton();
+            
             if (telegramEnabled) {
-                button.textContent = 'Aktif';
-                button.className = 'bg-red-500 text-white px-3 py-1 rounded-lg text-sm';
                 showNotification('🔔 Notifikasi Telegram diaktifkan', 'success');
             } else {
-                button.textContent = 'Nonaktif';
-                button.className = 'bg-gray-500 text-white px-3 py-1 rounded-lg text-sm';
                 showNotification('🔕 Notifikasi Telegram dinonaktifkan', 'warning');
             }
         }
@@ -1921,6 +1939,7 @@ Semangat kerjakan! 🚀
 
         // ==================== INITIALIZATION ====================
         async function initDashboard() {
+            // PERBAIKAN: Check authentication terlebih dahulu
             currentUser = checkAuth();
             if (!currentUser) return;
 
@@ -1929,7 +1948,7 @@ Semangat kerjakan! 🚀
             document.getElementById('sidebarUserInitial').textContent = currentUser.username.charAt(0).toUpperCase();
             document.getElementById('settingsUsername').textContent = currentUser.username;
             
-            toggleTelegramNotifications();
+            // PERBAIKAN: Load Telegram config dengan benar
             loadTelegramConfigUI();
 
             const messages = [
