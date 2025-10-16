@@ -719,8 +719,7 @@
             const username = localStorage.getItem('username');
             
             if (isLoggedIn !== 'true' || !username) {
-                // window.location.href = 'login.html'; // uncomment ini jika ada halaman login.html
-                console.log("Not logged in. Using default user."); // Default fallback for single-file demo
+                console.log("Not logged in. Using default user.");
                 return {
                     username: 'Khoirul',
                     user_id: 'khoirul-user'
@@ -738,7 +737,6 @@
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
                 localStorage.removeItem('user_id');
-                // window.location.href = 'login.html'; // uncomment ini jika ada halaman login.html
                 showNotification('Anda telah logout.', 'info');
                 location.reload(); 
             }
@@ -762,7 +760,6 @@
             const newPassword = document.getElementById('newPasswordDashboard').value;
             const confirmPassword = document.getElementById('confirmPasswordDashboard').value;
             
-            // Load credentials, default for demo
             const defaultCreds = { username: 'khoirul', password: '2509' };
             const credentials = JSON.parse(localStorage.getItem('tugasmerah_credentials')) || defaultCreds;
             
@@ -781,7 +778,6 @@
                 return;
             }
             
-            // Update password
             credentials.password = newPassword;
             localStorage.setItem('tugasmerah_credentials', JSON.stringify(credentials));
             
@@ -791,17 +787,14 @@
 
         // ==================== PAGE NAVIGATION ====================
         function showPage(pageName) {
-            // Hide all pages
             document.getElementById('dashboard-page').classList.add('page-hidden');
             document.getElementById('calendar-page').classList.add('page-hidden');
             document.getElementById('notes-page').classList.add('page-hidden');
             document.getElementById('settings-page').classList.add('page-hidden');
             
-            // Show selected page
             document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
             updateNavigationActiveState(pageName);
             
-            // Load page-specific content
             if (pageName === 'calendar') {
                 loadCalendar();
                 loadCalendarDeadlines();
@@ -809,12 +802,11 @@
                 loadSavedNotes();
             } else if (pageName === 'settings') {
                 document.getElementById('settingsUsername').textContent = currentUser.username;
-                loadTelegramConfigUI(); // Load telegram settings to UI
+                loadTelegramConfigUI();
             }
         }
 
         function updateNavigationActiveState(activePage) {
-            // Update desktop navigation
             const desktopItems = document.querySelectorAll('nav a');
             desktopItems.forEach(item => {
                 const linkText = item.querySelector('span').textContent.toLowerCase();
@@ -828,7 +820,6 @@
                 }
             });
 
-            // Update mobile navigation
             const mobileItems = document.querySelectorAll('.mobile-nav a');
             mobileItems.forEach(item => {
                 const linkText = item.querySelector('.text-xs')?.textContent.toLowerCase();
@@ -867,7 +858,6 @@
                 updateLastSync();
                 setupRealtimeSubscription();
                 
-                // Setup scheduled notifications for all tasks
                 setupAllScheduledNotifications();
                 
                 showNotification('✅ Tugas berhasil dimuat!', 'success');
@@ -926,7 +916,6 @@
                         tasks[index] = newData;
                         setupScheduledNotification(newData);
                         if (newData.completed && oldData.completed !== newData.completed) {
-                             // Jangan tampilkan notif update saat hanya toggle complete
                         } else {
                             showNotification(`📱 Tugas diupdate: "${newData.title}"`, 'info');
                         }
@@ -943,16 +932,14 @@
             updateUI();
         }
 
-        // ==================== FLEKSIBLE REMINDER SYSTEM (IMPROVED) ====================
+        // ==================== FLEKSIBLE REMINDER SYSTEM ====================
         
         function setupAllScheduledNotifications() {
-            // Clear all existing notifications
             Object.values(scheduledNotifications).forEach(timeoutId => {
                 clearTimeout(timeoutId);
             });
             scheduledNotifications = {};
 
-            // Setup notifications for all active tasks
             tasks.filter(task => !task.completed).forEach(task => {
                 setupScheduledNotification(task);
             });
@@ -964,30 +951,31 @@
                 return;
             }
 
-            const notificationTime = task.notification_time;
+            const notificationTime = localStorage.getItem(`task_${task.id}_notification`) || '07:00';
             const taskDate = task.deadline;
             
-            if (!notificationTime || !taskDate) return;
+            if (!taskDate) return;
 
-            // Parse waktu notifikasi
-            const [notifHours, notifMinutes] = notificationTime.split(':').map(Number);
-            const notifDateTime = new Date(`${taskDate}T${notificationTime}:00`);
-            
-            // Hapus jadwal lama jika ada
-            cancelScheduledNotification(task.id);
-            
-            // Jadwalkan notifikasi pada waktu yang ditentukan
-            const now = new Date();
-            const timeUntilNotification = notifDateTime.getTime() - now.getTime();
-            
-            if (timeUntilNotification > 0 && timeUntilNotification < 7 * 24 * 60 * 60 * 1000) { // Max 7 hari
-                scheduledNotifications[task.id] = setTimeout(() => {
-                    sendScheduledReminder(task);
-                }, timeUntilNotification);
+            try {
+                const [notifHours, notifMinutes] = notificationTime.split(':').map(Number);
+                const notifDateTime = new Date(`${taskDate}T${notificationTime}:00`);
                 
-                console.log(`🔔 Notifikasi dijadwalkan untuk "${task.title}" pada ${notifDateTime}`);
-            } else if (timeUntilNotification <= 0) {
-                console.log(`⚠️ Waktu notifikasi untuk "${task.title}" sudah lewat`);
+                cancelScheduledNotification(task.id);
+                
+                const now = new Date();
+                const timeUntilNotification = notifDateTime.getTime() - now.getTime();
+                
+                if (timeUntilNotification > 0 && timeUntilNotification < 7 * 24 * 60 * 60 * 1000) {
+                    scheduledNotifications[task.id] = setTimeout(() => {
+                        sendScheduledReminder(task);
+                    }, timeUntilNotification);
+                    
+                    console.log(`🔔 Notifikasi dijadwalkan untuk "${task.title}" pada ${notifDateTime}`);
+                } else if (timeUntilNotification <= 0) {
+                    console.log(`⚠️ Waktu notifikasi untuk "${task.title}" sudah lewat`);
+                }
+            } catch (error) {
+                console.error('Error scheduling notification:', error);
             }
         }
 
@@ -1008,12 +996,13 @@
 
             const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
             const urgency = task.priority === 'high' ? 'TINGGI' : task.priority === 'medium' ? 'SEDANG' : 'RENDAH';
+            const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '';
             
             const message = `
 ⏰ **REMINDER TUGAS - Sistem Fleksibel** ⏰
 
 📚 **${task.title}**
-📅 Deadline: ${formatDate(task.deadline)} ${task.deadline_time || ''}
+📅 Deadline: ${formatDate(task.deadline)} ${deadlineTime}
 🎯 Prioritas: ${priorityEmoji} ${urgency}
 ${task.description ? `📝 ${task.description}` : ''}
 
@@ -1028,21 +1017,16 @@ Semangat kerjakan sebelum waktunya! 💪
             
             if (sent) {
                 console.log(`✅ Reminder terkirim untuk: "${task.title}"`);
-                // Update task to mark reminder as sent
-                await supabase
-                    .from('tasks')
-                    .update({ reminder_sent: true })
-                    .eq('id', task.id);
             } else {
                 console.log(`❌ Gagal mengirim reminder untuk: "${task.title}"`);
             }
             
-            // Hapus dari scheduled notifications setelah dikirim
             delete scheduledNotifications[task.id];
         }
 
         function calculateTimeRemaining(task) {
-            const deadline = new Date(`${task.deadline}T${task.deadline_time || '23:59:00'}`);
+            const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '23:59:00';
+            const deadline = new Date(`${task.deadline}T${deadlineTime}`);
             const now = new Date();
             const diffMs = deadline - now;
             
@@ -1072,8 +1056,6 @@ Semangat kerjakan sebelum waktunya! 💪
                 title: document.getElementById('taskTitle').value,
                 description: document.getElementById('taskDescription').value,
                 deadline: taskDeadline,
-                deadline_time: taskTime, // Menyimpan waktu deadline
-                notification_time: taskNotificationTime, // Menyimpan waktu notifikasi yang diinginkan
                 priority: document.getElementById('taskPriority').value,
                 completed: false,
                 created_at: new Date().toISOString(),
@@ -1089,15 +1071,26 @@ Semangat kerjakan sebelum waktunya! 💪
 
                 if (error) throw error;
                 
+                const taskId = data[0].id;
+                
+                localStorage.setItem(`task_${taskId}_deadline`, taskTime);
+                localStorage.setItem(`task_${taskId}_notification`, taskNotificationTime);
+                
                 closeAddTaskModal();
                 showNotification('🎉 Tugas berhasil disimpan ke cloud!', 'success');
                 
-                // Kirim reminder Telegram jika diaktifkan (segera setelah dibuat)
+                const taskWithTimes = {
+                    ...data[0],
+                    notification_time: taskNotificationTime,
+                    deadline_time: taskTime
+                };
+                
+                setupScheduledNotification(taskWithTimes);
+                
                 const sendReminder = document.getElementById('sendTelegramReminder').checked;
                 
                 if (sendReminder && telegramEnabled) {
-                    // Mengirim notif segera, dengan detail waktu notifikasi yang disetel
-                    sendImmediateReminder(data[0]);
+                    sendImmediateReminder(taskWithTimes);
                 }
                 
             } catch (error) {
@@ -1108,7 +1101,6 @@ Semangat kerjakan sebelum waktunya! 💪
             }
         }
 
-        // Fungsi untuk mengirim notifikasi segera setelah tugas dibuat
         async function sendImmediateReminder(task) {
             const config = getTelegramConfig();
             if (!config.token || !config.chatId) {
@@ -1125,7 +1117,7 @@ Semangat kerjakan sebelum waktunya! 💪
 📚 **${task.title}**
 📅 Deadline: ${formatDate(task.deadline)} ${task.deadline_time || ''}
 🎯 Prioritas: ${priorityEmoji} ${urgency}
-⏰ Notifikasi dijadwalkan: ${task.notification_time}
+⏰ Notifikasi dijadwalkan: ${task.notification_time || '07:00'}
 ${task.description ? `📝 ${task.description}` : ''}
 
 💡 *Notifikasi akan dikirim otomatis pada waktu yang Anda tentukan.*
@@ -1184,7 +1176,6 @@ Semangat kerjakan! 🚀
             
             const config = getTelegramConfig();
             
-            // Validasi token & chat ID
             if (!config.token || !config.chatId) {
                 console.log('❌ Telegram bot not configured properly');
                 return false;
@@ -1272,7 +1263,12 @@ Semangat kerjakan! 🚀
                     playCelebration();
                     showNotification('🎉 Tugas diselesaikan! Mantap!', 'success');
                 } else {
-                    setupScheduledNotification({...task, completed: false});
+                    const taskWithTimes = {
+                        ...task,
+                        notification_time: localStorage.getItem(`task_${taskId}_notification`) || '07:00',
+                        deadline_time: localStorage.getItem(`task_${taskId}_deadline`) || '23:59'
+                    };
+                    setupScheduledNotification(taskWithTimes);
                     showNotification('↩️ Tugas diaktifkan kembali.', 'info');
                 }
                 
@@ -1293,6 +1289,8 @@ Semangat kerjakan! 🚀
                     if (error) throw error;
                     
                     cancelScheduledNotification(taskId);
+                    localStorage.removeItem(`task_${taskId}_notification`);
+                    localStorage.removeItem(`task_${taskId}_deadline`);
                     showNotification('🗑️ Tugas dihapus', 'warning');
                     
                 } catch (error) {
@@ -1310,7 +1308,6 @@ Semangat kerjakan! 🚀
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('taskDeadline').value = tomorrow.toISOString().split('T')[0];
             
-            // Set default time to user's local time for better UX
             const now = new Date();
             const defaultTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             document.getElementById('taskTime').value = '23:59';
@@ -1349,12 +1346,10 @@ Semangat kerjakan! 🚀
                 <div class="grid grid-cols-7 gap-2">
             `;
             
-            // Empty cells for days before first day of month
             for (let i = 0; i < firstDay.getDay(); i++) {
                 calendarHTML += `<div class="h-12"></div>`;
             }
             
-            // Days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayTasks = tasks.filter(task => task.deadline === dateStr && !task.completed);
@@ -1385,7 +1380,10 @@ Semangat kerjakan! 🚀
         function showDayTasks(dateStr) {
             const dayTasks = tasks.filter(task => task.deadline === dateStr && !task.completed);
             if (dayTasks.length > 0) {
-                const taskTitles = dayTasks.map(task => `• ${task.title} (Jam: ${task.deadline_time || 'Tidak ada'})`).join('\n');
+                const taskTitles = dayTasks.map(task => {
+                    const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || 'Tidak ada';
+                    return `• ${task.title} (Jam: ${deadlineTime})`;
+                }).join('\n');
                 alert(`Tugas untuk ${formatDate(dateStr)}:\n\n${taskTitles}`);
             } else {
                 showNotification(`Tidak ada tugas untuk ${formatDate(dateStr)}`, 'info');
@@ -1409,13 +1407,15 @@ Semangat kerjakan! 🚀
                     </div>
                 `;
             } else {
-                calendarContainer.innerHTML = upcomingTasks.map(task => `
+                calendarContainer.innerHTML = upcomingTasks.map(task => {
+                    const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '';
+                    return `
                     <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-red-300 transition duration-200 transform hover:scale-105">
                         <div class="flex-1">
                             <p class="font-medium text-gray-900">${task.title}</p>
                             <p class="text-sm text-gray-600 flex items-center mt-1">
                                 <i class="fas fa-calendar-day text-red-400 mr-2"></i>
-                                ${formatDate(task.deadline)} ${task.deadline_time || ''}
+                                ${formatDate(task.deadline)} ${deadlineTime}
                             </p>
                         </div>
                         <span class="text-xs px-2 py-1 rounded-full ${
@@ -1426,7 +1426,7 @@ Semangat kerjakan! 🚀
                             ${task.priority === 'high' ? 'Tinggi' : task.priority === 'medium' ? 'Sedang' : 'Rendah'}
                         </span>
                     </div>
-                `).join('');
+                `}).join('');
             }
         }
 
@@ -1544,7 +1544,6 @@ Semangat kerjakan! 🚀
             try {
                 showLoadingState(true);
                 
-                // Hapus tugas lama
                 const { error: deleteError } = await supabase
                     .from('tasks')
                     .delete()
@@ -1552,7 +1551,6 @@ Semangat kerjakan! 🚀
                 
                 if (deleteError) throw deleteError;
                 
-                // Import tugas baru
                 const tasksToImport = importedTasks.map(task => ({
                     ...task,
                     user_id: currentUser.user_id,
@@ -1566,7 +1564,6 @@ Semangat kerjakan! 🚀
                 if (insertError) throw insertError;
                 
                 showNotification('✅ Data berhasil diimport! Memuat ulang...', 'success');
-                // Force reload tasks to show imported data
                 await loadTasks(); 
                 
             } catch (error) {
@@ -1722,17 +1719,19 @@ Semangat kerjakan! 🚀
                     </div>
                 `;
             } else {
-                reminderContainer.innerHTML = todayTasks.map(task => `
+                reminderContainer.innerHTML = todayTasks.map(task => {
+                    const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '';
+                    return `
                     <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200 hover:border-red-300 transition duration-200">
                         <div class="flex items-center space-x-3 flex-1">
                             <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 animate-pulse-custom"></div>
                             <span class="text-sm font-medium truncate">${task.title}</span>
                         </div>
                         <span class="text-xs text-red-600 font-medium bg-red-100 px-2 py-1 rounded-full whitespace-nowrap animate-pulse-custom">
-                            Hari ini ${task.deadline_time ? `(${task.deadline_time})` : ''}
+                            Hari ini ${deadlineTime ? `(${deadlineTime})` : ''}
                         </span>
                     </div>
-                `).join('');
+                `}).join('');
             }
         }
 
@@ -1765,7 +1764,12 @@ Semangat kerjakan! 🚀
             emptyState.classList.add('hidden');
             loadingState.classList.add('hidden');
             
-            taskList.innerHTML = filteredTasks.map((task, index) => `
+            taskList.innerHTML = filteredTasks.map((task, index) => {
+                const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '';
+                const notificationTime = localStorage.getItem(`task_${task.id}_notification`) || '07:00';
+                const hasScheduled = scheduledNotifications[task.id] !== undefined;
+                
+                return `
                 <div class="task-card p-6 ${task.completed ? 'opacity-70' : ''}" style="animation-delay: ${index * 0.1}s">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="font-bold text-lg text-gray-900 ${task.completed ? 'line-through' : ''}">
@@ -1788,7 +1792,7 @@ Semangat kerjakan! 🚀
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-calendar ${isOverdue(task) ? 'text-red-500 animate-shake' : ''}"></i>
                             <span class="${isOverdue(task) ? 'text-red-500 font-medium' : ''}">
-                                ${formatDate(task.deadline)} ${task.deadline_time || ''}
+                                ${formatDate(task.deadline)} ${deadlineTime}
                             </span>
                         </div>
                         ${isOverdue(task) ? 
@@ -1799,12 +1803,12 @@ Semangat kerjakan! 🚀
 
                     <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
                         <div class="flex items-center space-x-2">
-                            <i class="fas fa-bell ${hasScheduledNotification(task) ? 'text-green-500' : 'text-gray-400'}"></i>
-                            <span class="${hasScheduledNotification(task) ? 'text-green-600 font-medium' : 'text-gray-500'}">
-                                Notifikasi: ${task.notification_time || 'Tidak diatur'}
+                            <i class="fas fa-bell ${hasScheduled ? 'text-green-500' : 'text-gray-400'}"></i>
+                            <span class="${hasScheduled ? 'text-green-600 font-medium' : 'text-gray-500'}">
+                                Notifikasi: ${notificationTime}
                             </span>
                         </div>
-                        ${hasScheduledNotification(task) ? 
+                        ${hasScheduled ? 
                             '<span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Terjadwal</span>' : 
                             ''
                         }
@@ -1829,17 +1833,14 @@ Semangat kerjakan! 🚀
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
-
-        function hasScheduledNotification(task) {
-            return scheduledNotifications[task.id] !== undefined;
+            `}).join('');
         }
 
         function isOverdue(task) {
             if (task.completed) return false;
             
-            const deadline = new Date(`${task.deadline}T${task.deadline_time || '23:59:00'}`);
+            const deadlineTime = localStorage.getItem(`task_${task.id}_deadline`) || '23:59:00';
+            const deadline = new Date(`${task.deadline}T${deadlineTime}`);
             return deadline < new Date();
         }
 
@@ -1854,7 +1855,6 @@ Semangat kerjakan! 🚀
         // ==================== ANIMATION EFFECTS ====================
         function playCelebration() {
             createConfetti();
-            // showNotification('🎉 Yeay! Tugas selesai!', 'success'); // Already called in toggleTask
         }
 
         function createConfetti() {
@@ -1909,12 +1909,10 @@ Semangat kerjakan! 🚀
             
             document.body.appendChild(notification);
             
-            // Animate in
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
             }, 10);
             
-            // Animate out after 3 seconds
             setTimeout(() => {
                 notification.style.transform = 'translateX(120%)';
                 setTimeout(() => notification.remove(), 300);
@@ -1926,17 +1924,14 @@ Semangat kerjakan! 🚀
             currentUser = checkAuth();
             if (!currentUser) return;
 
-            // Update user info
             document.getElementById('welcomeName').textContent = currentUser.username;
             document.getElementById('sidebarUsername').textContent = currentUser.username;
             document.getElementById('sidebarUserInitial').textContent = currentUser.username.charAt(0).toUpperCase();
             document.getElementById('settingsUsername').textContent = currentUser.username;
             
-            // Initial load for telegram enabled status
             toggleTelegramNotifications();
-            loadTelegramConfigUI(); // Ensure UI reflects local storage value
+            loadTelegramConfigUI();
 
-            // Set random motivation message
             const messages = [
                 { text: "Semangat menyelesaikan tugas hari ini! 🚀", sub: "Kamu bisa, satu per satu tugas akan selesai!" },
                 { text: "Progress kecil tetap progress! 💪", sub: "Langkah kecil membawa hasil besar!" },
@@ -1948,13 +1943,9 @@ Semangat kerjakan! 🚀
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
 
-            // Load initial data
             await loadTasks();
             
-            // Setup periodic checks
             setInterval(updateLastSync, 30000);
-            
-            // Check for notifications every minute
             setInterval(checkPendingNotifications, 60000);
         }
 
@@ -1962,7 +1953,6 @@ Semangat kerjakan! 🚀
             const now = new Date();
             console.log(`🔔 Checking notifications at ${now.toLocaleTimeString()}`);
             
-            // Log scheduled notifications for debugging
             const scheduledCount = Object.keys(scheduledNotifications).length;
             if (scheduledCount > 0) {
                 console.log(`📋 ${scheduledCount} notifications scheduled`);
@@ -1979,7 +1969,6 @@ Semangat kerjakan! 🚀
             if (e.target === this) closeChangePasswordModal();
         });
         
-        // Use the function name for the form submit handler
         document.getElementById('changePasswordForm').addEventListener('submit', changePassword);
 
         // Initialize
