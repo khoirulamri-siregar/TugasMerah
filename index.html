@@ -8,6 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- PWA META TAGS -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TugasMerah">
+    <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4da.svg">
+    
     <style>
         body { 
             font-family: 'Poppins', sans-serif;
@@ -64,9 +73,32 @@
                 border-radius: 16px;
             }
         }
+
+        /* PWA Install Button */
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #E63946;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
+            z-index: 1000;
+            display: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
+    <!-- Install Button -->
+    <button id="installBtn" class="install-btn">
+        <i class="fas fa-download"></i>
+    </button>
+
     <!-- Animated Background -->
     <div class="fixed top-10 left-10 w-6 h-6 bg-white rounded-full opacity-20 floating" style="animation-delay: 0s;"></div>
     <div class="fixed top-20 right-20 w-8 h-8 bg-white rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
@@ -187,18 +219,57 @@
     </div>
 
     <script>
-        // Supabase Configuration - GANTI DENGAN URL DAN KEY ANDA
+        // Supabase Configuration
         const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Kredensial default - bisa direset melalui modal
+        // Kredensial default
         let userCredentials = {
             username: 'khoirul',
             password: '2509',
             user_id: 'khoirul-user'
         };
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
 
         // Load credentials dari localStorage jika ada
         function loadCredentials() {
@@ -212,6 +283,20 @@
         function saveCredentials() {
             localStorage.setItem('tugasmerah_credentials', JSON.stringify(userCredentials));
         }
+
+        // Clear login status saat halaman login dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('user_id');
+            
+            loadCredentials();
+            
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+            });
+        });
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -317,20 +402,9 @@
         }
 
         // Redirect if already logged in
-        if (localStorage.getItem('isLoggedIn') === 'true') {
+        if (localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('username')) {
             window.location.href = 'dashboard.html';
         }
-
-        // Initialize credentials on load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCredentials();
-            
-            const featureCards = document.querySelectorAll('.feature-card');
-            featureCards.forEach((card, index) => {
-                card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
-            });
-        });
     </script>
 </body>
 </html>
-
