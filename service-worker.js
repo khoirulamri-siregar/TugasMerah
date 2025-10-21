@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tugasmerah-v1.3';
+const CACHE_NAME = 'tugasmerah-v1.4'; // Ganti versi cache agar cache lama dihapus
 const urlsToCache = [
   '/',
   '/index.html',
@@ -41,22 +41,68 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event
+// Fetch event (Cache First then Network)
 self.addEventListener('fetch', event => {
-  console.log('Service Worker: Fetching');
+  // Hanya tangani GET request, lewati request POST, dll.
+  if (event.request.method !== 'GET') return; 
+
+  console.log('Service Worker: Fetching', event.request.url);
   event.respondWith(
-    fetch(event.request)
-      .then(res => {
-        // Make copy/clone of response
-        const resClone = res.clone();
-        // Open cache
-        caches.open(CACHE_NAME)
-          .then(cache => {
-            // Add response to cache
-            cache.put(event.request, resClone);
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // Jika ada di cache, kirim dari cache
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        // Jika tidak ada di cache, ambil dari network
+        return fetch(event.request)
+          .then(res => {
+            // Cek jika response valid
+            if (!res || res.status !== 200 || res.type !== 'basic') {
+              return res;
+            }
+            
+            // Simpan salinan response ke cache
+            const resClone = res.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, resClone);
+              });
+            return res;
+          })
+          .catch(err => {
+            console.log('Service Worker: Fetch failed; returning offline page or error.', err);
+            // Anda bisa mengembalikan halaman offline di sini jika diperlukan
           });
-        return res;
       })
-      .catch(err => caches.match(event.request).then(res => res))
+  );
+});
+
+// =========================================================
+// NEW: Event Listener untuk menangani klik Notifikasi Sistem
+// =========================================================
+self.addEventListener('notificationclick', event => {
+  console.log('Notification clicked: ', event.notification.tag);
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({
+      type: 'window'
+    })
+    .then(clientList => {
+      // Cari jika ada window aplikasi yang sudah terbuka
+      for (const client of clientList) {
+        if (client.url.includes('/dashboard.html') && 'focus' in client) {
+          // Jika ada, fokuskan ke window tersebut
+          return client.focus();
+        }
+      }
+      
+      // Jika belum ada window yang terbuka, buka window baru ke halaman dashboard
+      if (clients.openWindow) {
+        return clients.openWindow('/dashboard.html');
+      }
+    })
   );
 });
