@@ -139,22 +139,28 @@
             </button>
         </form>
 
-        <!-- Lupa Password -->
-        <div class="mt-4 text-center">
-            <button onclick="showResetPasswordModal()" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200">
+        <!-- Lupa Password & Daftar -->
+        <div class="mt-4 text-center space-y-3">
+            <button onclick="showResetPasswordModal()" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200 block w-full">
                 <i class="fas fa-key mr-1"></i>Lupa Password?
             </button>
+            <div class="border-t pt-3">
+                <p class="text-gray-600 text-sm mb-2">Belum punya akun?</p>
+                <button onclick="showRegisterModal()" class="text-green-600 hover:text-green-800 font-medium transition duration-200">
+                    <i class="fas fa-user-plus mr-1"></i>Daftar Akun Baru
+                </button>
+            </div>
         </div>
 
         <!-- Features Preview -->
         <div class="mt-8 grid grid-cols-2 gap-4 text-center">
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.1s">
                 <i class="fas fa-bell text-red-500 text-lg mb-2"></i>
-                <p class="text-xs font-medium text-gray-700">Telegram Reminder</p>
+                <p class="text-xs font-medium text-gray-700">Browser Notifikasi</p>
             </div>
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.2s">
-                <i class="fas fa-mobile-alt text-red-500 text-lg mb-2"></i>
-                <p class="text-xs font-medium text-gray-700">Responsive</p>
+                <i class="fas fa-users text-red-500 text-lg mb-2"></i>
+                <p class="text-xs font-medium text-gray-700">Multi-User</p>
             </div>
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.3s">
                 <i class="fas fa-chart-line text-red-500 text-lg mb-2"></i>
@@ -218,19 +224,81 @@
         </div>
     </div>
 
+    <!-- Registration Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-user-plus text-green-500 mr-2"></i>Daftar Akun Baru
+                </h3>
+            </div>
+            
+            <form id="registerForm" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-green-500"></i>Nama Lengkap
+                    </label>
+                    <input type="text" id="regFullName" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                           placeholder="Nama lengkap Anda">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-at mr-2 text-green-500"></i>Username
+                    </label>
+                    <input type="text" id="regUsername" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                           placeholder="Pilih username unik">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-green-500"></i>Email
+                    </label>
+                    <input type="email" id="regEmail" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                           placeholder="email@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-green-500"></i>Password
+                    </label>
+                    <input type="password" id="regPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                           placeholder="Minimal 6 karakter">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-green-500"></i>Konfirmasi Password
+                    </label>
+                    <input type="password" id="regConfirmPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                           placeholder="Ulangi password">
+                </div>
+            </form>
+            
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+                <button type="button" onclick="closeRegisterModal()" 
+                        class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
+                    Batal
+                </button>
+                <button type="submit" form="registerForm"
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                    <i class="fas fa-user-plus mr-2"></i>Daftar Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Kredensial default
-        let userCredentials = {
-            username: 'khoirul',
-            password: '2509',
-            user_id: 'khoirul-user'
-        };
 
         // PWA Install Prompt
         let deferredPrompt;
@@ -271,26 +339,13 @@
             });
         }
 
-        // Load credentials dari localStorage jika ada
-        function loadCredentials() {
-            const saved = localStorage.getItem('tugasmerah_credentials');
-            if (saved) {
-                userCredentials = JSON.parse(saved);
-            }
-        }
-
-        // Save credentials ke localStorage
-        function saveCredentials() {
-            localStorage.setItem('tugasmerah_credentials', JSON.stringify(userCredentials));
-        }
-
         // Clear login status saat halaman login dimuat
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             localStorage.removeItem('user_id');
-            
-            loadCredentials();
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('user_name');
             
             const featureCards = document.querySelectorAll('.feature-card');
             featureCards.forEach((card, index) => {
@@ -298,6 +353,7 @@
             });
         });
 
+        // ==================== LOGIN SYSTEM ====================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -305,27 +361,51 @@
             const password = document.getElementById('password').value;
             const submitBtn = this.querySelector('button[type="submit"]');
             
-            // Load credentials terbaru
-            loadCredentials();
-            
             // Show loading
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
             submitBtn.disabled = true;
             
             try {
-                // Validasi login
-                if (username === userCredentials.username && password === userCredentials.password) {
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('username', username);
-                    localStorage.setItem('user_id', userCredentials.user_id);
-                    
-                    showNotification(`Login berhasil! Selamat datang ${username}!`, 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                } else {
-                    throw new Error('Username atau password salah!');
+                // Cek user di database Supabase
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('is_active', true)
+                    .single();
+
+                if (error || !user) {
+                    throw new Error('Username tidak ditemukan!');
                 }
+
+                // Verifikasi password
+                if (password !== user.password) {
+                    throw new Error('Password salah!');
+                }
+
+                // Update last login
+                await supabase
+                    .from('users')
+                    .update({ last_login: new Date().toISOString() })
+                    .eq('id', user.id);
+
+                // Simpan session
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('user_id', user.id);
+                localStorage.setItem('username', user.username);
+                localStorage.setItem('user_role', user.role);
+                localStorage.setItem('user_name', user.full_name);
+
+                showNotification(`Login berhasil! Selamat datang ${user.full_name}!`, 'success');
+                
+                setTimeout(() => {
+                    if (user.role === 'superadmin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1000);
+
             } catch (error) {
                 showNotification(error.message, 'error');
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
@@ -333,42 +413,116 @@
             }
         });
 
-        // Reset Password Form
-        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
+        // ==================== REGISTRATION SYSTEM ====================
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('regFullName').value;
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            // Validasi
+            if (password !== confirmPassword) {
+                showNotification('Konfirmasi password tidak cocok!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Password minimal 6 karakter!', 'error');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showNotification('Username minimal 3 karakter!', 'error');
+                return;
+            }
+
+            try {
+                // Cek apakah username sudah ada
+                const { data: existingUser } = await supabase
+                    .from('users')
+                    .select('username')
+                    .eq('username', username)
+                    .single();
+
+                if (existingUser) {
+                    throw new Error('Username sudah digunakan!');
+                }
+
+                // Insert user baru
+                const { data: newUser, error } = await supabase
+                    .from('users')
+                    .insert([{
+                        username: username,
+                        password: password,
+                        email: email,
+                        full_name: fullName,
+                        role: 'user',
+                        is_active: true
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                showNotification('✅ Pendaftaran berhasil! Silakan login.', 'success');
+                closeRegisterModal();
+                
+                // Auto-fill login form
+                document.getElementById('username').value = username;
+                document.getElementById('password').value = password;
+
+            } catch (error) {
+                showNotification('❌ Gagal mendaftar: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== RESET PASSWORD ====================
+        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const username = document.getElementById('resetUsername').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
-            // Load credentials terbaru
-            loadCredentials();
-            
-            if (username !== userCredentials.username) {
-                showNotification('Username tidak ditemukan!', 'error');
-                return;
-            }
-            
             if (newPassword !== confirmPassword) {
                 showNotification('Konfirmasi password tidak cocok!', 'error');
                 return;
             }
             
-            if (newPassword.length < 4) {
-                showNotification('Password minimal 4 karakter!', 'error');
+            if (newPassword.length < 6) {
+                showNotification('Password minimal 6 karakter!', 'error');
                 return;
             }
             
-            // Update password
-            userCredentials.password = newPassword;
-            saveCredentials();
-            
-            showNotification('✅ Password berhasil direset!', 'success');
-            closeResetPasswordModal();
-            
-            // Clear form
-            document.getElementById('resetPasswordForm').reset();
+            try {
+                // Update password di database
+                const { error } = await supabase
+                    .from('users')
+                    .update({ password: newPassword })
+                    .eq('username', username);
+
+                if (error) throw error;
+
+                showNotification('✅ Password berhasil direset! Silakan login.', 'success');
+                closeResetPasswordModal();
+                
+            } catch (error) {
+                showNotification('❌ Gagal reset password: ' + error.message, 'error');
+            }
         });
+
+        // ==================== MODAL FUNCTIONS ====================
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.remove('hidden');
+            document.getElementById('regFullName').focus();
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.add('hidden');
+            document.getElementById('registerForm').reset();
+        }
 
         function showResetPasswordModal() {
             document.getElementById('resetPasswordModal').classList.remove('hidden');
@@ -385,7 +539,13 @@
             if (e.target === this) closeResetPasswordModal();
         });
 
+        document.getElementById('registerModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRegisterModal();
+        });
+
         function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${        function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${
                 type === 'success' ? 'bg-green-500' : 'bg-red-500'
@@ -403,7 +563,12 @@
 
         // Redirect if already logged in
         if (localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('username')) {
-            window.location.href = 'dashboard.html';
+            const userRole = localStorage.getItem('user_role');
+            if (userRole === 'superadmin') {
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         }
     </script>
 </body>
