@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - TugasMerah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+        .nav-active {
+            background: #E63946;
+            color: white;
+            transform: scale(1.05);
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <script>
+        const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-crown text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">TugasMerah Super Admin</h1>
+                        <p class="text-xs text-red-500">Super Admin Panel</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700" id="adminName">Loading...</span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card p-6 text-center">
+                <div class="text-3xl font-bold text-blue-500" id="totalUsers">0</div>
+                <div class="text-gray-600">Total Users</div>
+            </div>
+            <div class="stat-card p-6 text-center">
+                <div class="text-3xl font-bold text-green-500" id="totalTasks">0</div>
+                <div class="text-gray-600">Total Tasks</div>
+            </div>
+            <div class="stat-card p-6 text-center">
+                <div class="text-3xl font-bold text-purple-500" id="activeUsers">0</div>
+                <div class="text-gray-600">Active Users</div>
+            </div>
+            <div class="stat-card p-6 text-center">
+                <div class="text-3xl font-bold text-orange-500" id="completedTasks">0</div>
+                <div class="text-gray-600">Completed Tasks</div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-users mr-3 text-red-500"></i>User Management
+                </h2>
+                <button onclick="showAddUserModal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-user-plus mr-2"></i>Tambah User
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-700">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3">Username</th>
+                            <th class="px-4 py-3">Nama Lengkap</th>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">Role</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <!-- Data users akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- System Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-bar mr-2 text-blue-500"></i>User Statistics
+                </h3>
+                <div id="userStatsChart" class="h-64">
+                    <!-- Chart akan diisi -->
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-tasks mr-2 text-green-500"></i>Task Statistics
+                </h3>
+                <div id="taskStatsChart" class="h-64">
+                    <!-- Chart akan diisi -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-user-plus text-green-500 mr-2"></i>Tambah User Baru
+                </h3>
+            </div>
+            
+            <form id="addUserForm" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="addFullName" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Nama lengkap">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="addUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Username unik">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="addEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="email@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="addPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Minimal 6 karakter">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select id="addRole" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </form>
+            
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+                <button type="button" onclick="closeAddUserModal()" class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300">
+                    Batal
+                </button>
+                <button type="submit" form="addUserForm" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200">
+                    <i class="fas fa-save mr-2"></i>Simpan User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== AUTHENTICATION ====================
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userRole = localStorage.getItem('user_role');
+            
+            if (isLoggedIn !== 'true' || userRole !== 'superadmin') {
+                alert('Akses ditolak! Hanya Super Admin yang bisa mengakses halaman ini.');
+                window.location.href = 'index.html';
+                return null;
+            }
+            
+            return {
+                username: localStorage.getItem('username'),
+                user_id: localStorage.getItem('user_id'),
+                name: localStorage.getItem('user_name')
+            };
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ==================== USER MANAGEMENT ====================
+        let allUsers = [];
+        let allTasks = [];
+
+        async function loadDashboardData() {
+            const currentUser = checkAuth();
+            if (!currentUser) return;
+
+            document.getElementById('adminName').textContent = currentUser.name;
+
+            try {
+                // Load semua users
+                const { data: users, error: usersError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (usersError) throw usersError;
+                allUsers = users || [];
+
+                // Load semua tasks
+                const { data: tasks, error: tasksError } = await supabase
+                    .from('tasks')
+                    .select('*');
+
+                if (tasksError) throw tasksError;
+                allTasks = tasks || [];
+
+                updateStats();
+                renderUsersTable();
+                renderCharts();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showNotification('Error memuat data: ' + error.message, 'error');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = allUsers.length;
+            document.getElementById('totalTasks').textContent = allTasks.length;
+            document.getElementById('activeUsers').textContent = allUsers.filter(u => u.is_active).length;
+            document.getElementById('completedTasks').textContent = allTasks.filter(t => t.completed).length;
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+
+            allUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3 font-medium">${user.username}</td>
+                    <td class="px-4 py-3">${user.full_name}</td>
+                    <td class="px-4 py-3">${user.email || '-'}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            user.role === 'superadmin' ? 'bg-purple-100 text-purple-800' :
+                            user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ${user.is_active ? 'Aktif' : 'Nonaktif'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex space-x-2">
+                            <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="toggleUserStatus('${user.id}', ${!user.is_active})" class="${
+                                user.is_active ? 'text-orange-600 hover:text-orange-800' : 'text-green-600 hover:text-green-800'
+                            } transition duration-200">
+                                <i class="fas ${user.is_active ? 'fa-pause' : 'fa-play'}"></i>
+                            </button>
+                            ${user.role !== 'superadmin' ? `
+                                <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-800 transition duration-200">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ==================== USER OPERATIONS ====================
+        async function addUser(e) {
+            e.preventDefault();
+
+            const userData = {
+                full_name: document.getElementById('addFullName').value,
+                username: document.getElementById('addUsername').value,
+                email: document.getElementById('addEmail').value,
+                password: document.getElementById('addPassword').value,
+                role: document.getElementById('addRole').value,
+                is_active: true
+            };
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([userData])
+                    .select();
+
+                if (error) throw error;
+
+                showNotification('✅ User berhasil ditambahkan!', 'success');
+                closeAddUserModal();
+                await loadDashboardData();
+
+            } catch (error) {
+                showNotification('❌ Gagal menambah user: ' + error.message, 'error');
+            }
+        }
+
+        async function toggleUserStatus(userId, newStatus) {
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ is_active: newStatus })
+                    .eq('id', userId);
+
+                if (error) throw error;
+
+                showNotification(`✅ User ${newStatus ? 'diaktifkan' : 'dinonaktifkan'}!`, 'success');
+                await loadDashboardData();
+
+            } catch (error) {
+                showNotification('❌ Gagal mengupdate user: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan!')) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', userId);
+
+                if (error) throw error;
+
+                showNotification('✅ User berhasil dihapus!', 'success');
+                await loadDashboardData();
+
+            } catch (error) {
+                showNotification('❌ Gagal menghapus user: ' + error.message, 'error');
+            }
+        }
+
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (user) {
+                // Isi form edit (bisa dibuat modal terpisah)
+                document.getElementById('addFullName').value = user.full_name;
+                document.getElementById('addUsername').value = user.username;
+                document.getElementById('addEmail').value = user.email || '';
+                document.getElementById('addRole').value = user.role;
+                document.getElementById('addPassword').value = ''; // Kosongkan password
+                
+                showAddUserModal();
+                // Ubah judul modal menjadi Edit User
+                document.querySelector('#addUserModal h3').innerHTML = '<i class="fas fa-edit text-blue-500 mr-2"></i>Edit User';
+            }
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+        function showAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('hidden');
+            document.getElementById('addFullName').focus();
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.add('hidden');
+            document.getElementById('addUserForm').reset();
+            // Reset judul modal
+            document.querySelector('#addUserModal h3').innerHTML = '<i class="fas fa-user-plus text-green-500 mr-2"></i>Tambah User Baru';
+        }
+
+        function renderCharts() {
+            // Simple chart menggunakan HTML
+            const userStats = document.getElementById('userStatsChart');
+            const taskStats = document.getElementById('taskStatsChart');
+
+            // User role distribution
+            const roleCounts = {
+                superadmin: allUsers.filter(u => u.role === 'superadmin').length,
+                admin: allUsers.filter(u => u.role === 'admin').length,
+                user: allUsers.filter(u => u.role === 'user').length
+            };
+
+            userStats.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span>Super Admin</span>
+                        <span class="font-bold text-purple-600">${roleCounts.superadmin}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Admin</span>
+                        <span class="font-bold text-blue-600">${roleCounts.admin}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>User</span>
+                        <span class="font-bold text-gray-600">${roleCounts.user}</span>
+                    </div>
+                </div>
+            `;
+
+            // Task statistics
+            const taskCounts = {
+                total: allTasks.length,
+                completed: allTasks.filter(t => t.completed).length,
+                pending: allTasks.filter(t => !t.completed).length,
+                high: allTasks.filter(t => t.priority === 'high').length,
+                medium: allTasks.filter(t => t.priority === 'medium').length,
+                low: allTasks.filter(t => t.priority === 'low').length
+            };
+
+            taskStats.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span>Total Tasks</span>
+                        <span class="font-bold text-blue-600">${taskCounts.total}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Selesai</span>
+                        <span class="font-bold text-green-600">${taskCounts.completed}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Pending</span>
+                        <span class="font-bold text-orange-600">${taskCounts.pending}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Prioritas Tinggi</span>
+                        <span class="font-bold text-red-600">${taskCounts.high}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            
+            // Event listeners
+            document.getElementById('addUserForm').addEventListener('submit', addUser);
+            document.getElementById('addUserModal').addEventListener('click', function(e) {
+                if (e.target === this) closeAddUserModal();
+            });
+        });
+    </script>
+</body>
+                          </html>
