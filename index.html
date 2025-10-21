@@ -5,11 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TugasMerah - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'bounce-in': 'bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.320, 1.275)'
+                    },
+                    keyframes: {
+                        slideUp: {
+                            'from': { opacity: 0, transform: 'translateY(30px)' },
+                            'to': { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            'from': { opacity: 0 },
+                            'to': { opacity: 1 },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.5)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- PWA META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#E63946">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,7 +59,7 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.8s ease-out;
+            animation: slideUp 0.8s ease-out; /* Menggunakan keyframe kustom */
         }
         .btn-primary {
             background: linear-gradient(135deg, #E63946 0%, #f97316 100%);
@@ -40,30 +71,24 @@
         }
         .feature-card {
             transition: all 0.3s ease;
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.6s ease-out; /* Menggunakan keyframe kustom */
         }
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
+        /* Mengganti kelas animasi floating dengan utility kustom di config Tailwind*/
         .floating {
             animation: float 3s ease-in-out infinite;
+        }
+
+        /* Kelas untuk menutup modal dengan animasi */
+        .modal-slide-out {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(30px) scale(0.9); }
         }
 
         @media (max-width: 640px) {
@@ -94,18 +119,15 @@
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
-    <!-- Install Button -->
-    <button id="installBtn" class="install-btn">
+    <button id="installBtn" class="install-btn" title="Install Aplikasi PWA">
         <i class="fas fa-download"></i>
     </button>
 
-    <!-- Animated Background -->
     <div class="fixed top-10 left-10 w-6 h-6 bg-white rounded-full opacity-20 floating" style="animation-delay: 0s;"></div>
     <div class="fixed top-20 right-20 w-8 h-8 bg-white rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
     <div class="fixed bottom-20 left-20 w-10 h-10 bg-white rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
     
     <div class="login-card w-full max-w-md p-8">
-        <!-- Logo & Header -->
         <div class="text-center mb-8">
             <div class="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg floating">
                 <i class="fas fa-tasks text-white text-3xl"></i>
@@ -114,10 +136,9 @@
             <p class="text-gray-600 mt-2">Manage tugas dengan semangat merah!</p>
         </div>
 
-        <!-- Login Form -->
         <form id="loginForm" class="space-y-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-user mr-2 text-red-500"></i>Username
                 </label>
                 <input type="text" id="username" required 
@@ -126,7 +147,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-lock mr-2 text-red-500"></i>Password
                 </label>
                 <input type="password" id="password" required 
@@ -139,20 +160,18 @@
             </button>
         </form>
 
-        <!-- Lupa Password & Daftar -->
         <div class="mt-4 text-center space-y-3">
-            <button onclick="showResetPasswordModal()" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200 block w-full">
+            <button type="button" onclick="showResetPasswordModal()" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200 block w-full">
                 <i class="fas fa-key mr-1"></i>Lupa Password?
             </button>
             <div class="border-t pt-3">
                 <p class="text-gray-600 text-sm mb-2">Belum punya akun?</p>
-                <button onclick="showRegisterModal()" class="text-green-600 hover:text-green-800 font-medium transition duration-200">
+                <button type="button" onclick="showRegisterModal()" class="text-green-600 hover:text-green-800 font-medium transition duration-200">
                     <i class="fas fa-user-plus mr-1"></i>Daftar Akun Baru
                 </button>
             </div>
         </div>
 
-        <!-- Features Preview -->
         <div class="mt-8 grid grid-cols-2 gap-4 text-center">
             <div class="feature-card p-3 bg-white rounded-lg border border-gray-200" style="animation-delay: 0.1s">
                 <i class="fas fa-bell text-red-500 text-lg mb-2"></i>
@@ -173,9 +192,8 @@
         </div>
     </div>
 
-    <!-- Reset Password Modal -->
     <div id="resetPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
+        <div class="modal-content-reset bg-white rounded-2xl w-full max-w-md animate-bounce-in">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center">
                     <i class="fas fa-key text-red-500 mr-2"></i>Reset Password
@@ -184,7 +202,7 @@
             
             <form id="resetPasswordForm" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="resetUsername" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-user mr-2 text-red-500"></i>Username
                     </label>
                     <input type="text" id="resetUsername" required 
@@ -193,7 +211,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock mr-2 text-red-500"></i>Password Baru
                     </label>
                     <input type="password" id="newPassword" required 
@@ -202,31 +220,30 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock mr-2 text-red-500"></i>Konfirmasi Password
                     </label>
                     <input type="password" id="confirmPassword" required 
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
                            placeholder="Konfirmasi password">
                 </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeResetPasswordModal()" 
+                            class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i>Reset Password
+                    </button>
+                </div>
             </form>
-            
-            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
-                <button type="button" onclick="closeResetPasswordModal()" 
-                        class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
-                    Batal
-                </button>
-                <button type="submit" form="resetPasswordForm"
-                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
-                    <i class="fas fa-save mr-2"></i>Reset Password
-                </button>
-            </div>
         </div>
     </div>
 
-    <!-- Registration Modal -->
     <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md animate-bounce-in">
+        <div class="modal-content-register bg-white rounded-2xl w-full max-w-md animate-bounce-in">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center">
                     <i class="fas fa-user-plus text-green-500 mr-2"></i>Daftar Akun Baru
@@ -235,7 +252,7 @@
             
             <form id="registerForm" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="regFullName" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-user mr-2 text-green-500"></i>Nama Lengkap
                     </label>
                     <input type="text" id="regFullName" required 
@@ -244,7 +261,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="regUsername" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-at mr-2 text-green-500"></i>Username
                     </label>
                     <input type="text" id="regUsername" required 
@@ -253,7 +270,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="regEmail" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-envelope mr-2 text-green-500"></i>Email
                     </label>
                     <input type="email" id="regEmail" required 
@@ -262,7 +279,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="regPassword" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock mr-2 text-green-500"></i>Password
                     </label>
                     <input type="password" id="regPassword" required 
@@ -271,25 +288,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="regConfirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock mr-2 text-green-500"></i>Konfirmasi Password
                     </label>
                     <input type="password" id="regConfirmPassword" required 
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
                            placeholder="Ulangi password">
                 </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeRegisterModal()" 
+                            class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-user-plus mr-2"></i>Daftar Sekarang
+                    </button>
+                </div>
             </form>
-            
-            <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
-                <button type="button" onclick="closeRegisterModal()" 
-                        class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
-                    Batal
-                </button>
-                <button type="submit" form="registerForm"
-                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105">
-                    <i class="fas fa-user-plus mr-2"></i>Daftar Sekarang
-                </button>
-            </div>
         </div>
     </div>
 
@@ -300,14 +317,17 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // PWA Install Prompt
+        // ==================== PWA INSTALL PROMPT ====================
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'block';
+            // Hanya tampilkan tombol jika di perangkat mobile dan belum terinstall
+            if (window.matchMedia('(display-mode: standalone)').matches) return;
+            installBtn.style.display = 'flex'; // Menggunakan flex agar icon ditengah
+            installBtn.classList.add('items-center', 'justify-center');
         });
 
         installBtn.addEventListener('click', async () => {
@@ -339,14 +359,16 @@
             });
         }
 
-        // Clear login status saat halaman login dimuat
+        // ==================== INITIALIZATION & UX ====================
         document.addEventListener('DOMContentLoaded', function() {
+            // Clear login status saat halaman login dimuat
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             localStorage.removeItem('user_id');
             localStorage.removeItem('user_role');
             localStorage.removeItem('user_name');
             
+            // Set animation delay untuk feature cards
             const featureCards = document.querySelectorAll('.feature-card');
             featureCards.forEach((card, index) => {
                 card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
@@ -358,14 +380,20 @@
             e.preventDefault();
             
             const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const password = document.getElementById('password').value; // Password dalam plain text
             const submitBtn = this.querySelector('button[type="submit"]');
+            const originalButtonHTML = submitBtn.innerHTML;
             
             // Show loading
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
             submitBtn.disabled = true;
             
             try {
+                // 🛑 CATATAN PENTING KEAMANAN: 
+                // Di aplikasi NYATA, Anda HARUS menggunakan Supabase Auth (misalnya `signInWithPassword`) 
+                // atau setidaknya membandingkan password yang di-hash (misalnya menggunakan fungsi `bcrypt.compare()` di sisi server).
+                // Membandingkan password sebagai plain text di sini SANGAT TIDAK AMAN!
+                
                 // Cek user di database Supabase
                 const { data: user, error } = await supabase
                     .from('users')
@@ -375,14 +403,16 @@
                     .single();
 
                 if (error || !user) {
-                    throw new Error('Username tidak ditemukan!');
+                    throw new Error('Username tidak ditemukan atau akun tidak aktif!');
                 }
 
-                // Verifikasi password
+                // 🚨 SIMULASI VERIFIKASI PASSWORD (HARUS DIGANTI DENGAN HASHING)
                 if (password !== user.password) {
                     throw new Error('Password salah!');
                 }
-
+                
+                // Lanjutkan jika berhasil...
+                
                 // Update last login
                 await supabase
                     .from('users')
@@ -408,7 +438,7 @@
 
             } catch (error) {
                 showNotification(error.message, 'error');
-                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Masuk ke Dashboard';
+                submitBtn.innerHTML = originalButtonHTML;
                 submitBtn.disabled = false;
             }
         });
@@ -420,7 +450,7 @@
             const fullName = document.getElementById('regFullName').value;
             const username = document.getElementById('regUsername').value;
             const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
+            const password = document.getElementById('regPassword').value; 
             const confirmPassword = document.getElementById('regConfirmPassword').value;
             
             // Validasi
@@ -438,6 +468,11 @@
                 showNotification('Username minimal 3 karakter!', 'error');
                 return;
             }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalButtonHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mendaftar...';
+            submitBtn.disabled = true;
 
             try {
                 // Cek apakah username sudah ada
@@ -445,24 +480,29 @@
                     .from('users')
                     .select('username')
                     .eq('username', username)
-                    .single();
+                    .maybeSingle(); // Menggunakan maybeSingle untuk handle no rows
 
                 if (existingUser) {
                     throw new Error('Username sudah digunakan!');
                 }
-
+                
+                // 🛑 CATATAN PENTING KEAMANAN:
+                // Password HARUS di-hash sebelum disimpan ke database!
+                // Supabase Auth secara otomatis melakukan hashing jika digunakan.
+                // Jika Anda menggunakan PostgREST/tabel kustom, Anda HARUS mengimplementasikan hashing
+                // sebelum memanggil `insert`.
+                
                 // Insert user baru
-                const { data: newUser, error } = await supabase
+                const { error } = await supabase
                     .from('users')
                     .insert([{
                         username: username,
-                        password: password,
+                        password: password, // 🚨 GANTI DENGAN HASHED PASSWORD DI APLIKASI NYATA
                         email: email,
                         full_name: fullName,
                         role: 'user',
                         is_active: true
-                    }])
-                    .select();
+                    }]);
 
                 if (error) throw error;
 
@@ -472,9 +512,14 @@
                 // Auto-fill login form
                 document.getElementById('username').value = username;
                 document.getElementById('password').value = password;
+                
+                submitBtn.innerHTML = originalButtonHTML;
+                submitBtn.disabled = false;
 
             } catch (error) {
                 showNotification('❌ Gagal mendaftar: ' + error.message, 'error');
+                submitBtn.innerHTML = originalButtonHTML;
+                submitBtn.disabled = false;
             }
         });
 
@@ -496,42 +541,76 @@
                 return;
             }
             
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalButtonHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengubah...';
+            submitBtn.disabled = true;
+
             try {
+                // 🛑 CATATAN PENTING KEAMANAN:
+                // Password HARUS di-hash sebelum di-update!
+                
                 // Update password di database
-                const { error } = await supabase
+                const { error, count } = await supabase
                     .from('users')
-                    .update({ password: newPassword })
+                    .update({ password: newPassword }) // 🚨 GANTI DENGAN HASHED PASSWORD DI APLIKASI NYATA
                     .eq('username', username);
 
                 if (error) throw error;
-
+                // Anda mungkin perlu memastikan hanya 1 baris yang terpengaruh (optional)
+                
                 showNotification('✅ Password berhasil direset! Silakan login.', 'success');
                 closeResetPasswordModal();
                 
+                submitBtn.innerHTML = originalButtonHTML;
+                submitBtn.disabled = false;
+                
             } catch (error) {
                 showNotification('❌ Gagal reset password: ' + error.message, 'error');
+                submitBtn.innerHTML = originalButtonHTML;
+                submitBtn.disabled = false;
             }
         });
 
         // ==================== MODAL FUNCTIONS ====================
         function showRegisterModal() {
-            document.getElementById('registerModal').classList.remove('hidden');
+            const modal = document.getElementById('registerModal');
+            const modalContent = modal.querySelector('.modal-content-register');
+            modalContent.classList.remove('modal-slide-out');
+            modal.classList.remove('hidden');
             document.getElementById('regFullName').focus();
         }
 
         function closeRegisterModal() {
-            document.getElementById('registerModal').classList.add('hidden');
-            document.getElementById('registerForm').reset();
+            const modal = document.getElementById('registerModal');
+            const modalContent = modal.querySelector('.modal-content-register');
+            modalContent.classList.add('modal-slide-out');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modalContent.classList.remove('modal-slide-out'); // Reset class setelah animasi selesai
+                document.getElementById('registerForm').reset();
+            }, 300);
         }
 
         function showResetPasswordModal() {
-            document.getElementById('resetPasswordModal').classList.remove('hidden');
+            const modal = document.getElementById('resetPasswordModal');
+            const modalContent = modal.querySelector('.modal-content-reset');
+            modalContent.classList.remove('modal-slide-out');
+            modal.classList.remove('hidden');
             document.getElementById('resetUsername').focus();
         }
 
         function closeResetPasswordModal() {
-            document.getElementById('resetPasswordModal').classList.add('hidden');
-            document.getElementById('resetPasswordForm').reset();
+            const modal = document.getElementById('resetPasswordModal');
+            const modalContent = modal.querySelector('.modal-content-reset');
+            modalContent.classList.add('modal-slide-out');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modalContent.classList.remove('modal-slide-out'); // Reset class setelah animasi selesai
+                document.getElementById('resetPasswordForm').reset();
+            }, 300);
         }
 
         // Modal click outside close
@@ -543,13 +622,18 @@
             if (e.target === this) closeRegisterModal();
         });
 
+        // ==================== NOTIFICATION FUNCTION ====================
         function showNotification(message, type) {
+            const existingNotification = document.querySelector('.tugasmerah-notification');
+            if (existingNotification) existingNotification.remove();
+
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            notification.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-medium z-50 transform transition-all duration-500 ease-out shadow-lg tugasmerah-notification ${
+                type === 'success' ? 'bg-green-500 translate-x-0' : 'bg-red-500 translate-x-0'
             }`;
+            notification.style.transitionProperty = 'transform, opacity';
+            notification.style.transform = 'translateX(100%)';
+            
             notification.innerHTML = `
                 <div class="flex items-center space-x-2">
                     <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
@@ -558,7 +642,18 @@
             `;
             
             document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            
+            // Animasi masuk
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10); // sedikit delay
+
+            // Animasi keluar dan hapus
+            setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
         }
 
         // Redirect if already logged in
