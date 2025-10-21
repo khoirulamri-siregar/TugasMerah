@@ -1,8 +1,11 @@
-const CACHE_NAME = 'tugasmerah-v1.4'; // Ganti versi cache agar cache lama dihapus
+// service-worker.js - Enhanced Version with Better Notification Handling
+const CACHE_NAME = 'tugasmerah-v3.1';
 const urlsToCache = [
   '/',
   '/index.html',
   '/dashboard.html',
+  '/admin-dashboard.html',
+  '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   'https://cdn.tailwindcss.com',
@@ -13,96 +16,199 @@ const urlsToCache = [
 
 // Install event
 self.addEventListener('install', event => {
-  console.log('Service Worker: Installed');
+  console.log('Service Worker: Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching Files');
+        console.log('Service Worker: Caching App Shell');
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('Service Worker: Skip waiting');
+        return self.skipWaiting();
+      })
   );
 });
 
 // Activate event
 self.addEventListener('activate', event => {
-  console.log('Service Worker: Activated');
+  console.log('Service Worker: Activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Clearing Old Cache');
+            console.log('Service Worker: Deleting old cache', cache);
             return caches.delete(cache);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('Service Worker: Claiming clients');
+      return self.clients.claim();
+    })
   );
 });
 
-// Fetch event (Cache First then Network)
+// Fetch event with network-first strategy
 self.addEventListener('fetch', event => {
-  // Hanya tangani GET request, lewati request POST, dll.
-  if (event.request.method !== 'GET') return; 
+  if (event.request.method !== 'GET') return;
 
-  console.log('Service Worker: Fetching', event.request.url);
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Jika ada di cache, kirim dari cache
-        if (cachedResponse) {
-          return cachedResponse;
+    fetch(event.request)
+      .then(response => {
+        // Cache the response if it's valid
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseClone);
+            });
         }
-        
-        // Jika tidak ada di cache, ambil dari network
-        return fetch(event.request)
-          .then(res => {
-            // Cek jika response valid
-            if (!res || res.status !== 200 || res.type !== 'basic') {
-              return res;
+        return response;
+      })
+      .catch(() => {
+        // Fallback to cache if network fails
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-            
-            // Simpan salinan response ke cache
-            const resClone = res.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, resClone);
-              });
-            return res;
-          })
-          .catch(err => {
-            console.log('Service Worker: Fetch failed; returning offline page or error.', err);
-            // Anda bisa mengembalikan halaman offline di sini jika diperlukan
+            // Return offline page for navigation requests
+            if (event.request.mode === 'navigate') {
+              return caches.match('/index.html');
+            }
           });
       })
   );
 });
 
-// =========================================================
-// NEW: Event Listener untuk menangani klik Notifikasi Sistem
-// =========================================================
-self.addEventListener('notificationclick', event => {
-  console.log('Notification clicked: ', event.notification.tag);
-  event.notification.close();
+// Enhanced Push Notification Handler
+self.addEventListener('push', event => {
+  console.log('Push Notification Received:', event);
+  
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (error) {
+    console.log('Error parsing push data, using default:', error);
+    data = {
+      title: 'TugasMerah Reminder',
+      body: 'Anda memiliki tugas yang perlu diselesaikan!',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png'
+    };
+  }
+
+  const options = {
+    body: data.body || 'Deadline tugas mendekati! Segera selesaikan.',
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
+    image: data.image,
+    vibrate: [100, 50, 100],
+    data: data.data || {
+      url: data.url || '/dashboard.html',
+      taskId: data.taskId,
+      timestamp: new Date().toISOString()
+    },
+    actions: [
+      {
+        action: 'view',
+        title: '📖 Lihat Tugas'
+      },
+      {
+        action: 'snooze',
+        title: '⏰ Tunda 1 Jam'
+      }
+    ],
+    requireInteraction: true,
+    tag: data.tag || 'tugasmerah-reminder',
+    renotify: true,
+    silent: false
+  };
 
   event.waitUntil(
-    clients.matchAll({
-      type: 'window'
-    })
-    .then(clientList => {
-      // Cari jika ada window aplikasi yang sudah terbuka
+    self.registration.showNotification(data.title || 'TugasMerah', options)
+      .then(() => {
+        console.log('Notification shown successfully');
+      })
+      .catch(error => {
+        console.error('Error showing notification:', error);
+      })
+  );
+});
+
+// Enhanced Notification Click Handler
+self.addEventListener('notificationclick', event => {
+  console.log('Notification clicked:', event.notification);
+  
+  event.notification.close();
+
+  const notificationData = event.notification.data || {};
+  const action = event.action;
+
+  event.waitUntil(
+    self.clients.matchAll({ 
+      type: 'window',
+      includeUncontrolled: true 
+    }).then(clientList => {
+      
+      // Handle different actions
+      if (action === 'snooze') {
+        // Snooze logic would go here
+        console.log('Snooze requested for task:', notificationData.taskId);
+        return;
+      }
+
+      // Default action - open/focus the app
+      const urlToOpen = notificationData.url || '/dashboard.html';
+      
+      // Check if app is already open
       for (const client of clientList) {
-        if (client.url.includes('/dashboard.html') && 'focus' in client) {
-          // Jika ada, fokuskan ke window tersebut
+        if (client.url.includes(urlToOpen) && 'focus' in client) {
+          client.postMessage({
+            type: 'NOTIFICATION_CLICK',
+            data: notificationData
+          });
           return client.focus();
         }
       }
       
-      // Jika belum ada window yang terbuka, buka window baru ke halaman dashboard
-      if (clients.openWindow) {
-        return clients.openWindow('/dashboard.html');
+      // Open new window if app isn't open
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen);
       }
     })
   );
+});
+
+// Background Sync for offline functionality
+self.addEventListener('sync', event => {
+  if (event.tag === 'background-sync-tasks') {
+    console.log('Background sync for tasks triggered');
+    event.waitUntil(syncTasks());
+  }
+});
+
+async function syncTasks() {
+  // Implement background sync logic here
+  console.log('Syncing tasks in background...');
+}
+
+// Message handler for communication with main app
+self.addEventListener('message', event => {
+  console.log('Service Worker received message:', event.data);
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'TEST_NOTIFICATION') {
+    self.registration.showNotification('Test Notification', {
+      body: 'Ini adalah notifikasi test dari TugasMerah',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      tag: 'test-notification'
+    });
+  }
 });
