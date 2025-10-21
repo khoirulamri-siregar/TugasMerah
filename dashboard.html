@@ -1,4 +1,3 @@
-                                      <p class="text-xs text-gray-500 mt-1">Dapatkan dari @BotFather di Telegram</p>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -28,8 +27,6 @@
         body { 
             font-family: 'Poppins', sans-serif;
             background-color: var(--secondary-light);
-            /* Memperhalus transisi saat navigasi */
-            transition: background-color 0.3s ease; 
         }
 
         .sidebar {
@@ -480,6 +477,10 @@
         let currentUser = null;
         let tasks = []; // Variabel global untuk menyimpan data tugas
         
+        // Data mock untuk kredensial admin (seperti dari code login sebelumnya)
+        // 🚨 PENTING: Dalam aplikasi nyata, ini SANGAT TIDAK AMAN dan HANYA untuk mock di client-side
+        const mockAdminCredentials = { username: 'khoirul', password: '2509' }; 
+
         // ==================== AUTHENTICATION ====================
         function checkAuth() {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -529,6 +530,7 @@
             };
 
             const container = document.getElementById('notificationContainer');
+            // Pastikan container ada sebelum melanjutkan
             if (!container) return; 
 
             const notificationDiv = document.createElement('div');
@@ -568,15 +570,15 @@
             if (Notification.permission === 'default') {
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
-                        showNotification('Notifikasi browser diizinkan! Anda akan menerima notifikasi sistem.', 'success');
+                        showNotification('Notifikasi browser diizinkan! Anda akan menerima notifikasi sistem untuk tugas yang jatuh tempo.', 'success');
                     } else {
-                        showNotification('Notifikasi browser ditolak saat ini.', 'warning');
+                        showNotification('Notifikasi browser ditolak.', 'error');
                     }
                 });
             } else if (Notification.permission === 'granted') {
                  showNotification('Notifikasi sudah diizinkan.', 'info');
             } else if (Notification.permission === 'denied') {
-                showNotification('Notifikasi browser diblokir permanen oleh Anda. Silakan ubah di pengaturan situs (ikon gembok) secara manual.', 'error');
+                showNotification('Notifikasi browser diblokir. Silakan ubah di pengaturan situs.', 'warning');
             }
         }
 
@@ -601,61 +603,44 @@
             }
         }
 
-        /**
-         * FUNGSI KRITIS: Memeriksa dan mengirim notifikasi untuk tugas yang jatuh tempo
-         * Diperbaiki untuk memiliki jendela waktu 1 jam.
-         */
+
         function checkPendingNotifications() {
             const now = new Date();
             
+            // Cek apakah ada tugas yang dimuat
             if (!tasks || tasks.length === 0) return;
 
+            // Dapatkan notifikasi yang sudah terkirim dari LocalStorage untuk menghindari duplikasi
             const sentNotifications = JSON.parse(localStorage.getItem('sentNotifications')) || {};
             let shouldUpdateLocalStorage = false;
-            const todayDate = now.toISOString().split('T')[0]; // Format 'YYYY-MM-DD'
 
             tasks.forEach(task => {
+                // Lewati tugas yang sudah selesai
                 if (task.status === 'completed') return;
+
+                // Asumsi: task.deadline format 'YYYY-MM-DD', task.notification_time format 'HH:MM'
+                // Jika notification_time tidak ada, gunakan default '07:00'
+                const notificationDateTimeStr = `${task.deadline}T${task.notification_time || '07:00'}:00`;
+                const notificationTime = new Date(notificationDateTimeStr);
+
+                // Batasan: Notifikasi hanya dikirim jika waktunya sudah terlewat, dan kurang dari 5 menit yang lalu (untuk menghindari notifikasi lama)
+                const FIVE_MINUTES = 5 * 60 * 1000;
                 
-                // Hanya fokus pada tugas yang deadlinenya HARI INI
-                if (task.deadline !== todayDate) return; 
-
-                // Gabungkan deadline hari ini dan waktu notifikasi
-                const notificationTimeStr = `${task.deadline}T${task.notification_time || '07:00'}:00`;
-                const notificationDateTime = new Date(notificationTimeStr);
-
-                // 1. Cek apakah notifikasi sudah terkirim
-                if (sentNotifications[task.id]) return;
-
-                // 2. Cek apakah waktu notifikasi sudah terlewat
-                if (notificationDateTime <= now) {
+                if (notificationTime <= now && (now.getTime() - notificationTime.getTime()) < FIVE_MINUTES && !sentNotifications[task.id]) {
                     
-                    // Jendela waktu pengiriman: 
-                    // Notifikasi dikirim jika sudah terlewat, TAPI tidak lebih dari 1 jam yang lalu.
-                    const ONE_HOUR = 60 * 60 * 1000;
-                    const timeElapsed = now.getTime() - notificationDateTime.getTime();
+                    const title = `🚨 REMINDER: ${task.title}`;
+                    const deadlineTime = task.time ? ` pukul ${task.time}` : '';
+                    const body = `Tugas akan jatuh tempo pada ${new Date(task.deadline).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long'})}${deadlineTime}. Prioritas: ${task.priority.toUpperCase()}`;
                     
-                    if (timeElapsed < ONE_HOUR) {
-                        
-                        const title = `🚨 JATUH TEMPO HARI INI: ${task.title}`;
-                        const deadlineTime = task.time ? ` pukul ${task.time}` : '';
-                        const body = `Tugas ini akan berakhir${deadlineTime}. Jangan lupa selesaikan!`;
-                        
-                        // Kirim Notifikasi In-App
-                        showNotification(title, 'error'); 
+                    // 1. Tampilkan Notifikasi In-App
+                    showNotification(title, 'error'); 
 
-                        // Kirim Notifikasi Sistem (PWA/Browser)
-                        showSystemNotification(title, body, `task-${task.id}`);
+                    // 2. Tampilkan Notifikasi Sistem (PWA/Browser)
+                    showSystemNotification(title, body, `task-${task.id}`);
 
-                        // Tandai sebagai sudah dikirim
-                        sentNotifications[task.id] = true;
-                        shouldUpdateLocalStorage = true;
-                        
-                    } else {
-                         // Tandai sebagai terlewat agar tidak muncul lagi
-                         sentNotifications[task.id] = true;
-                         shouldUpdateLocalStorage = true;
-                    }
+                    // 3. Tandai sebagai sudah dikirim
+                    sentNotifications[task.id] = true;
+                    shouldUpdateLocalStorage = true;
                 }
             });
 
@@ -670,6 +655,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            // Tampilkan tombol hanya jika di perangkat mobile/desktop dan belum terinstall
             if (window.matchMedia('(display-mode: standalone)').matches) return;
             installBtn.style.display = 'flex'; 
         });
@@ -716,8 +702,10 @@
             const newPassword = document.getElementById('newPasswordDashboard').value;
             const confirmPassword = document.getElementById('confirmPasswordDashboard').value;
             
-            const currentPassword = localStorage.getItem('user_password_mock') || '2509';
+            // 🚨 MOCK: Verifikasi password menggunakan MOCK yang disimpan (ASUMSI user khoirul)
+            const currentPassword = localStorage.getItem('username') === 'khoirul' && localStorage.getItem('user_role') === 'superadmin' ? '2509' : '';
             
+            // Verifikasi
             if (oldPassword !== currentPassword) {
                 showNotification('Password lama salah!', 'error');
                 return;
@@ -731,11 +719,16 @@
                 return;
             }
 
-            localStorage.setItem('user_password_mock', newPassword); 
+            // 🚨 DALAM APLIKASI NYATA, PANGGIL FUNGSI UPDATE PASSWORD SUPABASE DI SINI.
+            // Contoh MOCK update password admin:
+            if (localStorage.getItem('username') === 'khoirul') {
+                localStorage.setItem('user_password_mock', newPassword); 
+                // Di sini Anda harus memanggil Supabase.
+            }
             
             showNotification('✅ Password berhasil diganti! Silakan login ulang.', 'success');
             closeChangePasswordModal();
-            // logout(); // Hapus logout agar pengguna bisa langsung mencoba login ulang
+            logout(); // Log out untuk menggunakan password baru
         }
 
         // ==================== PAGE NAVIGATION & MOCK FUNCTIONS ====================
@@ -743,9 +736,12 @@
             const pages = ['dashboard', 'calendar', 'notes', 'settings'];
             pages.forEach(p => {
                 document.getElementById(`${p}-page`).classList.add('page-hidden');
+                // Khusus dashboard, perlu memuat ulang task jika kembali dari halaman lain
+                if (p === 'dashboard' && pageName === 'dashboard') loadTasks(); 
             });
             document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
             
+            // Update navigasi aktif
             document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('nav-active'));
             const activeLinks = document.querySelectorAll(`[onclick*="showPage('${pageName}')"]`);
             activeLinks.forEach(link => {
@@ -753,13 +749,12 @@
                 if (parent) parent.classList.add('nav-active');
             });
 
+            // Load specific content (MOCK)
             if (pageName === 'calendar') loadCalendar();
             else if (pageName === 'notes') loadSavedNotes();
             else if (pageName === 'settings') {
                 document.getElementById('settingsUsername').textContent = currentUser.username;
                 loadTelegramConfigUI();
-            } else if (pageName === 'dashboard') {
-                loadTasks(); // Muat ulang tugas setiap kembali ke dashboard
             }
         }
         function loadCalendar() { document.getElementById('calendar').innerHTML = '<p class="text-gray-500">Kalender ditampilkan di sini (Memerlukan pustaka kalender seperti FullCalendar).</p>'; loadCalendarDeadlines(); }
@@ -787,9 +782,9 @@
         async function addTask(e) {
             e.preventDefault();
             
-            // 🚨 LOGIKA ADD TASK MOCK
+            // 🚨 DALAM APLIKASI NYATA, LAKUKAN INSERT DATA KE TABEL SUPABASE DI SINI.
             const newTask = {
-                id: tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1,
+                id: tasks.length + 1,
                 title: document.getElementById('taskTitle').value,
                 description: document.getElementById('taskDescription').value,
                 deadline: document.getElementById('taskDeadline').value,
@@ -810,21 +805,15 @@
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('taskList').innerHTML = '';
 
-            // 🚨 MOCK DATA AWAL
+            // 🚨 GANTI DENGAN FETCH DATA DARI SUPABASE NYA ANDA
             if (tasks.length === 0) {
-                // Contoh: Atur tugas ini untuk notif 5 menit dari sekarang (jika tanggalnya hari ini)
-                const now = new Date();
-                const todayDate = now.toISOString().split('T')[0];
-                const fiveMinutesLater = new Date(now.getTime() + 5 * 60000);
-                const notifTime = fiveMinutesLater.toTimeString().split(' ')[0].substring(0, 5);
-                
-                tasks = [
-                    { id: 1, title: 'Revisi Tugas Akhir', description: 'Perbaiki bab 2 dan 3.', deadline: todayDate, time: '16:00', notification_time: notifTime, priority: 'high', status: 'active' },
+                 tasks = [
+                    { id: 1, title: 'Revisi Tugas Akhir', description: 'Perbaiki bab 2 dan 3.', deadline: '2025-10-22', time: '10:00', notification_time: '08:00', priority: 'high', status: 'active' },
                     { id: 2, title: 'Mengerjakan Quiz Matematika', description: 'Bab Integral.', deadline: '2025-10-21', time: '15:00', notification_time: '09:05', priority: 'medium', status: 'active' },
                     { id: 3, title: 'Beli buku baru', description: '', deadline: '2025-10-25', time: '23:59', notification_time: '07:00', priority: 'low', status: 'completed' },
                 ];
             }
-            // *** AKHIR MOCK ***
+            // *** AKHIR GANTI ***
 
             renderTasks();
             updateDashboardStats(tasks);
@@ -900,6 +889,7 @@
                 const newStatus = tasks[taskIndex].status === 'completed' ? 'active' : 'completed';
                 tasks[taskIndex].status = newStatus;
                 
+                // Hapus notifikasi yang sudah terkirim jika tugas dibatalkan (agar bisa notif lagi)
                 if (newStatus === 'active') {
                     const sentNotifications = JSON.parse(localStorage.getItem('sentNotifications')) || {};
                     delete sentNotifications[taskId];
@@ -909,6 +899,7 @@
                 showNotification(`Tugas #${taskId} diubah menjadi ${newStatus}.`, 'info');
                 renderTasks();
                 updateDashboardStats(tasks);
+                // 🚨 DALAM APLIKASI NYATA, LAKUKAN UPDATE STATUS DI TABEL SUPABASE DI SINI.
             }
         }
 
@@ -953,17 +944,21 @@
             const auth = checkAuth();
             if (!auth) return;
 
+            // NEW: Request notification permission on page load
             requestNotificationPermission();
 
+            // Tampilkan username di UI
             const displayName = localStorage.getItem('user_name') || auth.username;
             document.getElementById('welcomeName').textContent = displayName;
             document.getElementById('sidebarUsername').textContent = displayName;
             document.getElementById('sidebarUserInitial').textContent = displayName.charAt(0).toUpperCase();
 
+            // Tampilkan tanggal hari ini
             document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', {
                 weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
             });
 
+            // Tampilkan pesan motivasi acak
             const motivationMessages = [
                 { text: 'Semangat menyelesaikan tugas hari ini! 🚀', sub: 'Data tersimpan otomatis di cloud! ☁️' },
                 { text: 'Selesaikan yang tersulit dulu! 💪', sub: 'Kunci sukses adalah konsistensi.' },
@@ -973,12 +968,12 @@
             document.getElementById('motivationText').textContent = randomMsg.text;
             document.getElementById('motivationSubtext').textContent = randomMsg.sub;
 
-            await loadTasks(); 
+            await loadTasks(); // Memuat tugas dari Supabase (atau mock)
             
-            updateLastSync(); 
+            updateLastSync(); // Update status sync awal
             
             // Jadwalkan pengecekan notifikasi dan sinkronisasi
-            setInterval(updateLastSync, 30000); 
+            setInterval(updateLastSync, 30000); // Sync setiap 30 detik
             setInterval(checkPendingNotifications, 60000); // Cek notif setiap 1 menit
         }
 
@@ -997,1007 +992,9 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', initDashboard);
         document.addEventListener('DOMContentLoaded', () => {
+            // Memastikan halaman dashboard ditampilkan saat inisialisasi selesai
             showPage('dashboard');
         });
     </script>
 </body>
 </html>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Telegram Chat ID</label>
-                                        <input type="text" id="telegramChatId" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Masukkan Chat ID Anda">
-                                        <p class="text-xs text-gray-500 mt-1">Gunakan @userinfobot untuk mendapatkan Chat ID</p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button type="button" onclick="testTelegramConnection()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-xl text-sm transition duration-200">
-                                            Test Koneksi
-                                        </button>
-                                        <button type="submit" class="flex-1 btn-primary text-white py-2 rounded-xl text-sm">
-                                            Simpan
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Data Management -->
-                    <div class="card p-6 lg:col-span-2">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-900 flex items-center">
-                            <i class="fas fa-database mr-2 text-red-500"></i> Manajemen Data
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button onclick="exportData()" class="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl font-medium transition duration-200 flex items-center justify-center space-x-2">
-                                <i class="fas fa-file-export"></i>
-                                <span>Export Data (JSON)</span>
-                            </button>
-                            <button onclick="showImportModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-xl font-medium transition duration-200 flex items-center justify-center space-x-2">
-                                <i class="fas fa-file-import"></i>
-                                <span>Import Data</span>
-                            </button>
-                            <button onclick="showResetDataModal()" class="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-medium transition duration-200 flex items-center justify-center space-x-2">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Reset Data</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Floating Action Button -->
-    <button class="floating-action-btn" onclick="openAddTaskModal()">
-        <i class="fas fa-plus"></i>
-    </button>
-
-    <!-- Add Task Modal -->
-    <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="p-6 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
-                <h3 class="text-2xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-plus-circle text-red-500 mr-3"></i> Tambah Tugas Baru
-                </h3>
-            </div>
-            
-            <form id="taskForm" class="p-6 space-y-6" onsubmit="addTask(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="taskTitle" class="block text-sm font-medium text-gray-700 mb-2">Judul Tugas *</label>
-                        <input type="text" id="taskTitle" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200" placeholder="Apa yang perlu dikerjakan?">
-                    </div>
-                    
-                    <div>
-                        <label for="taskPriority" class="block text-sm font-medium text-gray-700 mb-2">Prioritas *</label>
-                        <select id="taskPriority" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                            <option value="high">🟥 Tinggi</option>
-                            <option value="medium" selected>🟨 Sedang</option>
-                            <option value="low">🟦 Rendah</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="taskDescription" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
-                    <textarea id="taskDescription" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200" placeholder="Deskripsi detail tugas... (opsional)"></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="taskDeadline" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Deadline *</label>
-                        <input type="date" id="taskDeadline" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                    </div>
-                    
-                    <div>
-                        <label for="taskTime" class="block text-sm font-medium text-gray-700 mb-2">Waktu (opsional)</label>
-                        <input type="time" id="taskTime" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="taskCategory" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-                        <select id="taskCategory" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                            <option value="work">💼 Pekerjaan</option>
-                            <option value="personal">🏠 Personal</option>
-                            <option value="study">📚 Belajar</option>
-                            <option value="health">💪 Kesehatan</option>
-                            <option value="other">📌 Lainnya</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label for="taskEstimate" class="block text-sm font-medium text-gray-700 mb-2">Estimasi Waktu (jam)</label>
-                        <input type="number" id="taskEstimate" min="0.5" step="0.5" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200" placeholder="1.5">
-                    </div>
-                </div>
-
-                <!-- Notification Settings -->
-                <div class="border-t pt-6">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-bell text-red-500 mr-2"></i> Pengaturan Notifikasi
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="notificationTime" class="block text-sm font-medium text-gray-700 mb-2">Waktu Notifikasi</label>
-                            <input type="time" id="notificationTime" value="07:00" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200">
-                        </div>
-                        
-                        <div class="flex items-end">
-                            <div class="w-full">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Pengingat</label>
-                                <p class="text-sm text-gray-500">Anda akan mendapat notifikasi di waktu yang ditentukan</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                    <button type="button" onclick="closeAddTaskModal()" class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-xl border border-gray-300 hover:border-gray-400">
-                        Batal
-                    </button>
-                    <button type="submit" class="btn-primary text-white px-8 py-3 rounded-xl font-medium transition duration-200 transform hover:scale-105 flex items-center space-x-2">
-                        <i class="fas fa-save"></i>
-                        <span>Simpan Tugas</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Notification Permission Modal -->
-    <div id="notificationPermissionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-900">Kelola Notifikasi Browser</h3>
-                <button onclick="hideNotificationPermissionModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-4">
-                <div id="notificationStatusCard" class="p-4 rounded-xl border">
-                    <!-- Status will be dynamically inserted -->
-                </div>
-                
-                <div id="notificationActions" class="flex flex-col space-y-2">
-                    <!-- Actions will be dynamically inserted -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ==================== CONFIGURATION ====================
-        const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = null;
-        let tasks = [];
-        let currentCalendarMonth = new Date().getMonth();
-        let currentCalendarYear = new Date().getFullYear();
-        let charts = {};
-
-        // ==================== NOTIFICATION MANAGER ====================
-        class NotificationManager {
-            constructor() {
-                this.supported = 'Notification' in window;
-                this.permission = this.supported ? Notification.permission : 'denied';
-                this.telegramEnabled = localStorage.getItem('telegramEnabled') === 'true';
-                this.telegramToken = localStorage.getItem('telegramToken') || '';
-                this.telegramChatId = localStorage.getItem('telegramChatId') || '';
-            }
-
-            async initialize() {
-                if (!this.supported) {
-                    console.log('Browser tidak mendukung notifikasi');
-                    return false;
-                }
-
-                await this.updatePermissionStatus();
-                this.updateUI();
-                return true;
-            }
-
-            async updatePermissionStatus() {
-                if (!this.supported) return;
-                
-                const oldPermission = this.permission;
-                this.permission = Notification.permission;
-                
-                if (oldPermission !== this.permission) {
-                    this.updateUI();
-                }
-                
-                return this.permission;
-            }
-
-            updateUI() {
-                const statusElement = document.getElementById('browserNotifStatus');
-                const testButton = document.getElementById('testNotificationBtn');
-                
-                if (!statusElement) return;
-
-                switch (this.permission) {
-                    case 'granted':
-                        statusElement.textContent = '✅ Diizinkan';
-                        statusElement.className = 'text-green-600 text-sm font-medium';
-                        if (testButton) testButton.classList.remove('hidden');
-                        break;
-                        
-                    case 'denied':
-                        statusElement.textContent = '❌ Diblokir';
-                        statusElement.className = 'text-red-600 text-sm font-medium';
-                        if (testButton) testButton.classList.add('hidden');
-                        break;
-                        
-                    default:
-                        statusElement.textContent = '⏳ Menunggu Izin';
-                        statusElement.className = 'text-yellow-600 text-sm font-medium';
-                        if (testButton) testButton.classList.add('hidden');
-                }
-
-                // Update Telegram UI
-                const telegramToggle = document.getElementById('telegramToggle');
-                if (telegramToggle) {
-                    telegramToggle.textContent = this.telegramEnabled ? 'Aktif' : 'Nonaktif';
-                    telegramToggle.className = this.telegramEnabled 
-                        ? 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition duration-200'
-                        : 'bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-sm transition duration-200';
-                }
-            }
-
-            async requestPermission() {
-                if (!this.supported) {
-                    showNotification('Browser Anda tidak mendukung notifikasi', 'error');
-                    return false;
-                }
-
-                try {
-                    const permission = await Notification.requestPermission();
-                    await this.updatePermissionStatus();
-                    
-                    if (permission === 'granted') {
-                        showNotification('Notifikasi berhasil diaktifkan! 🎉', 'success');
-                        return true;
-                    } else if (permission === 'denied') {
-                        showNotification('Notifikasi ditolak. Anda bisa mengaktifkannya nanti di pengaturan browser.', 'warning');
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Error requesting notification permission:', error);
-                    showNotification('Terjadi kesalahan saat mengaktifkan notifikasi.', 'error');
-                    return false;
-                }
-            }
-
-            async sendBrowserNotification(task, type = 'reminder') {
-                if (this.permission !== 'granted') {
-                    console.log('Notification permission not granted');
-                    return false;
-                }
-
-                try {
-                    let title, body;
-
-                    if (type === 'reminder') {
-                        title = `📚 Deadline: ${task.title}`;
-                        body = `Tugas ini deadline ${new Date(task.deadline).toLocaleDateString('id-ID')} ${task.time ? `pukul ${task.time}` : ''}`;
-                    } else if (type === 'completed') {
-                        title = `✅ Tugas Selesai: ${task.title}`;
-                        body = 'Selamat! Anda telah menyelesaikan tugas ini.';
-                    }
-
-                    const options = {
-                        body: body,
-                        icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4da.svg',
-                        badge: 'https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4da.svg',
-                        tag: `task-${task.id}`,
-                        requireInteraction: true
-                    };
-
-                    const notification = new Notification(title, options);
-                    
-                    notification.onclick = () => {
-                        window.focus();
-                        notification.close();
-                    };
-
-                    return true;
-                } catch (error) {
-                    console.error('Error sending browser notification:', error);
-                    return false;
-                }
-            }
-
-            async sendTelegramNotification(task, type = 'reminder') {
-                if (!this.telegramEnabled || !this.telegramToken || !this.telegramChatId) {
-                    return false;
-                }
-
-                try {
-                    let message;
-
-                    if (type === 'reminder') {
-                        message = `📚 *DEADLINE REMINDER*\n\n` +
-                                 `*Judul:* ${task.title}\n` +
-                                 `*Deadline:* ${new Date(task.deadline).toLocaleDateString('id-ID')} ${task.time ? task.time : ''}\n` +
-                                 `*Prioritas:* ${task.priority.toUpperCase()}\n` +
-                                 `*Deskripsi:* ${task.description || 'Tidak ada deskripsi'}\n\n` +
-                                 `_Jangan lupa selesaikan tugas ini!_`;
-                    } else if (type === 'completed') {
-                        message = `✅ *TUGAS SELESAI*\n\n` +
-                                 `*Judul:* ${task.title}\n` +
-                                 `*Diselesaikan pada:* ${new Date().toLocaleDateString('id-ID')}\n` +
-                                 `_Selamat! Terus pertahankan produktivitas Anda!_`;
-                    }
-
-                    const url = `https://api.telegram.org/bot${this.telegramToken}/sendMessage`;
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: this.telegramChatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Telegram API error');
-                    }
-
-                    return true;
-                } catch (error) {
-                    console.error('Error sending Telegram notification:', error);
-                    return false;
-                }
-            }
-
-            async sendNotification(task, type = 'reminder') {
-                const browserSent = await this.sendBrowserNotification(task, type);
-                const telegramSent = await this.sendTelegramNotification(task, type);
-
-                return { browserSent, telegramSent };
-            }
-
-            async testNotification() {
-                if (this.permission !== 'granted') {
-                    showNotification('Harap izinkan notifikasi browser terlebih dahulu', 'warning');
-                    return;
-                }
-
-                const testTask = {
-                    id: 'test',
-                    title: 'Test Notifikasi',
-                    description: 'Ini adalah notifikasi test',
-                    deadline: new Date().toISOString().split('T')[0],
-                    time: '12:00',
-                    priority: 'medium'
-                };
-
-                const results = await this.sendNotification(testTask, 'reminder');
-                
-                if (results.browserSent) {
-                    showNotification('Notifikasi browser test berhasil dikirim!', 'success');
-                }
-                if (results.telegramSent) {
-                    showNotification('Notifikasi Telegram test berhasil dikirim!', 'success');
-                }
-                if (!results.browserSent && !results.telegramSent) {
-                    showNotification('Gagal mengirim notifikasi test', 'error');
-                }
-            }
-
-            toggleTelegram() {
-                this.telegramEnabled = !this.telegramEnabled;
-                localStorage.setItem('telegramEnabled', this.telegramEnabled);
-                this.updateUI();
-                showNotification(`Notifikasi Telegram ${this.telegramEnabled ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
-            }
-
-            saveTelegramConfig(token, chatId) {
-                this.telegramToken = token;
-                this.telegramChatId = chatId;
-                localStorage.setItem('telegramToken', token);
-                localStorage.setItem('telegramChatId', chatId);
-                this.updateUI();
-                showNotification('Konfigurasi Telegram berhasil disimpan!', 'success');
-            }
-
-            async testTelegramConnection() {
-                if (!this.telegramToken || !this.telegramChatId) {
-                    showNotification('Token dan Chat ID harus diisi!', 'error');
-                    return;
-                }
-
-                try {
-                    const url = `https://api.telegram.org/bot${this.telegramToken}/getMe`;
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        throw new Error('Token tidak valid atau bot tidak ditemukan');
-                    }
-
-                    const data = await response.json();
-                    
-                    if (data.ok) {
-                        showNotification(`✅ Koneksi berhasil! Bot: ${data.result.first_name}`, 'success');
-                    } else {
-                        throw new Error('Response tidak OK dari Telegram');
-                    }
-                    
-                } catch (error) {
-                    console.error('Telegram connection test failed:', error);
-                    showNotification(`❌ Gagal terhubung: ${error.message}`, 'error');
-                }
-            }
-        }
-
-        // Initialize notification manager
-        const notificationManager = new NotificationManager();
-
-        // ==================== AUTHENTICATION ====================
-        function checkAuth() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const username = localStorage.getItem('username');
-            const user_id = localStorage.getItem('user_id');
-            
-            if (isLoggedIn !== 'true' || !username || !user_id) {
-                console.log("Not logged in. Redirecting to login page.");
-                window.location.href = 'index.html';
-                return null;
-            }
-            
-            currentUser = { 
-                id: user_id,
-                username: username, 
-                role: localStorage.getItem('user_role') || 'user',
-                name: localStorage.getItem('user_name') || username
-            };
-            
-            return currentUser;
-        }
-
-        function logout() {
-            if (confirm('Yakin ingin logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
-                localStorage.removeItem('user_role');
-                localStorage.removeItem('user_name');
-                showNotification('Anda telah logout.', 'info');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            }
-        }
-
-        // ==================== NOTIFICATION SYSTEM ====================
-        function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existingNotifications = document.querySelectorAll('.notification');
-            existingNotifications.forEach(notification => notification.remove());
-
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <i class="fas ${
-                        type === 'success' ? 'fa-check-circle' : 
-                        type === 'error' ? 'fa-exclamation-triangle' : 
-                        type === 'warning' ? 'fa-exclamation-triangle' :
-                        'fa-info-circle'
-                    }"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => notification.classList.add('show'), 10);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 500);
-            }, 5000);
-        }
-
-        // ==================== NOTIFICATION PERMISSION MODAL ====================
-        function showNotificationPermissionModal() {
-            updateNotificationPermissionModal();
-            document.getElementById('notificationPermissionModal').classList.remove('hidden');
-        }
-
-        function hideNotificationPermissionModal() {
-            document.getElementById('notificationPermissionModal').classList.add('hidden');
-        }
-
-        function updateNotificationPermissionModal() {
-            const statusCard = document.getElementById('notificationStatusCard');
-            const actionsContainer = document.getElementById('notificationActions');
-            
-            if (!statusCard || !actionsContainer) return;
-
-            let statusHTML = '';
-            let actionsHTML = '';
-
-            if (!('Notification' in window)) {
-                statusHTML = `
-                    <div class="flex items-center space-x-3 text-red-700">
-                        <i class="fas fa-times-circle text-2xl"></i>
-                        <div>
-                            <p class="font-medium">Tidak Didukung</p>
-                            <p class="text-sm">Browser Anda tidak mendukung notifikasi</p>
-                        </div>
-                    </div>
-                `;
-                actionsHTML = `
-                    <button onclick="hideNotificationPermissionModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                        <i class="fas fa-times mr-2"></i>Tutup
-                    </button>
-                `;
-            } else {
-                switch (Notification.permission) {
-                    case 'granted':
-                        statusHTML = `
-                            <div class="flex items-center space-x-3 text-green-700">
-                                <i class="fas fa-check-circle text-2xl"></i>
-                                <div>
-                                    <p class="font-medium">Notifikasi Diizinkan</p>
-                                    <p class="text-sm">Anda akan menerima pengingat untuk tugas yang mendekati deadline</p>
-                                </div>
-                            </div>
-                        `;
-                        actionsHTML = `
-                            <button onclick="notificationManager.testNotification()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-bell mr-2"></i>Test Notifikasi
-                            </button>
-                            <button onclick="hideNotificationPermissionModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-times mr-2"></i>Tutup
-                            </button>
-                        `;
-                        break;
-
-                    case 'denied':
-                        statusHTML = `
-                            <div class="flex items-center space-x-3 text-red-700">
-                                <i class="fas fa-times-circle text-2xl"></i>
-                                <div>
-                                    <p class="font-medium">Notifikasi Diblokir</p>
-                                    <p class="text-sm">Anda perlu mengizinkan notifikasi di pengaturan browser</p>
-                                </div>
-                            </div>
-                        `;
-                        actionsHTML = `
-                            <button onclick="hideNotificationPermissionModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-times mr-2"></i>Tutup
-                            </button>
-                        `;
-                        break;
-
-                    default:
-                        statusHTML = `
-                            <div class="flex items-center space-x-3 text-yellow-700">
-                                <i class="fas fa-question-circle text-2xl"></i>
-                                <div>
-                                    <p class="font-medium">Belum Dijawab</p>
-                                    <p class="text-sm">Izinkan notifikasi untuk mendapatkan pengingat tugas</p>
-                                </div>
-                            </div>
-                        `;
-                        actionsHTML = `
-                            <button onclick="notificationManager.requestPermission()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-bell mr-2"></i>Izinkan Notifikasi
-                            </button>
-                            <button onclick="hideNotificationPermissionModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 w-full">
-                                <i class="fas fa-times mr-2"></i>Nanti Saja
-                            </button>
-                        `;
-                }
-            }
-
-            statusCard.innerHTML = statusHTML;
-            actionsContainer.innerHTML = actionsHTML;
-        }
-
-        // ==================== TELEGRAM FUNCTIONS ====================
-        function toggleTelegramNotifications() {
-            notificationManager.toggleTelegram();
-        }
-
-        function testTelegramConnection() {
-            notificationManager.testTelegramConnection();
-        }
-
-        function saveTelegramConfig() {
-            const token = document.getElementById('telegramToken').value;
-            const chatId = document.getElementById('telegramChatId').value;
-
-            if (!token || !chatId) {
-                showNotification('Token dan Chat ID harus diisi!', 'error');
-                return;
-            }
-
-            notificationManager.saveTelegramConfig(token, chatId);
-        }
-
-        // ==================== TASK NOTIFICATION SCHEDULING ====================
-        function scheduleTaskNotifications(task) {
-            // Schedule browser notification for task deadline
-            const deadline = new Date(`${task.deadline}T${task.time || '23:59'}:00`);
-            const now = new Date();
-            const timeUntilDeadline = deadline.getTime() - now.getTime();
-
-            if (timeUntilDeadline > 0) {
-                // Notify 1 hour before deadline
-                const notifyTime = Math.max(timeUntilDeadline - (60 * 60 * 1000), 0);
-                
-                setTimeout(async () => {
-                    if (task.status !== 'completed') {
-                        await notificationManager.sendNotification(task, 'reminder');
-                        showNotification(`Pengingat: "${task.title}" deadline mendekati!`, 'warning');
-                    }
-                }, notifyTime);
-            }
-
-            // Also schedule for exact deadline
-            if (timeUntilDeadline > 0) {
-                setTimeout(async () => {
-                    if (task.status !== 'completed') {
-                        await notificationManager.sendNotification(task, 'reminder');
-                        showNotification(`⏰ Deadline: "${task.title}" sudah tiba!`, 'error');
-                    }
-                }, timeUntilDeadline);
-            }
-        }
-
-        // ==================== MOBILE MENU FUNCTIONS ====================
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-            
-            // Prevent body scroll when menu is open
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        }
-
-        function closeMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            
-            sidebar.classList.remove('mobile-open');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // ==================== DARK MODE ====================
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            showNotification(`Mode ${isDarkMode ? 'gelap' : 'terang'} diaktifkan`, 'info');
-        }
-
-        // ==================== PAGE NAVIGATION ====================
-        function showPage(pageName) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.add('page-hidden');
-            });
-            
-            // Show selected page
-            const targetPage = document.getElementById(`${pageName}-page`);
-            if (targetPage) {
-                targetPage.classList.remove('page-hidden');
-            }
-            
-            // Update active navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('nav-active');
-            });
-            
-            // Add active class to matching links
-            const activeLinks = document.querySelectorAll(`[onclick*="showPage('${pageName}')"]`);
-            activeLinks.forEach(link => {
-                link.classList.add('nav-active');
-            });
-
-            // Load page-specific content
-            if (pageName === 'dashboard') {
-                loadTasks();
-            } else if (pageName === 'calendar') {
-                generateCalendar();
-            } else if (pageName === 'kanban') {
-                loadKanbanBoard();
-            } else if (pageName === 'analytics') {
-                loadAnalytics();
-            } else if (pageName === 'settings') {
-                loadSettings();
-            }
-
-            // Close mobile menu if open
-            closeMobileMenu();
-        }
-
-        // ==================== TASK MANAGEMENT ====================
-        async function loadTasks() {
-            if (!currentUser) return;
-            
-            document.getElementById('loadingState').classList.remove('hidden');
-            document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('taskList').innerHTML = '';
-
-            try {
-                // Load tasks from Supabase
-                const { data, error } = await supabase
-                    .from('tasks')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('deadline', { ascending: true });
-
-                if (error) throw error;
-
-                tasks = data || [];
-                
-                // If no tasks, create sample data
-                if (tasks.length === 0) {
-                    tasks = [
-                        {
-                            id: 1,
-                            user_id: currentUser.id,
-                            title: 'Selamat datang di TugasMerah! 🎉',
-                            description: 'Ini adalah contoh tugas. Anda dapat menghapusnya dan menambahkan tugas Anda sendiri.',
-                            deadline: new Date().toISOString().split('T')[0],
-                            time: '23:59',
-                            priority: 'medium',
-                            category: 'personal',
-                            status: 'active',
-                            created_at: new Date().toISOString()
-                        },
-                        {
-                            id: 2,
-                            user_id: currentUser.id,
-                            title: 'Pelajari fitur-fitur aplikasi',
-                            description: 'Jelajahi semua fitur yang tersedia di TugasMerah untuk meningkatkan produktivitas Anda.',
-                            deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                            time: '20:00',
-                            priority: 'low',
-                            category: 'study',
-                            status: 'active',
-                            created_at: new Date().toISOString()
-                        }
-                    ];
-                }
-
-                renderTasks();
-                updateDashboardStats();
-                updateSidebarStats();
-                updateAchievementBadges();
-                
-                // Schedule notifications for all tasks
-                tasks.forEach(task => {
-                    if (task.status === 'active') {
-                        scheduleTaskNotifications(task);
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Error loading tasks:', error);
-                showNotification('Gagal memuat tugas dari cloud', 'error');
-                
-                // Fallback to localStorage
-                const localTasks = localStorage.getItem(`tasks_${currentUser.id}`);
-                if (localTasks) {
-                    tasks = JSON.parse(localTasks);
-                    renderTasks();
-                    updateDashboardStats();
-                    updateSidebarStats();
-                    updateAchievementBadges();
-                }
-            } finally {
-                document.getElementById('loadingState').classList.add('hidden');
-            }
-        }
-
-        async function addTask(e) {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const newTask = {
-                user_id: currentUser.id,
-                title: document.getElementById('taskTitle').value,
-                description: document.getElementById('taskDescription').value,
-                deadline: document.getElementById('taskDeadline').value,
-                time: document.getElementById('taskTime').value || null,
-                priority: document.getElementById('taskPriority').value,
-                category: document.getElementById('taskCategory').value,
-                estimate: document.getElementById('taskEstimate').value || null,
-                notification_time: document.getElementById('notificationTime').value,
-                status: 'active',
-                created_at: new Date().toISOString()
-            };
-
-            try {
-                const { data, error } = await supabase
-                    .from('tasks')
-                    .insert([newTask])
-                    .select();
-
-                if (error) throw error;
-
-                const savedTask = data[0];
-                tasks.push(savedTask);
-                showNotification('Tugas berhasil ditambahkan!', 'success');
-                closeAddTaskModal();
-                
-                // Schedule notifications for the new task
-                scheduleTaskNotifications(savedTask);
-                
-            } catch (error) {
-                console.error('Error adding task:', error);
-                // Fallback to localStorage
-                newTask.id = Date.now();
-                tasks.push(newTask);
-                localStorage.setItem(`tasks_${currentUser.id}`, JSON.stringify(tasks));
-                showNotification('Tugas berhasil ditambahkan (offline mode)', 'success');
-                closeAddTaskModal();
-                
-                // Schedule notifications for the new task
-                scheduleTaskNotifications(newTask);
-            }
-
-            await loadTasks();
-        }
-
-        async function toggleTaskStatus(taskId) {
-            if (!currentUser) return;
-
-            const taskIndex = tasks.findIndex(t => t.id === taskId);
-            if (taskIndex === -1) return;
-
-            const newStatus = tasks[taskIndex].status === 'completed' ? 'active' : 'completed';
-            tasks[taskIndex].status = newStatus;
-            tasks[taskIndex].completed_at = newStatus === 'completed' ? new Date().toISOString() : null;
-
-            try {
-                const { error } = await supabase
-                    .from('tasks')
-                    .update({ 
-                        status: newStatus,
-                        completed_at: tasks[taskIndex].completed_at
-                    })
-                    .eq('id', taskId)
-                    .eq('user_id', currentUser.id);
-
-                if (error) throw error;
-                
-                // Send completion notification
-                if (newStatus === 'completed') {
-                    await notificationManager.sendNotification(tasks[taskIndex], 'completed');
-                }
-                
-            } catch (error) {
-                console.error('Error updating task:', error);
-                // Fallback to localStorage
-                localStorage.setItem(`tasks_${currentUser.id}`, JSON.stringify(tasks));
-            }
-
-            showNotification(`Tugas "${tasks[taskIndex].title}" ${newStatus === 'completed' ? 'diselesaikan' : 'dibuka kembali'}!`, 'success');
-            renderTasks();
-            updateDashboardStats();
-            updateSidebarStats();
-            updateAchievementBadges();
-        }
-
-        // ... (rest of the functions remain the same as previous version)
-
-        // ==================== INITIALIZATION ====================
-        async function initDashboard() {
-            const auth = checkAuth();
-            if (!auth) return;
-
-            // Load dark mode preference
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-            }
-
-            // Initialize notification manager
-            await notificationManager.initialize();
-
-            // Update UI with user data
-            const displayName = currentUser.name;
-            document.getElementById('welcomeName').textContent = displayName;
-            document.getElementById('sidebarUsername').textContent = displayName;
-            document.getElementById('sidebarUserInitial').textContent = displayName.charAt(0).toUpperCase();
-            document.getElementById('sidebarUserRole').textContent = currentUser.role === 'superadmin' ? 'Super Admin' : 'User';
-
-            // Set current date
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            // Set motivation message
-            const motivationMessages = [
-                { text: 'Semangat menyelesaikan tugas hari ini! 🚀', sub: 'Data tersimpan otomatis di cloud! ☁️' },
-                { text: 'Selesaikan yang tersulit dulu! 💪', sub: 'Kunci sukses adalah konsistensi.' },
-                { text: 'Jangan tunda pekerjaanmu! 💡', sub: 'Selesaikan sekarang, santai kemudian.' },
-                { text: 'Progress kecil lebih baik daripada tidak sama sekali! 🌟', sub: 'Langkah kecil membawa hasil besar.' }
-            ];
-            const randomMsg = motivationMessages[Math.floor(Math.random() * motivationMessages.length)];
-            document.getElementById('motivationText').textContent = randomMsg.text;
-            document.getElementById('motivationSubtext').textContent = randomMsg.sub;
-
-            // Load initial data
-            await loadTasks();
-            updateLastSync();
-
-            // Setup intervals
-            setInterval(updateLastSync, 30000);
-
-            // Show dashboard by default
-            showPage('dashboard');
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the dashboard
-            initDashboard();
-
-            // Event listeners for filters
-            const filterPriority = document.getElementById('filterPriority');
-            const filterStatus = document.getElementById('filterStatus');
-            
-            if (filterPriority) {
-                filterPriority.addEventListener('change', renderTasks);
-            }
-            if (filterStatus) {
-                filterStatus.addEventListener('change', renderTasks);
-            }
-
-            // Modal close events
-            document.getElementById('addTaskModal').addEventListener('click', function(e) {
-                if (e.target === this) closeAddTaskModal();
-            });
-
-            // Close mobile menu when clicking on overlay
-            document.getElementById('mobileOverlay').addEventListener('click', closeMobileMenu);
-
-            // Keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'n') {
-                    e.preventDefault();
-                    openAddTaskModal();
-                }
-                if (e.key === 'Escape') {
-                    closeAddTaskModal();
-                    hideNotificationPermissionModal();
-                }
-            });
-        });
-
-        // ... (Include all the other functions from the previous version: 
-        // renderTasks, createTaskCard, updateDashboardStats, updateStreakCounter, 
-        // updateSidebarStats, updateAchievementBadges, generateCalendar, 
-        // changeCalendarMonth, showTasksForDate, loadKanbanBoard, initializeDragAndDrop, 
-        // updateTaskStatus, addKanbanColumn, loadAnalytics, updateAnalyticsStats, 
-        // loadProductivityTips, openAddTaskModal, closeAddTaskModal, showChangePasswordModal, 
-        // loadSettings, exportData, exportTasks, showImportModal, showResetDataModal, 
-        // updateLastSync, sortTasks)
-        // These functions remain exactly the same as in the previous version
-
-    </script>
-</body>
-</html>
-
