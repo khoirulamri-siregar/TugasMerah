@@ -1,3 +1,4 @@
+                                      <p class="text-xs text-gray-500 mt-1">Dapatkan dari @BotFather di Telegram</p>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -5,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TugasMerah - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <link rel="manifest" href="/manifest.json">
@@ -23,39 +23,29 @@
             --primary-dark: #1D3557;
             --secondary-light: #F1FAEE;
             --text-color: #457B9D;
-            --accent-orange: #F97316;
-            --accent-purple: #8B5CF6;
         }
 
         body { 
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: var(--secondary-light);
+            /* Memperhalus transisi saat navigasi */
+            transition: background-color 0.3s ease; 
         }
 
         .sidebar {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #2c5282 100%);
+            background-color: var(--primary-dark);
             min-height: 100vh;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link {
             transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.8);
-            border-left: 4px solid transparent;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .nav-link:hover, .nav-active {
-            color: white;
-            background: linear-gradient(90deg, rgba(230, 57, 70, 0.2) 0%, transparent 100%);
+            color: var(--secondary-light);
+            background-color: rgba(230, 57, 70, 0.2);
             border-left-color: var(--primary-red);
-            transform: translateX(5px);
         }
 
         .page-hidden {
@@ -63,778 +53,955 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-orange) 100%);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+            background-color: var(--primary-red);
+            transition: background-color 0.3s;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4);
+            background-color: #D62839;
         }
 
         .card {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
         }
 
         .task-card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 16px;
-            border-left: 6px solid var(--primary-red);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .task-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-red) 0%, var(--accent-orange) 100%);
-        }
-
-        .task-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .priority-high {
-            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-            color: #DC2626;
-            border-left: 4px solid #DC2626;
+            background-color: #FEE2E2; /* Red-100 */
+            color: #EF4444; /* Red-500 */
         }
-
         .priority-medium {
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-            color: #D97706;
-            border-left: 4px solid #D97706;
+            background-color: #FFFBEB; /* Yellow-100 */
+            color: #F59E0B; /* Yellow-500 */
         }
-
         .priority-low {
-            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
-            color: #4F46E5;
-            border-left: 4px solid #4F46E5;
+            background-color: #EEF2FF; /* Indigo-100 */
+            color: #6366F1; /* Indigo-500 */
         }
 
-        .progress-bar {
-            background: linear-gradient(90deg, var(--primary-red) 0%, var(--accent-orange) 100%);
-            transition: width 1s ease-in-out;
-        }
-
-        .floating-action-btn {
+        /* PWA Install Button */
+        .install-btn {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-orange) 100%);
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-red);
             color: white;
             border: none;
-            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
             cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: flex;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
+            z-index: 99;
+            display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .floating-action-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 12px 35px rgba(230, 57, 70, 0.6);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-                width: 280px;
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            
-            .mobile-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-            }
-            
-            .mobile-overlay.active {
-                display: block;
-            }
-
-            .main-content {
-                margin-left: 0 !important;
-            }
-
-            .floating-action-btn {
-                bottom: 1rem;
-                right: 1rem;
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-red);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Notification Styles */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            transform: translateX(100%);
-            transition: all 0.5s ease-out;
-            max-width: 400px;
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .notification.info {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        }
-
-        .notification.warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        /* Calendar styles */
-        .calendar-day {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .calendar-day:hover {
-            background: var(--primary-red);
-            color: white;
-        }
-
-        .calendar-day.has-tasks {
-            background: #FEF3C7;
-            color: #D97706;
-        }
-
-        .calendar-day.today {
-            background: var(--primary-red);
-            color: white;
-        }
-
-        /* Kanban Board */
-        .kanban-column {
-            min-height: 500px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            padding: 1rem;
-        }
-
-        .kanban-task {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            cursor: move;
-            transition: all 0.2s ease;
-        }
-
-        .kanban-task:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Dark mode support */
-        .dark-mode {
-            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            color: white;
-        }
-
-        .dark-mode .card {
-            background: #2d3748;
-            color: white;
-        }
-
-        .dark-mode .task-card {
-            background: #2d3748;
-            color: white;
-        }
-
-        /* Achievement badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin: 0.25rem;
-        }
-
-        .badge-gold {
-            background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
-            color: #78350F;
-        }
-
-        .badge-silver {
-            background: linear-gradient(135deg, #E5E7EB 0%, #9CA3AF 100%);
-            color: #374151;
-        }
-
-        .badge-bronze {
-            background: linear-gradient(135deg, #FDE68A 0%, #D97706 100%);
-            color: #78350F;
-        }
-
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 10px;
         }
     </style>
 </head>
-<body class="flex bg-gray-50">
-    <!-- Mobile Overlay -->
-    <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileMenu()"></div>
+<body class="flex">
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 p-6 fixed hidden md:block z-50">
-        <div class="text-white mb-10">
-            <div class="flex items-center space-x-3 mb-2">
-                <div class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-tasks text-white text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold">TugasMerah</h1>
-                    <p class="text-xs text-red-300">Productivity Pro</p>
-                </div>
-            </div>
+    <button id="installBtn" class="install-btn" title="Install Aplikasi TugasMerah">
+        <i class="fas fa-download"></i>
+    </button>
+    
+    <div id="notificationContainer" class="fixed top-4 right-4 z-[100] space-y-3 max-w-xs"></div>
+
+    <aside class="sidebar w-64 p-6 fixed hidden md:block z-50">
+        <div class="text-white text-2xl font-bold mb-10 flex items-center">
+            <i class="fas fa-tasks mr-3 text-red-500"></i> TugasMerah
         </div>
 
-        <nav class="space-y-2 mb-8">
-            <a href="#" class="nav-link nav-active flex items-center p-4 rounded-xl" onclick="showPage('dashboard')">
-                <i class="fas fa-home mr-4 text-lg"></i>
-                <span class="font-medium">Dashboard</span>
+        <nav class="space-y-2">
+            <a href="#" class="nav-link nav-active flex items-center p-3 rounded-xl border-l-4 border-transparent" onclick="showPage('dashboard')">
+                <i class="fas fa-home mr-3"></i> Home
             </a>
-            <a href="#" class="nav-link flex items-center p-4 rounded-xl" onclick="showPage('calendar')">
-                <i class="fas fa-calendar-alt mr-4 text-lg"></i>
-                <span class="font-medium">Kalender</span>
+            <a href="#" class="nav-link flex items-center p-3 rounded-xl border-l-4 border-transparent" onclick="showPage('calendar')">
+                <i class="fas fa-calendar-alt mr-3"></i> Kalender
             </a>
-            <a href="#" class="nav-link flex items-center p-4 rounded-xl" onclick="showPage('kanban')">
-                <i class="fas fa-columns mr-4 text-lg"></i>
-                <span class="font-medium">Kanban Board</span>
+            <a href="#" class="nav-link flex items-center p-3 rounded-xl border-l-4 border-transparent" onclick="showPage('notes')">
+                <i class="fas fa-clipboard-list mr-3"></i> Catatan Cepat
             </a>
-            <a href="#" class="nav-link flex items-center p-4 rounded-xl" onclick="showPage('analytics')">
-                <i class="fas fa-chart-bar mr-4 text-lg"></i>
-                <span class="font-medium">Analytics</span>
-            </a>
-            <a href="#" class="nav-link flex items-center p-4 rounded-xl" onclick="showPage('settings')">
-                <i class="fas fa-cogs mr-4 text-lg"></i>
-                <span class="font-medium">Pengaturan</span>
+            <a href="#" class="nav-link flex items-center p-3 rounded-xl border-l-4 border-transparent" onclick="showPage('settings')">
+                <i class="fas fa-cogs mr-3"></i> Pengaturan
             </a>
         </nav>
 
-        <!-- Quick Stats -->
-        <div class="bg-white/10 rounded-2xl p-4 mb-6">
-            <div class="text-white text-sm space-y-2">
-                <div class="flex justify-between items-center">
-                    <span>Tugas Hari Ini</span>
-                    <span id="sidebarTodayTasks" class="font-bold">0</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span>Tugas Aktif</span>
-                    <span id="sidebarActiveTasks" class="font-bold">0</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span>Selesai</span>
-                    <span id="sidebarCompletedTasks" class="font-bold text-green-300">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Achievement Badges -->
-        <div class="mb-6">
-            <h3 class="text-white text-sm font-semibold mb-3">Pencapaian</h3>
-            <div id="achievementBadges" class="space-y-2">
-                <!-- Badges will be dynamically added -->
-            </div>
-        </div>
-
-        <!-- User Profile -->
         <div class="absolute bottom-6 left-6 right-6">
-            <div class="flex items-center space-x-3 text-white p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-lg font-bold shadow-lg" id="sidebarUserInitial">U</div>
-                <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-3 text-white p-3 bg-red-600/20 rounded-xl">
+                <div class="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-lg font-bold flex-shrink-0" id="sidebarUserInitial">U</div>
+                <div>
                     <p class="text-sm font-semibold truncate" id="sidebarUsername">Username</p>
-                    <p class="text-xs text-gray-300 truncate" id="sidebarUserRole">User</p>
+                    <button onclick="logout()" class="text-xs text-gray-300 hover:text-white transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                    </button>
                 </div>
-                <button onclick="logout()" class="text-gray-300 hover:text-white transition duration-200 p-2 hover:bg-white/10 rounded-lg" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 md:ml-64 min-h-screen main-content">
-        <!-- Mobile Header -->
-        <header class="md:hidden flex justify-between items-center p-4 bg-white shadow-lg sticky top-0 z-40 glass-effect">
-            <button onclick="toggleMobileMenu()" class="text-gray-600 p-2">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
+    <main class="flex-1 md:ml-64 p-4 md:p-8">
+
+        <header class="md:hidden flex justify-between items-center mb-6 p-3 bg-white rounded-xl shadow">
             <h1 class="text-xl font-bold text-gray-900 flex items-center">
                 <i class="fas fa-tasks mr-2 text-red-500"></i> TugasMerah
             </h1>
-            <button onclick="toggleDarkMode()" class="text-gray-600 p-2">
-                <i class="fas fa-moon text-xl"></i>
+            <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="text-gray-600 focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
             </button>
         </header>
 
-        <!-- Content Area -->
-        <div class="p-4 md:p-8">
-            <!-- Dashboard Page -->
-            <div id="dashboard-page" class="page">
-                <!-- Welcome Section -->
-                <section class="mb-8">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-                        <div class="flex-1">
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                                Selamat Datang, <span id="welcomeName" class="text-red-500">User</span>! 👋
-                            </h2>
-                            <p class="text-gray-600 text-lg" id="currentDate">Senin, 21 Oktober 2025</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <button onclick="toggleDarkMode()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-xl font-semibold flex items-center space-x-2 transition-all duration-300">
-                                <i class="fas fa-moon"></i>
-                                <span>Mode Gelap</span>
-                            </button>
-                            <button class="btn-primary text-white py-3 px-6 rounded-xl font-semibold flex items-center space-x-2 shadow-lg hover:shadow-xl transition-all duration-300" onclick="openAddTaskModal()">
-                                <i class="fas fa-plus"></i>
-                                <span>Tambah Tugas</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Motivation Card -->
-                    <div class="card p-6 bg-gradient-to-r from-red-500 to-orange-500 text-white relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                        <div class="relative z-10">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <div class="flex-1">
-                                    <p class="text-xl font-semibold mb-2" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</p>
-                                    <p class="text-red-100" id="motivationSubtext">Data tersimpan otomatis di cloud! ☁️</p>
-                                </div>
-                                <div class="mt-4 md:mt-0">
-                                    <div class="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-xl">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <span id="cloudStatus">Terkoneksi</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Stats Overview -->
-                <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-                    <div class="card p-6 text-center border-t-4 border-red-500 transform hover:scale-105 transition duration-300">
-                        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-sun text-red-500 text-xl"></i>
-                        </div>
-                        <p class="text-3xl font-bold text-gray-900 mb-1" id="todayTasks">0</p>
-                        <p class="text-sm text-gray-600 font-medium">Tugas Hari Ini</p>
-                    </div>
-                    
-                    <div class="card p-6 text-center border-t-4 border-yellow-500 transform hover:scale-105 transition duration-300">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-hourglass-half text-yellow-500 text-xl"></i>
-                        </div>
-                        <p class="text-3xl font-bold text-gray-900 mb-1" id="upcomingTasks">0</p>
-                        <p class="text-sm text-gray-600 font-medium">Tugas Mendatang</p>
-                    </div>
-                    
-                    <div class="card p-6 text-center border-t-4 border-green-500 transform hover:scale-105 transition duration-300">
-                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                        </div>
-                        <p class="text-3xl font-bold text-gray-900 mb-1" id="completedCount">0</p>
-                        <p class="text-sm text-gray-600 font-medium">Tugas Selesai</p>
-                    </div>
-                    
-                    <div class="card p-6 text-center border-t-4 border-blue-500 transform hover:scale-105 transition duration-300">
-                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-list-alt text-blue-500 text-xl"></i>
-                        </div>
-                        <p class="text-3xl font-bold text-gray-900 mb-1" id="totalTasks">0</p>
-                        <p class="text-sm text-gray-600 font-medium">Total Tugas</p>
-                    </div>
-                </section>
-
-                <!-- Progress & Analytics Section -->
-                <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- Progress Section -->
-                    <div class="card p-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4 md:mb-0">Progres Tugas Anda</h3>
-                            <div class="flex items-center space-x-4">
-                                <span class="text-sm text-gray-600">Sinkronisasi:</span>
-                                <span id="lastSync" class="text-sm font-medium text-green-600">00:00:00</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <div class="flex justify-between items-center text-sm mb-3">
-                                <span class="text-gray-600 font-medium" id="progressText">Mulai kerjakan tugasmu!</span>
-                                <span class="font-bold text-red-500 text-lg" id="progressPercent">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                                <div id="progressBar" class="progress-bar h-4 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Streak Counter -->
-                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-fire text-white"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-900" id="streakCount">0 hari</p>
-                                    <p class="text-sm text-gray-600">Streak berjalan</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-bold text-purple-600" id="streakLevel">Pemula</p>
-                                <p class="text-xs text-gray-500">Level streak</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Analytics -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">Analisis Cepat</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Produktivitas Minggu Ini</span>
-                                <span class="font-bold text-green-500" id="weeklyProductivity">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div id="weeklyProductivityBar" class="bg-green-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Rata-rata Selesai/Hari</span>
-                                <span class="font-bold text-blue-500" id="avgCompleted">0</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Tugas Terlambat</span>
-                                <span class="font-bold text-red-500" id="overdueCount">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Task List Section -->
-                <section>
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-2xl font-bold text-gray-900 flex items-center">
-                            <i class="fas fa-clipboard-check mr-3 text-red-500"></i> Daftar Tugas Anda
-                        </h3>
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center space-x-2 text-sm text-gray-600">
-                                <span id="taskCount">0 tugas</span>
-                                <span>•</span>
-                                <span id="filteredCount">0 ditampilkan</span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="sortTasks('deadline')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm transition duration-200">
-                                    <i class="fas fa-sort-amount-down mr-1"></i>Urutkan
-                                </button>
-                                <button onclick="exportTasks()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm transition duration-200">
-                                    <i class="fas fa-file-export mr-1"></i>Export
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Loading State -->
-                    <div id="loadingState" class="card p-8 text-center hidden">
-                        <div class="loading-spinner mx-auto mb-4"></div>
-                        <p class="text-gray-600 font-medium">Memuat tugas dari Cloud...</p>
-                        <p class="text-sm text-gray-500 mt-2">Harap tunggu sebentar</p>
-                    </div>
-
-                    <!-- Empty State -->
-                    <div id="emptyState" class="card p-8 text-center border-2 border-dashed border-gray-300 hidden">
-                        <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-inbox text-gray-400 text-2xl"></i>
-                        </div>
-                        <p class="text-lg font-semibold text-gray-700 mb-2">Tidak ada tugas yang sesuai filter</p>
-                        <p class="text-gray-500 mb-4">Saatnya beristirahat atau tambahkan tugas baru!</p>
-                        <button onclick="openAddTaskModal()" class="btn-primary text-white py-2 px-6 rounded-xl font-medium inline-flex items-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Tugas Pertama</span>
-                        </button>
-                    </div>
-
-                    <!-- Task Grid -->
-                    <div id="taskList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                        <!-- Tasks will be rendered here -->
-                    </div>
-                </section>
+        <div id="mobileMenu" class="mobile-nav md:hidden hidden bg-white shadow-xl rounded-xl p-4 mb-4 space-y-2 z-50">
+            <a href="#" class="nav-link nav-active flex items-center p-3 rounded-lg hover:bg-red-50" onclick="showPage('dashboard'); document.getElementById('mobileMenu').classList.add('hidden');">
+                <i class="fas fa-home mr-3 text-red-500"></i> Home
+            </a>
+            <a href="#" class="nav-link flex items-center p-3 rounded-lg hover:bg-red-50" onclick="showPage('calendar'); document.getElementById('mobileMenu').classList.add('hidden');">
+                <i class="fas fa-calendar-alt mr-3 text-red-500"></i> Kalender
+            </a>
+            <a href="#" class="nav-link flex items-center p-3 rounded-lg hover:bg-red-50" onclick="showPage('notes'); document.getElementById('mobileMenu').classList.add('hidden');">
+                <i class="fas fa-clipboard-list mr-3 text-red-500"></i> Catatan Cepat
+            </a>
+            <a href="#" class="nav-link flex items-center p-3 rounded-lg hover:bg-red-50" onclick="showPage('settings'); document.getElementById('mobileMenu').classList.add('hidden');">
+                <i class="fas fa-cogs mr-3 text-red-500"></i> Pengaturan
+            </a>
+            <div class="border-t pt-2">
+                <button onclick="logout()" class="w-full text-left text-red-500 hover:text-red-700 font-medium p-3 rounded-lg transition duration-200">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </button>
             </div>
-
-            <!-- Calendar Page -->
-            <div id="calendar-page" class="page page-hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-                        <i class="fas fa-calendar-alt mr-3 text-red-500"></i> Kalender Tugas
-                    </h2>
-                    <div class="flex space-x-3">
-                        <button onclick="changeCalendarMonth(-1)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-xl transition duration-200">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button onclick="changeCalendarMonth(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-xl transition duration-200">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+        </div>
+        
+        <div id="dashboard-page" class="page">
+            <section class="mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-1">
+                            Selamat Datang, <span id="welcomeName">User</span>!
+                        </h2>
+                        <p class="text-gray-600 text-sm mb-4" id="currentDate">Senin, 21 Oktober 2025</p>
                     </div>
-                </div>
-                
-                <div class="card p-6">
-                    <div id="calendarHeader" class="text-center text-xl font-bold text-gray-800 mb-4"></div>
-                    <div id="calendar" class="grid grid-cols-7 gap-2">
-                        <!-- Calendar will be generated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Kanban Board Page -->
-            <div id="kanban-page" class="page page-hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900 flex items-center">
-                        <i class="fas fa-columns mr-3 text-red-500"></i> Kanban Board
-                    </h2>
-                    <button onclick="addKanbanColumn()" class="btn-primary text-white px-4 py-2 rounded-xl">
-                        <i class="fas fa-plus mr-2"></i>Tambah Kolom
+                    <button class="btn-primary text-white py-2 px-4 rounded-xl font-semibold transform hover:scale-105 transition duration-200 shadow-md flex items-center" onclick="openAddTaskModal()">
+                        <i class="fas fa-plus mr-2"></i> Tambah Tugas Baru
                     </button>
                 </div>
                 
-                <div id="kanbanBoard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto custom-scrollbar">
-                    <!-- Kanban columns will be generated here -->
+                <div class="card p-5 mt-4 bg-red-500 text-white flex justify-between items-center shadow-lg">
+                    <div>
+                        <p class="text-xl font-semibold mb-1" id="motivationText">Semangat menyelesaikan tugas hari ini! 🚀</p>
+                        <p class="text-sm opacity-90" id="motivationSubtext">Data tersimpan otomatis di cloud! ☁️</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="card p-5 border-b-4 border-red-500 text-center">
+                    <i class="fas fa-sun text-red-500 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-900" id="todayTasks">0</p>
+                    <p class="text-sm text-gray-600">Tugas Hari Ini</p>
+                </div>
+                <div class="card p-5 border-b-4 border-yellow-500 text-center">
+                    <i class="fas fa-hourglass-half text-yellow-500 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-900" id="upcomingTasks">0</p>
+                    <p class="text-sm text-gray-600">Tugas Mendatang</p>
+                </div>
+                <div class="card p-5 border-b-4 border-green-500 text-center">
+                    <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-900" id="completedCount">0</p>
+                    <p class="text-sm text-gray-600">Tugas Selesai</p>
+                </div>
+                <div class="card p-5 border-b-4 border-blue-500 text-center">
+                    <i class="fas fa-list-alt text-blue-500 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-900" id="totalTasks">0</p>
+                    <p class="text-sm text-gray-600">Total Tugas</p>
+                </div>
+            </section>
+
+            <section class="mb-8 card p-5">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Progres Tugas</h3>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center text-sm mb-1">
+                        <span class="text-gray-600" id="progressText">Mulai kerjakan tugasmu!</span>
+                        <span class="font-bold text-red-500" id="progressPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progressBar" class="bg-red-500 h-3 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center border-t pt-4">
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span id="cloudStatus" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Terkoneksi</span>
+                        <span class="text-gray-500">Sinkronisasi terakhir: <span id="lastSync">00:00:00</span></span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <select id="filterPriority" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-red-500 focus:border-red-500">
+                            <option value="all">Semua Prioritas</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select id="filterStatus" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-red-500 focus:border-red-500">
+                            <option value="active">Aktif</option>
+                            <option value="completed">Selesai</option>
+                            <option value="all">Semua Status</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-clipboard-check mr-2 text-red-500"></i> Daftar Tugas Aktif
+                </h3>
+                
+                <div id="loadingState" class="card p-6 text-center text-gray-500 hidden">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                    <p>Memuat tugas dari Cloud...</p>
+                </div>
+
+                <div id="emptyState" class="card p-6 text-center border-2 border-dashed border-gray-300 hidden">
+                    <i class="fas fa-inbox text-4xl text-gray-400 mb-3"></i>
+                    <p class="text-lg font-semibold text-gray-700">Tidak ada tugas yang sesuai filter.</p>
+                    <p class="text-sm text-gray-500 mt-1">Saatnya beristirahat atau tambahkan tugas baru!</p>
+                </div>
+
+                <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+            </section>
+        </div>
+
+        <div id="calendar-page" class="page page-hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><i class="fas fa-calendar-alt mr-3 text-red-500"></i> Kalender Tugas</h2>
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-3">Tampilan Bulan</h3>
+                <div id="calendar" class="w-full h-96">
+                    </div>
+            </div>
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold mb-3">Deadline Minggu Ini</h3>
+                <div id="calendar-deadlines">
+                    </div>
+            </div>
+        </div>
+
+        <div id="notes-page" class="page page-hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><i class="fas fa-clipboard-list mr-3 text-red-500"></i> Catatan Cepat</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-3">Catatan Baru</h3>
+                    <textarea id="quickNoteText" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-200" placeholder="Tulis catatan penting di sini..."></textarea>
+                    <button onclick="saveQuickNote()" class="btn-primary text-white py-2 px-4 rounded-xl font-semibold mt-3 flex items-center">
+                        <i class="fas fa-save mr-2"></i> Simpan Catatan
+                    </button>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-3">Catatan Tersimpan</h3>
+                    <div id="savedNotes" class="space-y-3">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-page" class="page page-hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><i class="fas fa-cogs mr-3 text-red-500"></i> Pengaturan Aplikasi</h2>
+            
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900">Pengaturan Akun</h3>
+                <div class="space-y-3">
+                    <p class="text-gray-700"><span class="font-medium">Username:</span> <span id="settingsUsername">User</span></p>
+                    <button onclick="showChangePasswordModal()" class="text-red-500 hover:text-red-600 font-medium transition duration-200">
+                        <i class="fas fa-key mr-1"></i> Ganti Password
+                    </button>
                 </div>
             </div>
 
-            <!-- Analytics Page -->
-            <div id="analytics-page" class="page page-hidden">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-chart-bar mr-3 text-red-500"></i> Analytics & Laporan
-                </h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Produktivitas 7 Hari Terakhir</h3>
-                        <canvas id="productivityChart" width="400" height="200"></canvas>
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900">Pengaturan Notifikasi</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 border rounded-lg">
+                        <p class="font-medium text-gray-700">Notifikasi Browser/PWA</p>
+                        <button onclick="requestNotificationPermission()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-xl text-sm transition duration-200">
+                            Cek/Minta Izin
+                        </button>
                     </div>
-                    
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Distribusi Prioritas</h3>
-                        <canvas id="priorityChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Statistik Cepat</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <span>Total Waktu Kerja</span>
-                                <span class="font-bold text-blue-500" id="totalWorkTime">0 jam</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Efisiensi</span>
-                                <span class="font-bold text-green-500" id="efficiencyRate">0%</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Tugas Terbanyak/Hari</span>
-                                <span class="font-bold text-purple-500" id="peakDayTasks">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-6 lg:col-span-2">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Rekomendasi Produktivitas</h3>
-                        <div id="productivityTips" class="space-y-3">
-                            <!-- Tips will be dynamically added -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page -->
-            <div id="settings-page" class="page page-hidden">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-cogs mr-3 text-red-500"></i> Pengaturan Aplikasi
-                </h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Account Settings -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-900 flex items-center">
-                            <i class="fas fa-user-circle mr-2 text-red-500"></i> Pengaturan Akun
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                                <div>
-                                    <p class="font-medium text-gray-700">Username</p>
-                                    <p class="text-sm text-gray-500" id="settingsUsername">user</p>
-                                </div>
-                                <i class="fas fa-user text-gray-400"></i>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                                <div>
-                                    <p class="font-medium text-gray-700">Role</p>
-                                    <p class="text-sm text-gray-500" id="settingsRole">User</p>
-                                </div>
-                                <i class="fas fa-shield-alt text-gray-400"></i>
-                            </div>
-                            
-                            <button onclick="showChangePasswordModal()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition duration-200 flex items-center justify-center space-x-2">
-                                <i class="fas fa-key"></i>
-                                <span>Ganti Password</span>
+                    <div class="p-3 border rounded-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <p class="font-medium text-gray-700">Notifikasi Telegram</p>
+                            <button id="telegramToggle" onclick="toggleTelegramNotifications()" class="bg-gray-500 text-white px-3 py-1 rounded-xl text-sm transition duration-200">
+                                Nonaktif
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Notification Settings -->
-                    <div class="card p-6">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-900 flex items-center">
-                            <i class="fas fa-bell mr-2 text-red-500"></i> Pengaturan Notifikasi
-                        </h3>
-                        <div class="space-y-6">
-                            <!-- Browser Notifications -->
-                            <div class="p-4 border border-gray-200 rounded-xl">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                                    <div class="flex-1">
-                                        <p class="font-medium text-gray-700">Notifikasi Browser</p>
-                                        <p class="text-sm text-gray-500 mb-2">Notifikasi sistem browser/PWA</p>
-                                        <div class="flex items-center space-x-2">
-                                            <span id="browserNotifStatus" class="text-sm font-medium">Memuat status...</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <button id="testNotificationBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition duration-200 flex items-center space-x-2 hidden">
-                                            <i class="fas fa-bell"></i>
-                                            <span>Test</span>
-                                        </button>
-                                        <button onclick="showNotificationPermissionModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl text-sm transition duration-200 flex items-center space-x-2">
-                                            <i class="fas fa-cog"></i>
-                                            <span>Kelola</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Feature List -->
-                                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                    <div class="flex items-center space-x-2 text-gray-600">
-                                        <i class="fas fa-check text-green-500"></i>
-                                        <span>Pengingat deadline otomatis</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2 text-gray-600">
-                                        <i class="fas fa-check text-green-500"></i>
-                                        <span>Bekerja bahkan saat app ditutup</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2 text-gray-600">
-                                        <i class="fas fa-check text-green-500"></i>
-                                        <span>Notifikasi sistem native</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2 text-gray-600">
-                                        <i class="fas fa-check text-green-500"></i>
-                                        <span>Dukungan multi-platform</span>
-                                    </div>
-                                </div>
+                        <form onsubmit="event.preventDefault(); saveTelegramConfig();" class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Telegram Bot Token</label>
+                                <input type="text" id="telegramToken" class="w-full p-2 border rounded-lg" placeholder="Masukkan Bot Token Anda">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Telegram Chat ID</label>
+                                <input type="text" id="telegramChatId" class="w-full p-2 border rounded-lg" placeholder="Masukkan Chat ID Anda">
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" onclick="testTelegramConnection()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-xl text-sm transition duration-200">
+                                    Test Koneksi
+                                </button>
+                                <button type="submit" class="btn-primary text-white px-3 py-1 rounded-xl text-sm">
+                                    Simpan Konfigurasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-                            <!-- Telegram Notifications -->
-                            <div class="p-4 border border-gray-200 rounded-xl">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                                    <div>
-                                        <p class="font-medium text-gray-700">Notifikasi Telegram</p>
-                                        <p class="text-sm text-gray-500">Kirim notifikasi ke Telegram</p>
-                                    </div>
-                                    <button id="telegramToggle" onclick="toggleTelegramNotifications()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-sm transition duration-200">
-                                        Nonaktif
-                                    </button>
-                                </div>
-                                
-                                <form onsubmit="event.preventDefault(); saveTelegramConfig();" class="space-y-3">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Telegram Bot Token</label>
-                                        <input type="password" id="telegramToken" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Masukkan Bot Token Anda">
-                                        <p class="text-xs text-gray-500 mt-1">Dapatkan dari @BotFather di Telegram</p>
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900">Manajemen Data</h3>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="exportData()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 flex items-center">
+                        <i class="fas fa-file-export mr-2"></i> Export Data (JSON)
+                    </button>
+                    <button onclick="showImportModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 flex items-center">
+                        <i class="fas fa-file-import mr-2"></i> Import Data
+                    </button>
+                    <button onclick="showResetDataModal()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-xl font-medium transition duration-200 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Reset Semua Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl animate-bounce-in">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-plus-circle text-red-500 mr-2"></i> Tambah Tugas Baru
+                </h3>
+            </div>
+            
+            <form id="taskForm" class="p-6 space-y-4" onsubmit="addTask(event)">
+                <div>
+                    <label for="taskTitle" class="block text-sm font-medium text-gray-700 mb-1">Judul Tugas</label>
+                    <input type="text" id="taskTitle" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label for="taskDescription" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi (Opsional)</label>
+                    <textarea id="taskDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="taskDeadline" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Deadline</label>
+                        <input type="date" id="taskDeadline" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label for="taskTime" class="block text-sm font-medium text-gray-700 mb-1">Waktu (Opsional)</label>
+                        <input type="time" id="taskTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="taskPriority" class="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
+                        <select id="taskPriority" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                            <option value="high">High</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="notificationTime" class="block text-sm font-medium text-gray-700 mb-1">Waktu Notifikasi (HH:MM)</label>
+                        <input type="time" id="notificationTime" value="07:00" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeAddTaskModal()" class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-lg border border-gray-300 hover:border-gray-400">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i> Simpan Tugas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="changePasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-bounce-in">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-key text-red-500 mr-2"></i> Ganti Password
+                </h3>
+            </div>
+            
+            <form id="changePasswordForm" class="p-6 space-y-4">
+                <div>
+                    <label for="oldPassword" class="block text-sm font-medium text-gray-700 mb-1">Password Lama</label>
+                    <input type="password" id="oldPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label for="newPasswordDashboard" class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                    <input type="password" id="newPasswordDashboard" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label for="confirmPasswordDashboard" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirmPasswordDashboard" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition duration-200 rounded-lg border border-gray-300 hover:border-gray-400">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-xl font-medium transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i> Simpan Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        const SUPABASE_URL = 'https://vcmoztgdxlovqeizrunx.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbW96dGdkeGxvdnFlaXpydW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDMyOTQsImV4cCI6MjA3NTk3OTI5NH0.0Wg7Xw8dVCILBKNAtAWF6p23KQbYzJDmZbs4B_zk23I';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let tasks = []; // Variabel global untuk menyimpan data tugas
+        
+        // ==================== AUTHENTICATION ====================
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username');
+            if (isLoggedIn !== 'true' || !username) {
+                console.log("Not logged in. Redirecting to login page.");
+                window.location.href = 'index.html';
+                return null;
+            }
+            
+            currentUser = { 
+                username: username, 
+                user_id: localStorage.getItem('user_id') || 'default-user',
+                role: localStorage.getItem('user_role') || 'user'
+            };
+            return currentUser;
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                showNotification('Anda telah logout.', 'info');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'warning': 'bg-yellow-500',
+                'info': 'bg-blue-500'
+            };
+            const icon = {
+                'success': 'fas fa-check-circle',
+                'error': 'fas fa-times-circle',
+                'warning': 'fas fa-exclamation-triangle',
+                'info': 'fas fa-info-circle'
+            };
+
+            const container = document.getElementById('notificationContainer');
+            if (!container) return; 
+
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = `${colors[type]} text-white p-4 rounded-xl shadow-xl transition-all duration-300 transform translate-x-full opacity-0 flex items-center space-x-3`;
+            notificationDiv.style.minWidth = '250px';
+            notificationDiv.innerHTML = `
+                <i class="${icon[type]} text-lg"></i>
+                <span class="font-medium flex-1">${message}</span>
+            `;
+            
+            container.appendChild(notificationDiv);
+
+            // Animate in
+            setTimeout(() => {
+                notificationDiv.classList.remove('translate-x-full', 'opacity-0');
+                notificationDiv.classList.add('translate-x-0', 'opacity-100');
+            }, 10);
+
+            // Animate out and remove
+            setTimeout(() => {
+                notificationDiv.classList.remove('translate-x-0', 'opacity-100');
+                notificationDiv.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    notificationDiv.remove();
+                }, 300);
+            }, 5000);
+        }
+        
+        // ==================== NOTIFICATION SYSTEM (PWA/BROWSER) ====================
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                showNotification("Browser tidak mendukung Notifikasi Sistem.", 'warning');
+                return;
+            }
+
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        showNotification('Notifikasi browser diizinkan! Anda akan menerima notifikasi sistem.', 'success');
+                    } else {
+                        showNotification('Notifikasi browser ditolak saat ini.', 'warning');
+                    }
+                });
+            } else if (Notification.permission === 'granted') {
+                 showNotification('Notifikasi sudah diizinkan.', 'info');
+            } else if (Notification.permission === 'denied') {
+                showNotification('Notifikasi browser diblokir permanen oleh Anda. Silakan ubah di pengaturan situs (ikon gembok) secara manual.', 'error');
+            }
+        }
+
+        function showSystemNotification(title, body, tag = null) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const options = {
+                    body: body,
+                    icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4da.svg', // Icon PWA Anda
+                    vibrate: [200, 100, 200],
+                    tag: tag // Tag untuk mencegah duplikasi notifikasi yang sama
+                };
+
+                // Prioritaskan menggunakan Service Worker untuk PWA
+                if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(title, options);
+                    });
+                } else {
+                    // Fallback: Tampilkan notifikasi langsung
+                    new Notification(title, options);
+                }
+            }
+        }
+
+        /**
+         * FUNGSI KRITIS: Memeriksa dan mengirim notifikasi untuk tugas yang jatuh tempo
+         * Diperbaiki untuk memiliki jendela waktu 1 jam.
+         */
+        function checkPendingNotifications() {
+            const now = new Date();
+            
+            if (!tasks || tasks.length === 0) return;
+
+            const sentNotifications = JSON.parse(localStorage.getItem('sentNotifications')) || {};
+            let shouldUpdateLocalStorage = false;
+            const todayDate = now.toISOString().split('T')[0]; // Format 'YYYY-MM-DD'
+
+            tasks.forEach(task => {
+                if (task.status === 'completed') return;
+                
+                // Hanya fokus pada tugas yang deadlinenya HARI INI
+                if (task.deadline !== todayDate) return; 
+
+                // Gabungkan deadline hari ini dan waktu notifikasi
+                const notificationTimeStr = `${task.deadline}T${task.notification_time || '07:00'}:00`;
+                const notificationDateTime = new Date(notificationTimeStr);
+
+                // 1. Cek apakah notifikasi sudah terkirim
+                if (sentNotifications[task.id]) return;
+
+                // 2. Cek apakah waktu notifikasi sudah terlewat
+                if (notificationDateTime <= now) {
+                    
+                    // Jendela waktu pengiriman: 
+                    // Notifikasi dikirim jika sudah terlewat, TAPI tidak lebih dari 1 jam yang lalu.
+                    const ONE_HOUR = 60 * 60 * 1000;
+                    const timeElapsed = now.getTime() - notificationDateTime.getTime();
+                    
+                    if (timeElapsed < ONE_HOUR) {
+                        
+                        const title = `🚨 JATUH TEMPO HARI INI: ${task.title}`;
+                        const deadlineTime = task.time ? ` pukul ${task.time}` : '';
+                        const body = `Tugas ini akan berakhir${deadlineTime}. Jangan lupa selesaikan!`;
+                        
+                        // Kirim Notifikasi In-App
+                        showNotification(title, 'error'); 
+
+                        // Kirim Notifikasi Sistem (PWA/Browser)
+                        showSystemNotification(title, body, `task-${task.id}`);
+
+                        // Tandai sebagai sudah dikirim
+                        sentNotifications[task.id] = true;
+                        shouldUpdateLocalStorage = true;
+                        
+                    } else {
+                         // Tandai sebagai terlewat agar tidak muncul lagi
+                         sentNotifications[task.id] = true;
+                         shouldUpdateLocalStorage = true;
+                    }
+                }
+            });
+
+            if (shouldUpdateLocalStorage) {
+                localStorage.setItem('sentNotifications', JSON.stringify(sentNotifications));
+            }
+        }
+
+        // ==================== PWA INSTALLATION ====================
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (window.matchMedia('(display-mode: standalone)').matches) return;
+            installBtn.style.display = 'flex'; 
+        });
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+
+        // ==================== PASSWORD MANAGEMENT MOCK ====================
+        function showChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+            document.getElementById('oldPassword').focus();
+        }
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('hidden');
+            document.getElementById('changePasswordForm').reset();
+        }
+        function changePassword(e) {
+            e.preventDefault();
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPasswordDashboard').value;
+            const confirmPassword = document.getElementById('confirmPasswordDashboard').value;
+            
+            const currentPassword = localStorage.getItem('user_password_mock') || '2509';
+            
+            if (oldPassword !== currentPassword) {
+                showNotification('Password lama salah!', 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showNotification('Konfirmasi password tidak cocok!', 'error');
+                return;
+            }
+            if (newPassword.length < 4) {
+                showNotification('Password minimal 4 karakter!', 'error');
+                return;
+            }
+
+            localStorage.setItem('user_password_mock', newPassword); 
+            
+            showNotification('✅ Password berhasil diganti! Silakan login ulang.', 'success');
+            closeChangePasswordModal();
+            // logout(); // Hapus logout agar pengguna bisa langsung mencoba login ulang
+        }
+
+        // ==================== PAGE NAVIGATION & MOCK FUNCTIONS ====================
+        function showPage(pageName) {
+            const pages = ['dashboard', 'calendar', 'notes', 'settings'];
+            pages.forEach(p => {
+                document.getElementById(`${p}-page`).classList.add('page-hidden');
+            });
+            document.getElementById(`${pageName}-page`).classList.remove('page-hidden');
+            
+            document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('nav-active'));
+            const activeLinks = document.querySelectorAll(`[onclick*="showPage('${pageName}')"]`);
+            activeLinks.forEach(link => {
+                let parent = link.closest('a');
+                if (parent) parent.classList.add('nav-active');
+            });
+
+            if (pageName === 'calendar') loadCalendar();
+            else if (pageName === 'notes') loadSavedNotes();
+            else if (pageName === 'settings') {
+                document.getElementById('settingsUsername').textContent = currentUser.username;
+                loadTelegramConfigUI();
+            } else if (pageName === 'dashboard') {
+                loadTasks(); // Muat ulang tugas setiap kembali ke dashboard
+            }
+        }
+        function loadCalendar() { document.getElementById('calendar').innerHTML = '<p class="text-gray-500">Kalender ditampilkan di sini (Memerlukan pustaka kalender seperti FullCalendar).</p>'; loadCalendarDeadlines(); }
+        function loadCalendarDeadlines() { document.getElementById('calendar-deadlines').innerHTML = '<p class="text-gray-500">Deadline terdekat: (Mock data)</p><div class="p-3 bg-red-50 rounded-lg text-sm">Tugas TA - 2 hari lagi</div>'; }
+        function loadSavedNotes() { document.getElementById('savedNotes').innerHTML = '<p class="text-gray-500">Catatan disimpan di sini (Mock).</p>'; }
+        function saveQuickNote() { showNotification('Catatan cepat disimpan (Mock).', 'success'); }
+        function loadTelegramConfigUI() {
+            document.getElementById('telegramToken').value = localStorage.getItem('telegramToken') || '';
+            document.getElementById('telegramChatId').value = localStorage.getItem('telegramChatId') || '';
+            const isTelegramActive = localStorage.getItem('telegramActive') === 'true';
+            document.getElementById('telegramToggle').textContent = isTelegramActive ? 'Aktif' : 'Nonaktif';
+            document.getElementById('telegramToggle').classList.toggle('bg-red-500', isTelegramActive);
+            document.getElementById('telegramToggle').classList.toggle('bg-gray-500', !isTelegramActive);
+        }
+        function toggleTelegramNotifications() { let active = localStorage.getItem('telegramActive') === 'true'; active = !active; localStorage.setItem('telegramActive', active); loadTelegramConfigUI(); showNotification(`Notifikasi Telegram ${active ? 'diaktifkan' : 'dinonaktifkan'}.`, 'info'); }
+        function saveTelegramConfig() { localStorage.setItem('telegramToken', document.getElementById('telegramToken').value); localStorage.setItem('telegramChatId', document.getElementById('telegramChatId').value); showNotification('Konfigurasi Telegram disimpan.', 'success'); }
+        function testTelegramConnection() { showNotification('Test koneksi Telegram berhasil (Mock).', 'success'); }
+        function exportData() { showNotification('Data berhasil diexport (Mock).', 'success'); }
+        function showImportModal() { showNotification('Modal Import muncul (Mock).', 'info'); }
+        function showResetDataModal() { showNotification('Modal Reset Data muncul (Mock).', 'error'); }
+        function openAddTaskModal() { document.getElementById('addTaskModal').classList.remove('hidden'); document.getElementById('taskTitle').focus(); }
+        function closeAddTaskModal() { document.getElementById('addTaskModal').classList.add('hidden'); document.getElementById('taskForm').reset(); }
+        
+        // ==================== TASK LOGIC (MOCK/SIMPLIFIED) ====================
+        async function addTask(e) {
+            e.preventDefault();
+            
+            // 🚨 LOGIKA ADD TASK MOCK
+            const newTask = {
+                id: tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1,
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDescription').value,
+                deadline: document.getElementById('taskDeadline').value,
+                time: document.getElementById('taskTime').value,
+                notification_time: document.getElementById('notificationTime').value,
+                priority: document.getElementById('taskPriority').value,
+                status: 'active'
+            };
+
+            tasks.push(newTask);
+            showNotification('Tugas berhasil ditambahkan ke Cloud (Mock).', 'success');
+            closeAddTaskModal();
+            await loadTasks();
+        }
+        
+        async function loadTasks() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('taskList').innerHTML = '';
+
+            // 🚨 MOCK DATA AWAL
+            if (tasks.length === 0) {
+                // Contoh: Atur tugas ini untuk notif 5 menit dari sekarang (jika tanggalnya hari ini)
+                const now = new Date();
+                const todayDate = now.toISOString().split('T')[0];
+                const fiveMinutesLater = new Date(now.getTime() + 5 * 60000);
+                const notifTime = fiveMinutesLater.toTimeString().split(' ')[0].substring(0, 5);
+                
+                tasks = [
+                    { id: 1, title: 'Revisi Tugas Akhir', description: 'Perbaiki bab 2 dan 3.', deadline: todayDate, time: '16:00', notification_time: notifTime, priority: 'high', status: 'active' },
+                    { id: 2, title: 'Mengerjakan Quiz Matematika', description: 'Bab Integral.', deadline: '2025-10-21', time: '15:00', notification_time: '09:05', priority: 'medium', status: 'active' },
+                    { id: 3, title: 'Beli buku baru', description: '', deadline: '2025-10-25', time: '23:59', notification_time: '07:00', priority: 'low', status: 'completed' },
+                ];
+            }
+            // *** AKHIR MOCK ***
+
+            renderTasks();
+            updateDashboardStats(tasks);
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+
+            const priorityFilter = document.getElementById('filterPriority').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            const filteredTasks = tasks.filter(task => {
+                const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+                const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+                return matchesPriority && matchesStatus;
+            });
+
+            if (filteredTasks.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('emptyState').classList.add('hidden');
+
+            filteredTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+            filteredTasks.forEach(task => {
+                const card = createTaskCard(task);
+                taskList.appendChild(card);
+            });
+        }
+        
+        function createTaskCard(task) {
+            const card = document.createElement('div');
+            const priorityClass = `priority-${task.priority}`;
+            const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+            const deadlineDate = new Date(task.deadline).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'});
+            const isCompleted = task.status === 'completed';
+            const statusColor = isCompleted ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+            const statusText = isCompleted ? 'Selesai' : 'Aktif';
+
+            card.className = 'task-card p-5 border-l-4 border-red-500 hover:border-red-600 transition-all duration-300 transform hover:scale-[1.01]';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold text-gray-900 line-clamp-2">${task.title}</h3>
+                    <div class="${priorityClass} text-xs font-medium px-3 py-1 rounded-full ml-3 flex-shrink-0">${priorityLabel}</div>
+                </div>
+                <p class="text-sm text-gray-600 mb-4 line-clamp-3">${task.description || 'Tidak ada deskripsi.'}</p>
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-calendar-alt text-red-500"></i>
+                        <span class="font-medium">${deadlineDate}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-clock text-red-500"></i>
+                        <span class="font-medium">${task.time || 'Sepanjang Hari'}</span>
+                    </div>
+                    <span class="text-xs ${statusColor} px-2 py-1 rounded-full">${statusText}</span>
+                </div>
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button onclick="toggleTaskStatus(${task.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition duration-200">
+                        ${isCompleted ? 'Batal Selesai' : 'Tandai Selesai'}
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function toggleTaskStatus(taskId) {
+            const taskIndex = tasks.findIndex(t => t.id === taskId);
+            if (taskIndex !== -1) {
+                const newStatus = tasks[taskIndex].status === 'completed' ? 'active' : 'completed';
+                tasks[taskIndex].status = newStatus;
+                
+                if (newStatus === 'active') {
+                    const sentNotifications = JSON.parse(localStorage.getItem('sentNotifications')) || {};
+                    delete sentNotifications[taskId];
+                    localStorage.setItem('sentNotifications', JSON.stringify(sentNotifications));
+                }
+                
+                showNotification(`Tugas #${taskId} diubah menjadi ${newStatus}.`, 'info');
+                renderTasks();
+                updateDashboardStats(tasks);
+            }
+        }
+
+        function updateDashboardStats(tasks) {
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = tasks.filter(t => t.deadline === today && t.status === 'active').length;
+            const upcomingTasks = tasks.filter(t => t.deadline > today && t.status === 'active').length;
+            const completedCount = tasks.filter(t => t.status === 'completed').length;
+            const totalActive = todayTasks + upcomingTasks;
+            
+            document.getElementById('todayTasks').textContent = todayTasks;
+            document.getElementById('upcomingTasks').textContent = upcomingTasks;
+            document.getElementById('completedCount').textContent = completedCount;
+
+            const totalTasks = tasks.length;
+            document.getElementById('totalTasks').textContent = totalTasks;
+
+            let progressPercent = 0;
+            if (totalTasks > 0) {
+                progressPercent = Math.round((completedCount / totalTasks) * 100);
+            }
+            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            
+            if (progressPercent === 100 && totalTasks > 0) {
+                document.getElementById('progressText').textContent = 'Semua tugas selesai! Luar Biasa! 🎉';
+            } else if (progressPercent > 0) {
+                document.getElementById('progressText').textContent = `Tinggal ${totalActive} tugas lagi!`;
+            } else {
+                document.getElementById('progressText').textContent = 'Mulai kerjakan tugasmu!';
+            }
+        }
+
+        function updateLastSync() {
+            document.getElementById('lastSync').textContent = new Date().toLocaleTimeString('id-ID');
+            document.getElementById('cloudStatus').textContent = 'Terkoneksi';
+            document.getElementById('cloudStatus').className = 'text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full';
+        }
+        
+        // ==================== DASHBOARD INITIALIZATION ====================
+        async function initDashboard() {
+            const auth = checkAuth();
+            if (!auth) return;
+
+            requestNotificationPermission();
+
+            const displayName = localStorage.getItem('user_name') || auth.username;
+            document.getElementById('welcomeName').textContent = displayName;
+            document.getElementById('sidebarUsername').textContent = displayName;
+            document.getElementById('sidebarUserInitial').textContent = displayName.charAt(0).toUpperCase();
+
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            const motivationMessages = [
+                { text: 'Semangat menyelesaikan tugas hari ini! 🚀', sub: 'Data tersimpan otomatis di cloud! ☁️' },
+                { text: 'Selesaikan yang tersulit dulu! 💪', sub: 'Kunci sukses adalah konsistensi.' },
+                { text: 'Jangan tunda pekerjaanmu! 💡', sub: 'Selesaikan sekarang, santai kemudian.' }
+            ];
+            const randomMsg = motivationMessages[Math.floor(Math.random() * motivationMessages.length)];
+            document.getElementById('motivationText').textContent = randomMsg.text;
+            document.getElementById('motivationSubtext').textContent = randomMsg.sub;
+
+            await loadTasks(); 
+            
+            updateLastSync(); 
+            
+            // Jadwalkan pengecekan notifikasi dan sinkronisasi
+            setInterval(updateLastSync, 30000); 
+            setInterval(checkPendingNotifications, 60000); // Cek notif setiap 1 menit
+        }
+
+        // Event Listeners
+        document.getElementById('filterPriority').addEventListener('change', renderTasks);
+        document.getElementById('filterStatus').addEventListener('change', renderTasks);
+        document.getElementById('addTaskModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddTaskModal();
+        });
+        document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) closeChangePasswordModal();
+        });
+        
+        document.getElementById('changePasswordForm').addEventListener('submit', changePassword);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initDashboard);
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('dashboard');
+        });
+    </script>
+</body>
+</html>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Telegram Chat ID</label>
@@ -1833,3 +2000,4 @@
     </script>
 </body>
 </html>
+
